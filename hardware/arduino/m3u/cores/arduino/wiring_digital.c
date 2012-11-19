@@ -72,7 +72,7 @@
          case INPUT_ANALOG:
              outputMode = GPIO_ANALOG;
              break;
-         case PWM:
+         case PWM111:
              outputMode = GPIO_DIGITAL_PP;
              pwm = true;
              break;

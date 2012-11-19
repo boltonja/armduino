@@ -95,13 +95,7 @@
  * \note The functions prototypes can be found in the device exception header
  *       files (exceptions.h).
  */
-// FIXME [silabs]: irq_reg,cpu_irq en/ds marcros, cpu_irq_is_enabled_flags,cpu_irq_restore,cpu_irq_save
-#  define irq_register_handler(...) ()
 
-// FIXME [silabs]:
-typedef enum IRQn_Type {
-    unused_enum
-}IRQn_Type;
 //@}
 
 #  define cpu_irq_enable() ()

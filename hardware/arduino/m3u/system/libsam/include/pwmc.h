@@ -64,8 +64,7 @@
 #include "../chip.h"
 
 #include <stdint.h>
-// FIXME [silabs]:
-typedef void Pwm;
+
 #ifdef __cplusplus
  extern "C" {
 #endif

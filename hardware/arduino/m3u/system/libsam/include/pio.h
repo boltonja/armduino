@@ -35,8 +35,7 @@
  */
 
 #include "../chip.h"
-// FIXME [silabs]:
-typedef void Pio;
+
 #include <stdint.h>
 
 /*

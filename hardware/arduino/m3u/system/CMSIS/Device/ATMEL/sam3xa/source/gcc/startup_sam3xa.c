@@ -264,14 +264,6 @@ void Reset_Handler(void)
 		*pDest++ = 0;
 	}
 
-	/* Set the vector table base address */
-	pSrc = (uint32_t *) & _sfixed;
-	SCB->VTOR = ((uint32_t) pSrc & SCB_VTOR_TBLOFF_Msk);
-
-	if (((uint32_t) pSrc >= IRAM0_ADDR) && ((uint32_t) pSrc < NFC_RAM_ADDR)) {
-		SCB->VTOR |= (1UL) << SCB_VTOR_TBLBASE_Pos;
-	}
-
 	/* Initialize the C library */
 
 	// Arduino: we must setup hardware before doing this

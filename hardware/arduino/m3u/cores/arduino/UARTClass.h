@@ -21,8 +21,7 @@
 
 #include "HardwareSerial.h"
 #include "RingBuffer.h"
-// FIXME [silabs]:
-typedef void Uart;
+
 // Includes Atmel CMSIS
 #include <chip.h>
 

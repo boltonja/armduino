@@ -78,7 +78,7 @@ typedef enum WiringPinMode {
 
     INPUT_FLOATING, /**< Synonym for INPUT. */
 
-    PWM, /**< This is a special mode for when the pin will be used for
+    PWM111, /**< This is a special mode for when the pin will be used for
             PWM output (a special case of digital output). */
 
     PWM_OPEN_DRAIN, /**< Like PWM, except that instead of alternating

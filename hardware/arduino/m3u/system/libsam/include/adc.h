@@ -31,8 +31,7 @@
 #define ADC_H_INCLUDED
 
 #include "../chip.h"
-// FIXME [silabs]:
-typedef void Adc;
+
 /// @cond 0
 /**INDENT-OFF**/
 #ifdef __cplusplus

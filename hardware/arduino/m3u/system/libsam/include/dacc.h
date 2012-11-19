@@ -31,8 +31,7 @@
 #define DACC_H_INCLUDED
 
 #include "../chip.h"
-// FIXME [silabs]:
-typedef void Dacc;
+
 /// @cond 0
 /**INDENT-OFF**/
 #ifdef __cplusplus
