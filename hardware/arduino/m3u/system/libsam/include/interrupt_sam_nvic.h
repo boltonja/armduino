@@ -95,44 +95,35 @@
  * \note The functions prototypes can be found in the device exception header
  *       files (exceptions.h).
  */
-#  define irq_register_handler(...)                    \
-	do {                                           \
-	} while(0)
+// FIXME [silabs]: irq_reg,cpu_irq en/ds marcros, cpu_irq_is_enabled_flags,cpu_irq_restore,cpu_irq_save
+#  define irq_register_handler(...) ()
 
+// FIXME [silabs]:
+typedef enum IRQn_Type {
+    unused_enum
+}IRQn_Type;
 //@}
 
-#  define cpu_irq_enable()                             \
-	do {                                           \
-		g_interrupt_enabled = 1;            \
-		__DMB();                               \
-		__enable_irq();                        \
-	} while (0)
-#  define cpu_irq_disable()                            \
-	do {                                           \
-		__disable_irq();                       \
-		__DMB();                               \
-		g_interrupt_enabled = 0;           \
-	} while (0)
+#  define cpu_irq_enable() ()
+#  define cpu_irq_disable() ()
 
 typedef uint32_t irqflags_t;
 extern int g_interrupt_enabled;
 
 static inline irqflags_t cpu_irq_save(void)
 {
-	irqflags_t flags = g_interrupt_enabled;
-	cpu_irq_disable();
-	return flags;
+
+	return (irqflags_t)0;
 }
 
 static inline int cpu_irq_is_enabled_flags(irqflags_t flags)
 {
-	return (flags);
+	return 0;
 }
 
 static inline void cpu_irq_restore(irqflags_t flags)
 {
-	if (cpu_irq_is_enabled_flags(flags))
-		cpu_irq_enable();
+    return;
 }
 
 #define cpu_irq_is_enabled()    g_interrupt_enabled

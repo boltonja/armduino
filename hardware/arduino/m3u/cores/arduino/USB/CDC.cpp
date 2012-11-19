@@ -93,54 +93,16 @@ _Pragma("pack()")
 
 int WEAK CDC_GetInterface(uint8_t* interfaceNum)
 {
-	interfaceNum[0] += 2;	// uses 2
-	return USBD_SendControl(0,&_cdcInterface,sizeof(_cdcInterface));
+	return 0;
 }
 
 int WEAK CDC_GetOtherInterface(uint8_t* interfaceNum)
 {
-	interfaceNum[0] += 2;	// uses 2
-	return USBD_SendControl(0,&_cdcOtherInterface,sizeof(_cdcOtherInterface));
+	return 0;
 }
 
 bool WEAK CDC_Setup(Setup& setup)
 {
-	uint8_t r = setup.bRequest;
-	uint8_t requestType = setup.bmRequestType;
-
-	if (REQUEST_DEVICETOHOST_CLASS_INTERFACE == requestType)
-	{
-		if (CDC_GET_LINE_CODING == r)
-		{
-			USBD_SendControl(0,(void*)&_usbLineInfo,7);
-			return true;
-		}
-	}
-
-	if (REQUEST_HOSTTODEVICE_CLASS_INTERFACE == requestType)
-	{
-		if (CDC_SET_LINE_CODING == r)
-		{
-			USBD_RecvControl((void*)&_usbLineInfo,7);
-			return true;
-		}
-
-		if (CDC_SET_CONTROL_LINE_STATE == r)
-		{
-			_usbLineInfo.lineState = setup.wValueL;
-			// auto-reset into the bootloader is triggered when the port, already
-			// open at 1200 bps, is closed.
-			if (1200 == _usbLineInfo.dwDTERate)
-			{
-				// We check DTR state to determine if host port is open (bit 0 of lineState).
-				if ((_usbLineInfo.lineState & 0x01) == 0)
-					initiateReset(250);
-				else
-					cancelReset();
-			}
-			return true;
-		}
-	}
 	return false;
 }
 

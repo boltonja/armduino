@@ -18,270 +18,297 @@
 
 #include "variant.h"
 
-/*
- * DUE Board pin   |  PORT  | Label
- * ----------------+--------+-------
- *   0             |  PA8   | "RX0"
- *   1             |  PA9   | "TX0"
- *   2       TIOA0 |  PB25  |
- *   3       TIOA7 |  PC28  |
- *   4       NPCS1 |  PA29  |
- *           TIOB6 |  PC26  |
- *   5       TIOA6 |  PC25  |
- *   6       PWML7 |  PC24  |
- *   7       PWML6 |  PC23  |
- *   8       PWML5 |  PC22  |
- *   9       PWML4 |  PC21  |
- *  10       NPCS0 |  PA28  |
- *           TIOB7 |  PC29  |
- *  11       TIOA8 |  PD7   |
- *  12       TIOB8 |  PD8   |
- *  13       TIOB0 |  PB27  | LED AMBER "L"
- *  14       TXD3  |  PD4   | "TX3"
- *  15       RXD3  |  PD5   | "RX3"
- *  16       TXD1  |  PA13  | "TX2"
- *  17       RXD1  |  PA12  | "RX2"
- *  18       TXD0  |  PA11  | "TX1"
- *  19       RXD0  |  PA10  | "RX1"
- *  20             |  PB12  | "SDA"
- *  21             |  PB13  | "SCL"
- *  22             |  PB26  |
- *  23             |  PA14  |
- *  24             |  PA15  |
- *  25             |  PD0   |
- *  26             |  PD1   |
- *  27             |  PD2   |
- *  28             |  PD3   |
- *  29             |  PD6   |
- *  30             |  PD9   |
- *  31             |  PA7   |
- *  32             |  PD10  |
- *  33             |  PC1   |
- *  34             |  PC2   |
- *  35             |  PC3   |
- *  36             |  PC4   |
- *  37             |  PC5   |
- *  38             |  PC6   |
- *  39             |  PC7   |
- *  40             |  PC8   |
- *  41             |  PC9   |
- *  42             |  PA19  |
- *  43             |  PA20  |
- *  44             |  PC19  |
- *  45             |  PC18  |
- *  46             |  PC17  |
- *  47             |  PC16  |
- *  48             |  PC15  |
- *  49             |  PC14  |
- *  50             |  PC13  |
- *  51             |  PC12  |
- *  52       NPCS2 |  PB21  |
- *  53             |  PB14  |
- *  54             |  PA16  | "A0"
- *  55             |  PA24  | "A1"
- *  56             |  PA23  | "A2"
- *  57             |  PA22  | "A3"
- *  58       TIOB2 |  PA6   | "A4"
- *  69             |  PA4   | "A5"
- *  60       TIOB1 |  PA3   | "A6"
- *  61       TIOA1 |  PA2   | "A7"
- *  62             |  PB17  | "A8"
- *  63             |  PB18  | "A9"
- *  64             |  PB19  | "A10"
- *  65             |  PB20  | "A11"
- *  66             |  PB15  | "DAC0"
- *  67             |  PB16  | "DAC1"
- *  68             |  PA1   | "CANRX"
- *  69             |  PA0   | "CANTX"
- *  70             |  PA17  | "SDA1"
- *  71             |  PA18  | "SCL1"
- *  72             |  PC30  | LED AMBER "RX"
- *  73             |  PA21  | LED AMBER "TX"
- *  74       MISO  |  PA25  |
- *  75       MOSI  |  PA26  |
- *  76       SCLK  |  PA27  |
- *  77       NPCS0 |  PA28  |
- *  78       NPCS3 |  PB23  | unconnected!
- *
- * USB pin         |  PORT
- * ----------------+--------
- *  ID             |  PB11
- *  VBOF           |  PB10
- *
- */
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-/*
- * Pins descriptions
- */
-extern const PinDescription g_APinDescription[]=
+#define PMAP_ROW(gpio_dev, gpio_bit, timer_dev, timer_ch, adc_dev, adc_ch, exti_trg) \
+    { gpio_dev, timer_dev, adc_dev, gpio_bit, timer_ch, adc_ch, exti_trg}
+
+#define TIMER1 0
+#define TIMER2 0
+#define TIMER3 0
+#define TIMER4 0
+#define TIMER5 0
+#define ADC1 0
+#define ADC2 0
+#define ADC3 0
+
+#define PIN_ROW_D30_NOT_SHORTED PMAP_ROW(GPIOE,   5, TIMER1,  6,  NULL,  ADCx,   0),
+#define PIN_ROW_D30_SHORTED
+#if defined(PIN_D30_SHORTED)
+#define PIN_ROW_D30_SHORTED PMAP_ROW(GPIOE,   5, TIMER1,  6,  NULL,  ADCx,   0),
+#define PIN_ROW_D30_NOT_SHORTED
+#define D30 D3
+#endif
+
+#define PIN_ROW_D31_NOT_SHORTED PMAP_ROW(GPIOE,   4, TIMER1,  5,  NULL,  ADCx,   0),
+#define PIN_ROW_D31_SHORTED
+#if defined(PIN_D31_SHORTED)
+#define PIN_ROW_D31_SHORTED PMAP_ROW(GPIOE,   4, TIMER1,  5,  NULL,  ADCx,   0),
+#define PIN_ROW_D31_NOT_SHORTED
+#define D31 D5
+#endif
+
+#define PIN_ROW_D32_NOT_SHORTED PMAP_ROW(GPIOE,   3, TIMER1,  4,  NULL,  ADCx,   0),
+#define PIN_ROW_D32_SHORTED
+#if defined(PIN_D32_SHORTED)
+#define PIN_ROW_D32_SHORTED PMAP_ROW(GPIOE,   3, TIMER1,  4,  NULL,  ADCx,   0),
+#define PIN_ROW_D32_NOT_SHORTED
+#define D32 D6
+#endif
+
+#define PIN_ROW_D33_NOT_SHORTED PMAP_ROW(GPIOE,   2, TIMER1,  3,  NULL,  ADCx,   0),
+#define PIN_ROW_D33_SHORTED
+#if defined(PIN_D33_SHORTED)
+#define PIN_ROW_D33_SHORTED PMAP_ROW(GPIOE,   2, TIMER1,  3,  NULL,  ADCx,   0),
+#define PIN_ROW_D33_NOT_SHORTED
+#define D33 D9
+#endif
+
+#define PIN_ROW_D34_NOT_SHORTED PMAP_ROW(GPIOE,   1, TIMER1,  2,  NULL,  ADCx,   0),
+#define PIN_ROW_D34_SHORTED
+#if defined(PIN_D34_SHORTED)
+#define PIN_ROW_D34_SHORTED PMAP_ROW(GPIOE,   1, TIMER1,  2,  NULL,  ADCx,   0),
+#define PIN_ROW_D34_NOT_SHORTED
+#define D34 D10
+#endif
+
+#define PIN_ROW_D35_NOT_SHORTED PMAP_ROW(GPIOE,   0, TIMER1,  1,  NULL,  ADCx,   0),
+#define PIN_ROW_D35_SHORTED
+#if defined(PIN_D35_SHORTED)
+#define PIN_ROW_D35_SHORTED PMAP_ROW(GPIOE,   0, TIMER1,  1,  NULL,  ADCx,   0),
+#define PIN_ROW_D35_NOT_SHORTED
+#define D35 D11
+#endif
+
+// Pin map: this lets the basic I/O functions (digitalWrite(),
+// analogRead(), pwmWrite()) translate from pin numbers to STM32
+// peripherals.
+//
+// PMAP_ROW() lets us specify a row (really a struct stm32_pin_info)
+// in the pin map. Its arguments are:
+//
+// - GPIO:    Port Bank (PB) and PB pin number
+// - Timer:   Timer device and timer channel, Null/0 if none
+// - ADC:     ADC device and ADC channel, Null/ADCx if none
+// - EXTI:    External Interrupt (EXTI) trigger number, 0 if none
+//
+// Sections:
+//      1) Digital
+//      2) Analog
+// Comments:
+//      Function: Arduino compatible function (non compatible ones not listed).
+//      Periph:  Default SiM3U1 peripheral used.
+//      Shorted:
+//      Alternate: Supported alternate SiM3U1 peripheral.
+extern const stm32_pin_info PIN_MAP[BOARD_NR_GPIO_PINS] = {
+    /*       GPIO     -    Timer  -   ADC    -    EXTI      Pin        Function      Periph     Shorted Alternate */
+
+    PMAP_ROW(GPIOD,   5,   NULL,  0,  NULL,  ADCx,  11), /* D0/PD5     UART_RX       UART1_RX           I2C0_SCL   */
+    PMAP_ROW(GPIOD,   4,   NULL,  0,  NULL,  ADCx,  10), /* D1/PD4     UART_TX       UART1_TX           I2C0_SDA   */
+    PMAP_ROW(GPIOD,   7,   NULL,  0,  NULL,  ADCx,  13), /* D2/PD7     EXT_INT       INT0.12            I2S_RS_SCK */
+    PMAP_ROW(GPIOD,   6,   NULL,  0,  NULL,  ADCx,  12), /* D3/PD6     EXT_INT(PWM)  INT0.11    D30     I2S_RX_WS  */
+    PMAP_ROW(GPIOC,   9,   NULL,  0,  NULL,  ADCx,   0), /* D4/PC9                   SPI1_NSS                      */
+    PMAP_ROW(GPIOD,   8,   NULL,  0,  NULL,  ADCx,  14), /* D5/PD8     (PWM)                    D31                */
+    PMAP_ROW(GPIOD,   9,   NULL,  0,  NULL,  ADCx,  15), /* D6/PD9     (PWM)                    D32                */
+    PMAP_ROW(GPIOC,  10,   NULL,  0,  NULL,  ADCx,  16), /* D7/PC10                                                */
+    PMAP_ROW(GPIOD,  10,   NULL,  0,  NULL,  ADCx,   0), /* D8/PD10                  I2C1_SDA                      */
+    PMAP_ROW(GPIOD,  11,   NULL,  0,  NULL,  ADCx,   0), /* D9/PD11    (PWM)                    D33                */
+    PMAP_ROW(GPIOD,   3,   NULL,  0,  NULL,  ADCx,   0), /* D10/PD3    SPI_SS(PWM)   SPI2_NSS   D34                */
+    PMAP_ROW(GPIOD,   2,   NULL,  0,  NULL,  ADCx,   0), /* D11/PD2    SPI_MOSI(PWM) SPI2_MOSI  D35                */
+    PMAP_ROW(GPIOD,   1,   NULL,  0,  NULL,  ADCx,   0), /* D12/PD1    SPI_MISO      SPI2_MISO                     */
+    PMAP_ROW(GPIOD,   0,   NULL,  0,  NULL,  ADCx,   0), /* D13/PD0    SPI_SCK/LED   SPI2_SCK                      */
+    PMAP_ROW(GPIOA,   0,   NULL,  0,  ADC1,     0,   0), /* D14/PA0    UART_TX       USART0_TX          ADC0.0     */
+    PMAP_ROW(GPIOA,   1,   NULL,  0,  ADC1,     1,   0), /* D15/PA1    UART_RX       USART0_RX          ADC0.1     */
+    PMAP_ROW(GPIOA,   2,   NULL,  0,  ADC1,     2,   0), /* D16/PA2    UART_TX       SPI0_SCK           ADC0.2     */
+    PMAP_ROW(GPIOA,   3,   NULL,  0,  ADC1,     3,   0), /* D17/PA3    UART_RX       SPI0_MISO          ADC0.3     */
+    PMAP_ROW(GPIOA,   4,   NULL,  0,  ADC1,     4,   0), /* D18/PA4    UART_TX       SPI0_MOSI          ADC0.4     */
+    PMAP_ROW(GPIOA,   5,   NULL,  0,  ADC1,     5,   0), /* D19/PA5    UART_RX       SPI0_NSS           ADC0.5     */
+    PMAP_ROW(GPIOA,   6,   NULL,  0,  NULL,  ADCx,   0), /* D20/PA6    I2C_SDA       USART1_TX                     */
+    PMAP_ROW(GPIOA,   7,   NULL,  0,  ADC1,     6,   0), /* D21/PA7    I2C_SCL       USART1_RX          ADC0.6     */
+    PMAP_ROW(GPIOA,  13, TIMER2,  2,  NULL,  ADCx,   0), /* D22/PA13                 PCA0_CEX1                     */
+    PMAP_ROW(GPIOA,  14, TIMER3,  1,  NULL,  ADCx,   0), /* D23/PA14                 PCA1_CEX0                     */
+    PMAP_ROW(GPIOA,  15, TIMER3,  2,  NULL,  ADCx,  12), /* D24/PA15                 PCA1_CEX1                     */
+    PMAP_ROW(GPIOB,   0,   NULL,  0,  NULL,  ADCx,   0), /* D25/PB0                                                */
+    PMAP_ROW(GPIOB,   2,   NULL,  0,  NULL,  ADCx,   0), /* D26/PB2                                                */
+    PIN_ROW_D30_NOT_SHORTED                              /* D30/PE5    PWM           EPCA_CEX5  D3                 */
+    PIN_ROW_D31_NOT_SHORTED                              /* D31/PE4    PWM           EPCA_CEX4  D5                 */
+    PIN_ROW_D32_NOT_SHORTED                              /* D32/PE3    PWM           EPCA_CEX3  D6                 */
+    PIN_ROW_D33_NOT_SHORTED                              /* D33/PE2    PWM           EPCA_CEX2  D9                 */
+    PIN_ROW_D34_NOT_SHORTED                              /* D34/PE1    PWM           EPCA_CEX1  D10                */
+    PIN_ROW_D35_NOT_SHORTED                              /* D35/PE0    PWM           EPCA_CEX0  D11                */
+    PMAP_ROW(GPIOC,   0,   NULL,  0,  ADC2,     2,   1), /* D36/PC0                                                */
+    PMAP_ROW(GPIOC,   1,   NULL,  0,  ADC2,     1,   2), /* D37/PC1                                                */
+    PMAP_ROW(GPIOC,   2,   NULL,  0,  ADC2,     0,   3), /* D38/PC2                                                */
+    PMAP_ROW(GPIOC,   3,   NULL,  0,  NULL,  ADCx,   4), /* D39/PC3                                                */
+    PMAP_ROW(GPIOC,   4,   NULL,  0,  NULL,  ADCx,   5), /* D40/PC4                                                */
+    PMAP_ROW(GPIOC,   5,   NULL,  0,  NULL,  ADCx,   6), /* D41/PC5                                                */
+    PMAP_ROW(GPIOC,   6,   NULL,  0,  NULL,  ADCx,   7), /* D42/PC6    SPI_SCK      SPI1_SCK                       */
+    PMAP_ROW(GPIOC,   7,   NULL,  0,  NULL,  ADCx,   8), /* D45/PC7    SPI_MISO     SPI1_MISO                      */
+    PMAP_ROW(GPIOC,   8,   NULL,  0,  NULL,  ADCx,   0), /* D46/PC8    SPI_MOSI     SPI1_MOSI                      */
+    PMAP_ROW(GPIOC,  11,   NULL,  0,  NULL,  ADCx,   0), /* D49/PC11                                               */
+    PMAP_ROW(GPIOC,  12,   NULL,  0,  NULL,  ADCx,   0), /* D50/PC12                                               */
+    PMAP_ROW(GPIOC,  13,   NULL,  0,  NULL,  ADCx,   0), /* D51/PC13                                               */
+    PMAP_ROW(GPIOC,  14,   NULL,  0,  NULL,  ADCx,   0), /* D52/PC14                                               */
+
+    PMAP_ROW(GPIOA,   8,   NULL,  0,  ADC1,     7,   0), /* A0/PA8     ADC0          ADC0.7                        */
+    PMAP_ROW(GPIOA,  11, TIMER2,  1,  ADC1,     9,   0), /* A1/PA11    ADC1          ADC0.9             PCA0_CEX0  */
+    PMAP_ROW(GPIOB,   1,   NULL,  0,  ADC1,    11,   0), /* A2/PB1     ADC2          ADC0.11                       */
+    PMAP_ROW(GPIOB,   3,   NULL,  0,  ADC1,    12,   0), /* A3/PB3     ADC3          ADC0.12                       */
+    PMAP_ROW(GPIOB,   4,   NULL,  0,  ADC1,    13,   0), /* A4/PB4     ADC4/SDA      ADC0.13            I2C0_SDA   */
+    PMAP_ROW(GPIOB,   5,   NULL,  0,  ADC1,    14,   0), /* A5/PB5     ADC5/SCL      ADC0.14            I2C0_SCL   */
+    PMAP_ROW(GPIOB,   6,   NULL,  0,  ADC1,    15,   0), /* A6/PB6     ADC6          ADC0.15                       */
+    PMAP_ROW(GPIOB,   7,   NULL,  0,  ADC2,    11,   0), /* A7/PB7     ADC7          ADC1.11                       */
+    PMAP_ROW(GPIOB,   8, TIMER4,  1,  ADC2,    10,   0), /* A8/PB8     ADC8          ADC1.10            TIMER0_CT  */
+    PMAP_ROW(GPIOB,   9, TIMER4,  2,  ADC2,     9,   0), /* A9/PB9     ADC9          ADC1.9             TIMER0_EX  */
+    PMAP_ROW(GPIOB,  10, TIMER5,  1,  ADC2,     8,   0), /* A10/PB10   ADC10         ADC1.8             TIMER1_CT  */
+    PMAP_ROW(GPIOB,  11, TIMER5,  2,  ADC2,     7,   0), /* A11/PB11   ADC11         ADC1.7             TIMER1_EX  */
+    PMAP_ROW(GPIOB,  12,   NULL,  0,  ADC2,     6,   0), /* A12/PB12   ADC12         ADC1.6             UART0_TX   */
+    PMAP_ROW(GPIOB,  13,   NULL,  0,  ADC2,     5,   0), /* A13/PB13   ADC13         ADC1.5             UART0_RX   */
+    PMAP_ROW(GPIOB,  14,   NULL,  0,  ADC2,     4,   0), /* A14/PB14   ADC14         ADC1.4                        */
+    PMAP_ROW(GPIOB,  15,   NULL,  0,  ADC2,     3,   0), /* A15/PB15   ADC15         ADC1.3                        */
+    PMAP_ROW(GPIOA,  12,   NULL,  0,  NULL,  ADCx,   0), /* AREF/PA12  AREF          VREF                          */
+};
+
+// Array of pins you can use for pwmWrite(). Keep it in Flash because
+// it doesn't change, and so we don't waste RAM.
+extern const uint8_t boardPWMPins[] = {
+    D30, D31, D32, D33, D34, D35, A1, D22, D23, D24, A9, A11
+};
+
+// Array of pins you can use for analogRead().
+extern const uint8_t boardADCPins[] = {
+    A0, A2, A3, A4, A5, A6, A7, A12, A13, A14, A15
+};
+
+// Array of pins that the board uses for something special. Other than
+// the button and the LED, it's usually best to leave these pins alone
+// unless you know what you're doing.
+extern const uint8_t boardUsedPins[] = {
+
+};
+
+
+#define PIN_TO_PB_MASK(pin)                                 (pin == 0xff || pin == 0xfe ? 0 : PIN_MAP[pin].gpio_device == GPIOA || PIN_MAP[pin].gpio_device == GPIOC ? \
+                                                                (uint32_t)1 << PIN_MAP[pin].gpio_bit : (uint32_t)1 << (PIN_MAP[pin].gpio_bit + 16))
+#define PIN_TO_PB_MASK2(pin1, pin2)                         (PIN_TO_PB_MASK(pin1) | PIN_TO_PB_MASK(pin2))
+#define PIN_TO_PB_MASK3(pin1, pin2, pin3)                   (PIN_TO_PB_MASK(pin1) | PIN_TO_PB_MASK2(pin2, pin3))
+#define PIN_TO_PB_MASK4(pin1, pin2, pin3, pin4)             (PIN_TO_PB_MASK(pin1) | PIN_TO_PB_MASK3(pin2, pin3, pin4))
+#define PIN_TO_PB_MASK5(pin1, pin2, pin3, pin4, pin5)       (PIN_TO_PB_MASK(pin1) | PIN_TO_PB_MASK4(pin2, pin3, pin4, pin5))
+#define PIN_TO_PB_MASK6(pin1, pin2, pin3, pin4, pin5, pin6) (PIN_TO_PB_MASK(pin1) | PIN_TO_PB_MASK5(pin2, pin3, pin4, pin5, pin6))
+#define XBAR_NUM(pin, xlow_offset) (pin == 0xff ? XBAR_NUM_NULL : pin == 0xfe ? XBAR_NUM_GPIOE : \
+                        PIN_MAP[pin].gpio_device == GPIOC || PIN_MAP[pin].gpio_device == GPIOD ? XBAR_NUM_1 : \
+                                xlow_offset + XBAR_NUM_0L)
+#define XBAR_ROW(array, xbar_num) {(sizeof(array) / sizeof(si_xbar_info)), xbar_num, (si_xbar_info *) &array}
+static const si_xbar_info xbar_usart1[] = {XBAR_UART0_ROW(PIN_TO_PB_MASK2(BOARD_USART1_TX_PIN, BOARD_USART1_RX_PIN), XBAR_NUM(BOARD_USART1_TX_PIN, 1))};
+static const si_xbar_info xbar_usart2[] = {XBAR_UART1_ROW(PIN_TO_PB_MASK2(BOARD_USART2_TX_PIN, BOARD_USART2_RX_PIN), XBAR_NUM(BOARD_USART2_TX_PIN, 1))};
+static const si_xbar_info xbar_usart3[] = {XBAR_USART0_ROW(PIN_TO_PB_MASK2(BOARD_USART3_TX_PIN, BOARD_USART3_RX_PIN), XBAR_NUM(BOARD_USART3_TX_PIN, 0))};
+static const si_xbar_info xbar_usart4[] = {XBAR_USART1_ROW(PIN_TO_PB_MASK2(BOARD_USART4_TX_PIN, BOARD_USART4_RX_PIN), XBAR_NUM(BOARD_USART4_TX_PIN, 0))};
+static const si_xbar_info xbar_spi1[] = {XBAR_SPI0_ROW(PIN_TO_PB_MASK3(BOARD_SPI1_SCK_PIN, BOARD_SPI1_MISO_PIN, BOARD_SPI1_MOSI_PIN), XBAR_NUM(BOARD_SPI1_MISO_PIN, 0)),
+                                        XBAR_SPI0NSS_ROW(PIN_TO_PB_MASK(BOARD_SPI1_NSS_PIN), XBAR_NUM(BOARD_SPI1_NSS_PIN, 0))};
+static const si_xbar_info xbar_spi2[] = {XBAR_SPI1_ROW(PIN_TO_PB_MASK3(BOARD_SPI2_SCK_PIN, BOARD_SPI2_MISO_PIN, BOARD_SPI2_MOSI_PIN), XBAR_NUM(BOARD_SPI2_MISO_PIN, 1)),
+                                        XBAR_SPI1NSS_ROW(PIN_TO_PB_MASK(BOARD_SPI2_NSS_PIN), XBAR_NUM(BOARD_SPI2_NSS_PIN, 1))};
+static const si_xbar_info xbar_spi3[] = {XBAR_SPI2_ROW(PIN_TO_PB_MASK3(BOARD_SPI3_SCK_PIN, BOARD_SPI3_MISO_PIN, BOARD_SPI3_MOSI_PIN), XBAR_NUM(BOARD_SPI3_MISO_PIN, 1)),
+                                        XBAR_SPI2NSS_ROW(PIN_TO_PB_MASK(BOARD_SPI3_NSS_PIN), XBAR_NUM(BOARD_SPI3_NSS_PIN, 1))};
+static const si_xbar_info xbar_timer1[] = {XBAR_EPCA0_ROW(PIN_TO_PB_MASK6(BOARD_TIMER1C1_PIN, BOARD_TIMER1C2_PIN, BOARD_TIMER1C3_PIN, BOARD_TIMER1C4_PIN, BOARD_TIMER1C5_PIN, BOARD_TIMER1C6_PIN), XBAR_NUM(BOARD_USART1_TX_PIN, 0))};
+static const si_xbar_info xbar_timer2[] = {XBAR_PCA0_ROW(PIN_TO_PB_MASK2(BOARD_TIMER2C1_PIN, BOARD_TIMER2C2_PIN), XBAR_NUM(BOARD_TIMER2C1_PIN, 0))};
+static const si_xbar_info xbar_timer3[] = {XBAR_PCA1_ROW(PIN_TO_PB_MASK2(BOARD_TIMER3C1_PIN, BOARD_TIMER3C2_PIN), XBAR_NUM(BOARD_TIMER3C1_PIN, 0))};
+static const si_xbar_info xbar_timer4[] = {XBAR_TIMER0CT_ROW(PIN_TO_PB_MASK(BOARD_TIMER4CX_PIN), XBAR_NUM(BOARD_TIMER4CX_PIN, 0)),
+                                            XBAR_TIMER0EX_ROW(PIN_TO_PB_MASK(BOARD_TIMER4EX_PIN), XBAR_NUM(BOARD_TIMER4EX_PIN, 0))};
+static const si_xbar_info xbar_timer5[] = {XBAR_TIMER1CT_ROW(PIN_TO_PB_MASK(BOARD_TIMER5CX_PIN), XBAR_NUM(BOARD_TIMER5CX_PIN, 0)),
+                                            XBAR_TIMER1EX_ROW(PIN_TO_PB_MASK(BOARD_TIMER5EX_PIN), XBAR_NUM(BOARD_TIMER5EX_PIN, 0))};
+static const si_xbar_info xbar_i2s1[] = {XBAR_I2S0TX_ROW(PIN_TO_PB_MASK3(BOARD_I2S1TX_WS_PIN, BOARD_I2S1TX_SCK_PIN, BOARD_I2S1TX_SD_PIN), XBAR_NUM(BOARD_I2S1TX_WS_PIN, 0)),
+                                         XBAR_I2S0RX_ROW(PIN_TO_PB_MASK3(BOARD_I2S1RX_WS_PIN, BOARD_I2S1RX_SCK_PIN, BOARD_I2S1RX_SD_PIN), XBAR_NUM(BOARD_I2S1RX_WS_PIN, 0))};
+static const si_xbar_info xbar_i2c1[] = {XBAR_I2C0_ROW(PIN_TO_PB_MASK2(BOARD_I2C1_SDA_PIN, BOARD_I2C1_SCL_PIN), XBAR_NUM(BOARD_I2C1_SDA_PIN, 0))};
+static const si_xbar_info xbar_i2c2[] = {XBAR_I2C1_ROW(PIN_TO_PB_MASK2(BOARD_I2C2_SDA_PIN, BOARD_I2C2_SCL_PIN), XBAR_NUM(BOARD_I2C2_SDA_PIN, 0))};
+static const si_xbar_info xbar_ahb_out[] = {XBAR_AHB_OUT_ROW(PIN_TO_PB_MASK(BOARD_AHB_OUT_PIN), XBAR_NUM(BOARD_AHB_OUT_PIN, 1))};
+
+extern const xbar_dev_info XBAR_MAP[XBAR_NULL] = {
+    // USART
+    XBAR_ROW(xbar_usart1, XBAR_NUM(BOARD_USART1_TX_PIN, 1)),
+    XBAR_ROW(xbar_usart2, XBAR_NUM(BOARD_USART2_TX_PIN, 1)),
+    XBAR_ROW(xbar_usart3, XBAR_NUM(BOARD_USART3_TX_PIN, 0)),
+    XBAR_ROW(xbar_usart4, XBAR_NUM(BOARD_USART4_TX_PIN, 0)),
+
+    // SPI
+    XBAR_ROW(xbar_spi1, XBAR_NUM(BOARD_SPI1_MISO_PIN, 0)),
+    XBAR_ROW(xbar_spi2, XBAR_NUM(BOARD_SPI2_MISO_PIN, 1)),
+    XBAR_ROW(xbar_spi3, XBAR_NUM(BOARD_SPI3_MISO_PIN, 1)),
+
+    // Timers
+    XBAR_ROW(xbar_timer1, XBAR_NUM(BOARD_TIMER1C1_PIN, 0)),
+    XBAR_ROW(xbar_timer2, XBAR_NUM(BOARD_TIMER2C1_PIN, 0)),
+    XBAR_ROW(xbar_timer3, XBAR_NUM(BOARD_TIMER3C1_PIN, 0)),
+    XBAR_ROW(xbar_timer4, XBAR_NUM(BOARD_TIMER4CX_PIN, 0)),
+    XBAR_ROW(xbar_timer5, XBAR_NUM(BOARD_TIMER5CX_PIN, 0)),
+
+    // I2S
+    XBAR_ROW(xbar_i2s1, XBAR_NUM(BOARD_I2S1TX_WS_PIN, 0)),
+
+    // I2C
+    XBAR_ROW(xbar_i2c1, XBAR_NUM(BOARD_I2C1_SDA_PIN, 0)),
+    XBAR_ROW(xbar_i2c2, XBAR_NUM(BOARD_I2C2_SDA_PIN, 0)),
+
+    // AHB out
+    XBAR_ROW(xbar_ahb_out, XBAR_NUM(BOARD_AHB_OUT_PIN, 1)),
+};
+
+extern const stm32_pin_info PIN_MAP_SHORTS[BOARD_NR_SHORTED_PINS] = {
+        PIN_ROW_D30_SHORTED
+        PIN_ROW_D31_SHORTED
+        PIN_ROW_D32_SHORTED
+        PIN_ROW_D33_SHORTED
+        PIN_ROW_D34_SHORTED
+        PIN_ROW_D35_SHORTED
+};
+
+/* Return 0 if not shorted */
+uint8_t board_get_short_num(gpio_dev *dev, uint8_t pin)
 {
-  // 0 .. 53 - Digital pins
-  // ----------------------
-  // 0/1 - UART (Serial)
-  { PIOA, PIO_PA8A_URXD,     ID_PIOA, PIO_PERIPH_A, PIO_DEFAULT,  PIN_ATTR_DIGITAL,                 NO_ADC, NO_ADC, NOT_ON_PWM,  NOT_ON_TIMER }, // URXD
-  { PIOA, PIO_PA9A_UTXD,     ID_PIOA, PIO_PERIPH_A, PIO_DEFAULT,  PIN_ATTR_DIGITAL,                 NO_ADC, NO_ADC, NOT_ON_PWM,  NOT_ON_TIMER }, // UTXD
-
-  // 2
-  { PIOB, PIO_PB25B_TIOA0,   ID_PIOB, PIO_PERIPH_B, PIO_DEFAULT, (PIN_ATTR_DIGITAL|PIN_ATTR_TIMER), NO_ADC, NO_ADC, NOT_ON_PWM,  TC0_CHA0     }, // TIOA0
-  { PIOC, PIO_PC28B_TIOA7,   ID_PIOC, PIO_PERIPH_B, PIO_DEFAULT, (PIN_ATTR_DIGITAL|PIN_ATTR_TIMER), NO_ADC, NO_ADC, NOT_ON_PWM,  TC2_CHA7     }, // TIOA7
-  { PIOC, PIO_PC26B_TIOB6,   ID_PIOC, PIO_PERIPH_B, PIO_DEFAULT, (PIN_ATTR_DIGITAL|PIN_ATTR_TIMER), NO_ADC, NO_ADC, NOT_ON_PWM,  TC2_CHB6     }, // TIOB6
-
-  // 5
-  { PIOC, PIO_PC25B_TIOA6,   ID_PIOC, PIO_PERIPH_B, PIO_DEFAULT, (PIN_ATTR_DIGITAL|PIN_ATTR_TIMER), NO_ADC, NO_ADC, NOT_ON_PWM,  TC2_CHA6     }, // TIOA6
-  { PIOC, PIO_PC24B_PWML7,   ID_PIOC, PIO_PERIPH_B, PIO_DEFAULT, (PIN_ATTR_DIGITAL|PIN_ATTR_PWM),   NO_ADC, NO_ADC, PWM_CH7,     NOT_ON_TIMER }, // PWML7
-  { PIOC, PIO_PC23B_PWML6,   ID_PIOC, PIO_PERIPH_B, PIO_DEFAULT, (PIN_ATTR_DIGITAL|PIN_ATTR_PWM),   NO_ADC, NO_ADC, PWM_CH6,     NOT_ON_TIMER }, // PWML6
-  { PIOC, PIO_PC22B_PWML5,   ID_PIOC, PIO_PERIPH_B, PIO_DEFAULT, (PIN_ATTR_DIGITAL|PIN_ATTR_PWM),   NO_ADC, NO_ADC, PWM_CH5,     NOT_ON_TIMER }, // PWML5
-  { PIOC, PIO_PC21B_PWML4,   ID_PIOC, PIO_PERIPH_B, PIO_DEFAULT, (PIN_ATTR_DIGITAL|PIN_ATTR_PWM),   NO_ADC, NO_ADC, PWM_CH4,     NOT_ON_TIMER }, // PWML4
-  // 10
-  { PIOC, PIO_PC29B_TIOB7,   ID_PIOC, PIO_PERIPH_B, PIO_DEFAULT, (PIN_ATTR_DIGITAL|PIN_ATTR_TIMER), NO_ADC, NO_ADC, NOT_ON_PWM,  TC2_CHB7     }, // TIOB7
-  { PIOD, PIO_PD7B_TIOA8,    ID_PIOD, PIO_PERIPH_B, PIO_DEFAULT, (PIN_ATTR_DIGITAL|PIN_ATTR_TIMER), NO_ADC, NO_ADC, NOT_ON_PWM,  TC2_CHA8     }, // TIOA8
-  { PIOD, PIO_PD8B_TIOB8,    ID_PIOD, PIO_PERIPH_B, PIO_DEFAULT, (PIN_ATTR_DIGITAL|PIN_ATTR_TIMER), NO_ADC, NO_ADC, NOT_ON_PWM,  TC2_CHB8     }, // TIOB8
-
-  // 13 - AMBER LED
-  { PIOB, PIO_PB27B_TIOB0,   ID_PIOB, PIO_PERIPH_B, PIO_DEFAULT, (PIN_ATTR_DIGITAL|PIN_ATTR_TIMER), NO_ADC, NO_ADC, NOT_ON_PWM,  TC0_CHB0     }, // TIOB0
-
-  // 14/15 - USART3 (Serial3)
-  { PIOD, PIO_PD4B_TXD3,     ID_PIOD, PIO_PERIPH_B, PIO_DEFAULT, PIN_ATTR_DIGITAL,                  NO_ADC, NO_ADC, NOT_ON_PWM,  NOT_ON_TIMER }, // TXD3
-  { PIOD, PIO_PD5B_RXD3,     ID_PIOD, PIO_PERIPH_B, PIO_DEFAULT, PIN_ATTR_DIGITAL,                  NO_ADC, NO_ADC, NOT_ON_PWM,  NOT_ON_TIMER }, // RXD3
-
-  // 16/17 - USART1 (Serial2)
-  { PIOA, PIO_PA13A_TXD1,    ID_PIOA, PIO_PERIPH_A, PIO_DEFAULT, PIN_ATTR_DIGITAL,                  NO_ADC, NO_ADC, NOT_ON_PWM,  NOT_ON_TIMER }, // TXD1
-  { PIOA, PIO_PA12A_RXD1,    ID_PIOA, PIO_PERIPH_A, PIO_DEFAULT, PIN_ATTR_DIGITAL,                  NO_ADC, NO_ADC, NOT_ON_PWM,  NOT_ON_TIMER }, // RXD1
-
-  // 18/19 - USART0 (Serial1)
-  { PIOA, PIO_PA11A_TXD0,    ID_PIOA, PIO_PERIPH_A, PIO_DEFAULT, PIN_ATTR_DIGITAL,                  NO_ADC, NO_ADC, NOT_ON_PWM,  NOT_ON_TIMER }, // TXD0
-  { PIOA, PIO_PA10A_RXD0,    ID_PIOA, PIO_PERIPH_A, PIO_DEFAULT, PIN_ATTR_DIGITAL,                  NO_ADC, NO_ADC, NOT_ON_PWM,  NOT_ON_TIMER }, // RXD0
-
-  // 20/21 - TWI1
-  { PIOB, PIO_PB12A_TWD1,    ID_PIOB, PIO_PERIPH_A, PIO_DEFAULT, PIN_ATTR_DIGITAL,                  NO_ADC, NO_ADC, NOT_ON_PWM,  NOT_ON_TIMER }, // TWD1 - SDA0
-  { PIOB, PIO_PB13A_TWCK1,   ID_PIOB, PIO_PERIPH_A, PIO_DEFAULT, PIN_ATTR_DIGITAL,                  NO_ADC, NO_ADC, NOT_ON_PWM,  NOT_ON_TIMER }, // TWCK1 - SCL0
-
-  // 22
-  { PIOB, PIO_PB26,          ID_PIOB, PIO_OUTPUT_0, PIO_DEFAULT, PIN_ATTR_DIGITAL,                  NO_ADC, NO_ADC, NOT_ON_PWM,  NOT_ON_TIMER }, // PIN 22
-  { PIOA, PIO_PA14,          ID_PIOA, PIO_OUTPUT_0, PIO_DEFAULT, PIN_ATTR_DIGITAL,                  NO_ADC, NO_ADC, NOT_ON_PWM,  NOT_ON_TIMER }, // PIN 23
-  { PIOA, PIO_PA15,          ID_PIOA, PIO_OUTPUT_0, PIO_DEFAULT, PIN_ATTR_DIGITAL,                  NO_ADC, NO_ADC, NOT_ON_PWM,  NOT_ON_TIMER }, // PIN 24
-  { PIOD, PIO_PD0,           ID_PIOD, PIO_OUTPUT_0, PIO_DEFAULT, PIN_ATTR_DIGITAL,                  NO_ADC, NO_ADC, NOT_ON_PWM,  NOT_ON_TIMER }, // PIN 25
-
-  // 26
-  { PIOD, PIO_PD1,           ID_PIOD, PIO_OUTPUT_0, PIO_DEFAULT, PIN_ATTR_DIGITAL,                  NO_ADC, NO_ADC, NOT_ON_PWM,  NOT_ON_TIMER }, // PIN 26
-  { PIOD, PIO_PD2,           ID_PIOD, PIO_OUTPUT_0, PIO_DEFAULT, PIN_ATTR_DIGITAL,                  NO_ADC, NO_ADC, NOT_ON_PWM,  NOT_ON_TIMER }, // PIN 27
-  { PIOD, PIO_PD3,           ID_PIOD, PIO_OUTPUT_0, PIO_DEFAULT, PIN_ATTR_DIGITAL,                  NO_ADC, NO_ADC, NOT_ON_PWM,  NOT_ON_TIMER }, // PIN 28
-  { PIOD, PIO_PD6,           ID_PIOD, PIO_OUTPUT_0, PIO_DEFAULT, PIN_ATTR_DIGITAL,                  NO_ADC, NO_ADC, NOT_ON_PWM,  NOT_ON_TIMER }, // PIN 29
-
-  // 30
-  { PIOD, PIO_PD9,           ID_PIOD, PIO_OUTPUT_0, PIO_DEFAULT, PIN_ATTR_DIGITAL,                  NO_ADC, NO_ADC, NOT_ON_PWM,  NOT_ON_TIMER }, // PIN 30
-  { PIOA, PIO_PA7,           ID_PIOA, PIO_OUTPUT_0, PIO_DEFAULT, PIN_ATTR_DIGITAL,                  NO_ADC, NO_ADC, NOT_ON_PWM,  NOT_ON_TIMER }, // PIN 31
-  { PIOD, PIO_PD10,          ID_PIOD, PIO_OUTPUT_0, PIO_DEFAULT, PIN_ATTR_DIGITAL,                  NO_ADC, NO_ADC, NOT_ON_PWM,  NOT_ON_TIMER }, // PIN 32
-  { PIOC, PIO_PC1,           ID_PIOC, PIO_OUTPUT_0, PIO_DEFAULT, PIN_ATTR_DIGITAL,                  NO_ADC, NO_ADC, NOT_ON_PWM,  NOT_ON_TIMER }, // PIN 33
-
-  // 34
-  { PIOC, PIO_PC2,           ID_PIOC, PIO_OUTPUT_0, PIO_DEFAULT, PIN_ATTR_DIGITAL,                  NO_ADC, NO_ADC, NOT_ON_PWM,  NOT_ON_TIMER }, // PIN 34
-  { PIOC, PIO_PC3,           ID_PIOC, PIO_OUTPUT_0, PIO_DEFAULT, PIN_ATTR_DIGITAL,                  NO_ADC, NO_ADC, NOT_ON_PWM,  NOT_ON_TIMER }, // PIN 35
-  { PIOC, PIO_PC4,           ID_PIOC, PIO_OUTPUT_0, PIO_DEFAULT, PIN_ATTR_DIGITAL,                  NO_ADC, NO_ADC, NOT_ON_PWM,  NOT_ON_TIMER }, // PIN 36
-  { PIOC, PIO_PC5,           ID_PIOC, PIO_OUTPUT_0, PIO_DEFAULT, PIN_ATTR_DIGITAL,                  NO_ADC, NO_ADC, NOT_ON_PWM,  NOT_ON_TIMER }, // PIN 37
-
-  // 38
-  { PIOC, PIO_PC6,           ID_PIOC, PIO_OUTPUT_0, PIO_DEFAULT, PIN_ATTR_DIGITAL,                  NO_ADC, NO_ADC, NOT_ON_PWM,  NOT_ON_TIMER }, // PIN 38
-  { PIOC, PIO_PC7,           ID_PIOC, PIO_OUTPUT_0, PIO_DEFAULT, PIN_ATTR_DIGITAL,                  NO_ADC, NO_ADC, NOT_ON_PWM,  NOT_ON_TIMER }, // PIN 39
-  { PIOC, PIO_PC8,           ID_PIOC, PIO_OUTPUT_0, PIO_DEFAULT, PIN_ATTR_DIGITAL,                  NO_ADC, NO_ADC, NOT_ON_PWM,  NOT_ON_TIMER }, // PIN 40
-  { PIOC, PIO_PC9,           ID_PIOC, PIO_OUTPUT_0, PIO_DEFAULT, PIN_ATTR_DIGITAL,                  NO_ADC, NO_ADC, NOT_ON_PWM,  NOT_ON_TIMER }, // PIN 41
-
-  // 42
-  { PIOA, PIO_PA19,          ID_PIOA, PIO_OUTPUT_0, PIO_DEFAULT, PIN_ATTR_DIGITAL,                  NO_ADC, NO_ADC, NOT_ON_PWM,  NOT_ON_TIMER }, // PIN 42
-  { PIOA, PIO_PA20,          ID_PIOA, PIO_OUTPUT_0, PIO_DEFAULT, PIN_ATTR_DIGITAL,                  NO_ADC, NO_ADC, NOT_ON_PWM,  NOT_ON_TIMER }, // PIN 43
-  { PIOC, PIO_PC19,          ID_PIOC, PIO_OUTPUT_0, PIO_DEFAULT, PIN_ATTR_DIGITAL,                  NO_ADC, NO_ADC, NOT_ON_PWM,  NOT_ON_TIMER }, // PIN 44
-  { PIOC, PIO_PC18,          ID_PIOC, PIO_OUTPUT_0, PIO_DEFAULT, PIN_ATTR_DIGITAL,                  NO_ADC, NO_ADC, NOT_ON_PWM,  NOT_ON_TIMER }, // PIN 45
-
-  // 46
-  { PIOC, PIO_PC17,          ID_PIOC, PIO_OUTPUT_0, PIO_DEFAULT, PIN_ATTR_DIGITAL,                  NO_ADC, NO_ADC, NOT_ON_PWM,  NOT_ON_TIMER }, // PIN 46
-  { PIOC, PIO_PC16,          ID_PIOC, PIO_OUTPUT_0, PIO_DEFAULT, PIN_ATTR_DIGITAL,                  NO_ADC, NO_ADC, NOT_ON_PWM,  NOT_ON_TIMER }, // PIN 47
-  { PIOC, PIO_PC15,          ID_PIOC, PIO_OUTPUT_0, PIO_DEFAULT, PIN_ATTR_DIGITAL,                  NO_ADC, NO_ADC, NOT_ON_PWM,  NOT_ON_TIMER }, // PIN 48
-  { PIOC, PIO_PC14,          ID_PIOC, PIO_OUTPUT_0, PIO_DEFAULT, PIN_ATTR_DIGITAL,                  NO_ADC, NO_ADC, NOT_ON_PWM,  NOT_ON_TIMER }, // PIN 49
-
-  // 50
-  { PIOC, PIO_PC13,          ID_PIOC, PIO_OUTPUT_0, PIO_DEFAULT, PIN_ATTR_DIGITAL,                  NO_ADC, NO_ADC, NOT_ON_PWM,  NOT_ON_TIMER }, // PIN 50
-  { PIOC, PIO_PC12,          ID_PIOC, PIO_OUTPUT_0, PIO_DEFAULT, PIN_ATTR_DIGITAL,                  NO_ADC, NO_ADC, NOT_ON_PWM,  NOT_ON_TIMER }, // PIN 51
-  { PIOB, PIO_PB21,          ID_PIOB, PIO_OUTPUT_0, PIO_DEFAULT, PIN_ATTR_DIGITAL,                  NO_ADC, NO_ADC, NOT_ON_PWM,  NOT_ON_TIMER }, // PIN 52
-  { PIOB, PIO_PB14,          ID_PIOB, PIO_OUTPUT_0, PIO_DEFAULT, PIN_ATTR_DIGITAL,                  NO_ADC, NO_ADC, NOT_ON_PWM,  NOT_ON_TIMER }, // PIN 53
+#if BOARD_NR_SHORTED_PINS == 0
+    return 0;
+#endif // BOARD_NR_SHORTED_PINS == 0
 
 
-  // 54 .. 69 - Analog pins
-  // ----------------------
-  { PIOA, PIO_PA16X1_AD7,    ID_PIOA, PIO_INPUT,    PIO_DEFAULT, PIN_ATTR_ANALOG,                   ADC0,   ADC7,   NOT_ON_PWM,  NOT_ON_TIMER }, // AD0
-  { PIOA, PIO_PA24X1_AD6,    ID_PIOA, PIO_INPUT,    PIO_DEFAULT, PIN_ATTR_ANALOG,                   ADC1,   ADC6,   NOT_ON_PWM,  NOT_ON_TIMER }, // AD1
-  { PIOA, PIO_PA23X1_AD5,    ID_PIOA, PIO_INPUT,    PIO_DEFAULT, PIN_ATTR_ANALOG,                   ADC2,   ADC5,   NOT_ON_PWM,  NOT_ON_TIMER }, // AD2
-  { PIOA, PIO_PA22X1_AD4,    ID_PIOA, PIO_INPUT,    PIO_DEFAULT, PIN_ATTR_ANALOG,                   ADC3,   ADC4,   NOT_ON_PWM,  NOT_ON_TIMER }, // AD3
-  // 58
-  { PIOA, PIO_PA6X1_AD3,     ID_PIOA, PIO_INPUT,    PIO_DEFAULT, PIN_ATTR_ANALOG,                   ADC4,   ADC3,   NOT_ON_PWM,  TC0_CHB2     }, // AD4
-  { PIOA, PIO_PA4X1_AD2,     ID_PIOA, PIO_INPUT,    PIO_DEFAULT, PIN_ATTR_ANALOG,                   ADC5,   ADC2,   NOT_ON_PWM,  NOT_ON_TIMER }, // AD5
-  { PIOA, PIO_PA3X1_AD1,     ID_PIOA, PIO_INPUT,    PIO_DEFAULT, PIN_ATTR_ANALOG,                   ADC6,   ADC1,   NOT_ON_PWM,  TC0_CHB1     }, // AD6
-  { PIOA, PIO_PA2X1_AD0,     ID_PIOA, PIO_INPUT,    PIO_DEFAULT, PIN_ATTR_ANALOG,                   ADC7,   ADC0,   NOT_ON_PWM,  TC0_CHA1     }, // AD7
-  // 62
-  { PIOB, PIO_PB17X1_AD10,   ID_PIOB, PIO_INPUT,    PIO_DEFAULT, PIN_ATTR_ANALOG,                   ADC8,   ADC10,  NOT_ON_PWM,  NOT_ON_TIMER }, // AD8
-  { PIOB, PIO_PB18X1_AD11,   ID_PIOB, PIO_INPUT,    PIO_DEFAULT, PIN_ATTR_ANALOG,                   ADC9,   ADC11,  NOT_ON_PWM,  NOT_ON_TIMER }, // AD9
-  { PIOB, PIO_PB19X1_AD12,   ID_PIOB, PIO_INPUT,    PIO_DEFAULT, PIN_ATTR_ANALOG,                   ADC10,  ADC12,  NOT_ON_PWM,  NOT_ON_TIMER }, // AD10
-  { PIOB, PIO_PB20X1_AD13,   ID_PIOB, PIO_INPUT,    PIO_DEFAULT, PIN_ATTR_ANALOG,                   ADC11,  ADC13,  NOT_ON_PWM,  NOT_ON_TIMER }, // AD11
-  // 66
-  { PIOB, PIO_PB15X1_DAC0,   ID_PIOB, PIO_INPUT,    PIO_DEFAULT, PIN_ATTR_ANALOG,                   ADC12,  DA0,    NOT_ON_PWM,  NOT_ON_TIMER }, // AD12
-  { PIOB, PIO_PB16X1_DAC1,   ID_PIOB, PIO_INPUT,    PIO_DEFAULT, PIN_ATTR_ANALOG,                   ADC13,  DA1,    NOT_ON_PWM,  NOT_ON_TIMER }, // AD13
-  { PIOA, PIO_PA1A_CANRX0,   ID_PIOA, PIO_PERIPH_A, PIO_DEFAULT, PIN_ATTR_DIGITAL,                  ADC14,  NO_ADC, NOT_ON_PWM,  NOT_ON_TIMER }, // AD14
-  { PIOA, PIO_PA0A_CANTX0,   ID_PIOA, PIO_PERIPH_A, PIO_DEFAULT, PIN_ATTR_DIGITAL,                  ADC15,  NO_ADC, NOT_ON_PWM,  NOT_ON_TIMER }, // AD15
-
-  // 70/71 - TWI0
-  { PIOA, PIO_PA17A_TWD0,    ID_PIOA, PIO_PERIPH_A, PIO_DEFAULT, PIN_ATTR_DIGITAL,                  NO_ADC, NO_ADC, NOT_ON_PWM,  NOT_ON_TIMER }, // TWD0 - SDA1
-  { PIOA, PIO_PA18A_TWCK0,   ID_PIOA, PIO_PERIPH_A, PIO_DEFAULT, PIN_ATTR_DIGITAL,                  NO_ADC, NO_ADC, NOT_ON_PWM,  NOT_ON_TIMER }, // TWCK0 - SCL1
-
-  // 72/73 - LEDs
-  { PIOC, PIO_PC30,          ID_PIOC, PIO_OUTPUT_0, PIO_DEFAULT, PIN_ATTR_DIGITAL,                  NO_ADC, NO_ADC, NOT_ON_PWM,  NOT_ON_TIMER }, // LED AMBER RXL
-  { PIOA, PIO_PA21,          ID_PIOA, PIO_OUTPUT_0, PIO_DEFAULT, PIN_ATTR_DIGITAL,                  NO_ADC, NO_ADC, NOT_ON_PWM,  NOT_ON_TIMER }, // LED AMBER TXL
-
-  // 74/75/76 - SPI
-  { PIOA, PIO_PA25A_SPI0_MISO,ID_PIOA,PIO_PERIPH_A, PIO_DEFAULT, PIN_ATTR_DIGITAL,                  NO_ADC, NO_ADC, NOT_ON_PWM,  NOT_ON_TIMER }, // MISO
-  { PIOA, PIO_PA26A_SPI0_MOSI,ID_PIOA,PIO_PERIPH_A, PIO_DEFAULT, PIN_ATTR_DIGITAL,                  NO_ADC, NO_ADC, NOT_ON_PWM,  NOT_ON_TIMER }, // MOSI
-  { PIOA, PIO_PA27A_SPI0_SPCK,ID_PIOA,PIO_PERIPH_A, PIO_DEFAULT, PIN_ATTR_DIGITAL,                  NO_ADC, NO_ADC, NOT_ON_PWM,  NOT_ON_TIMER }, // SPCK
-
-  // 77 - SPI CS0
-  { PIOA, PIO_PA28A_SPI0_NPCS0,ID_PIOA,PIO_PERIPH_A,PIO_DEFAULT, PIN_ATTR_DIGITAL,                  NO_ADC, NO_ADC, NOT_ON_PWM,  NOT_ON_TIMER }, // NPCS0
-
-  // 78 - SPI CS3 (unconnected)
-  { PIOB, PIO_PB23B_SPI0_NPCS3,ID_PIOB,PIO_PERIPH_B,PIO_DEFAULT, PIN_ATTR_DIGITAL,                  NO_ADC, NO_ADC, NOT_ON_PWM,  NOT_ON_TIMER }, // NPCS3
-
-  // 79 .. 84 - "All pins" masks
-
-  // 79 - TWI0 all pins
-  { PIOA, PIO_PA17A_TWD0|PIO_PA18A_TWCK0, ID_PIOA, PIO_PERIPH_A, PIO_DEFAULT, (PIN_ATTR_DIGITAL|PIN_ATTR_COMBO), NO_ADC, NO_ADC, NOT_ON_PWM, NOT_ON_TIMER },
-  // 80 - TWI1 all pins
-  { PIOB, PIO_PB12A_TWD1|PIO_PB13A_TWCK1, ID_PIOB, PIO_PERIPH_A, PIO_DEFAULT, (PIN_ATTR_DIGITAL|PIN_ATTR_COMBO), NO_ADC, NO_ADC, NOT_ON_PWM, NOT_ON_TIMER },
-  // 81 - UART (Serial) all pins
-  { PIOA, PIO_PA8A_URXD|PIO_PA9A_UTXD, ID_PIOA, PIO_PERIPH_A, PIO_DEFAULT, (PIN_ATTR_DIGITAL|PIN_ATTR_COMBO), NO_ADC, NO_ADC, NOT_ON_PWM, NOT_ON_TIMER },
-  // 82 - USART0 (Serial1) all pins
-  { PIOA, PIO_PA11A_TXD0|PIO_PA10A_RXD0, ID_PIOA, PIO_PERIPH_A, PIO_DEFAULT, (PIN_ATTR_DIGITAL|PIN_ATTR_COMBO), NO_ADC, NO_ADC, NOT_ON_PWM, NOT_ON_TIMER },
-  // 83 - USART1 (Serial2) all pins
-  { PIOA, PIO_PA13A_TXD1|PIO_PA12A_RXD1, ID_PIOA, PIO_PERIPH_A, PIO_DEFAULT, (PIN_ATTR_DIGITAL|PIN_ATTR_COMBO), NO_ADC, NO_ADC, NOT_ON_PWM, NOT_ON_TIMER },
-  // 84 - USART3 (Serial3) all pins
-  { PIOD, PIO_PD4B_TXD3|PIO_PD5B_RXD3, ID_PIOD, PIO_PERIPH_B, PIO_DEFAULT, (PIN_ATTR_DIGITAL|PIN_ATTR_COMBO), NO_ADC, NO_ADC, NOT_ON_PWM, NOT_ON_TIMER },
-
-  // 85 - USB
-  { PIOB, PIO_PB11A_UOTGID|PIO_PB10A_UOTGVBOF, ID_PIOB, PIO_PERIPH_A, PIO_DEFAULT, PIN_ATTR_DIGITAL,NO_ADC, NO_ADC, NOT_ON_PWM,  NOT_ON_TIMER }, // ID - VBOF
-
-  // 86 - SPI CS2
-  { PIOB, PIO_PB21B_SPI0_NPCS2, ID_PIOB, PIO_PERIPH_B, PIO_DEFAULT, PIN_ATTR_DIGITAL,                  NO_ADC, NO_ADC, NOT_ON_PWM,  NOT_ON_TIMER }, // NPCS2
-
-  // 87 - SPI CS1
-  { PIOA, PIO_PA29A_SPI0_NPCS1, ID_PIOA, PIO_PERIPH_A, PIO_DEFAULT, PIN_ATTR_DIGITAL,                  NO_ADC, NO_ADC, NOT_ON_PWM,  NOT_ON_TIMER }, // NPCS1
-
-  // END
-  { NULL, 0, 0, PIO_NOT_A_PIN, PIO_DEFAULT, 0, NO_ADC, NO_ADC, NOT_ON_PWM, NOT_ON_TIMER }
-} ;
-
+    // Primary pin
+    if (dev == GPIOD) {
+        switch (pin) {
+#if defined(PIN_D30_SHORTED)
+        case 6:
+            return PIN_D30_SHORTED + 1;
+#endif // defined(PIN_D30_SHORTED)
+#if defined(PIN_D31_SHORTED)
+        case 8:
+            return PIN_D31_SHORTED + 1;
+#endif // defined(PIN_D31_SHORTED)
+#if defined(PIN_D32_SHORTED)
+        case 9:
+            return PIN_D32_SHORTED + 1;
+#endif // defined(PIN_D32_SHORTED)
+#if defined(PIN_D33_SHORTED)
+        case 11:
+            return PIN_D33_SHORTED + 1;
+#endif // defined(PIN_D33_SHORTED)
+#if defined(PIN_D34_SHORTED)
+        case 3:
+            return PIN_D34_SHORTED + 1;
+#endif // defined(PIN_D34_SHORTED)
+#if defined(PIN_D35_SHORTED)
+        case 2:
+            return PIN_D35_SHORTED + 1;
+#endif // defined(PIN_D35_SHORTED)
+        default:
+            return 0;
+        }
+    }
+    return 0;
+}
 #ifdef __cplusplus
 }
 #endif
-
+#if 0
 /*
  * UART objects
  */
@@ -294,11 +321,12 @@ void UART_Handler(void)
 {
   Serial.IrqHandler();
 }
-
+#endif
 // ----------------------------------------------------------------------------
 /*
  * USART objects
  */
+#if 0
 RingBuffer rx_buffer2;
 RingBuffer rx_buffer3;
 RingBuffer rx_buffer4;
@@ -322,7 +350,7 @@ void USART3_Handler(void)
 {
   Serial3.IrqHandler();
 }
-
+#endif
 // ----------------------------------------------------------------------------
 
 #ifdef __cplusplus
@@ -330,68 +358,21 @@ extern "C" {
 #endif
 
 void __libc_init_array(void);
-
+#include "gpio.h"
 void init( void )
 {
-  SystemInit();
+    // Turn off watchdog
+    *((volatile uint32_t*)0x4002D020) = 0;
+    clk_enable_dev(CLK_MISC1);
+    *((volatile uint32_t*)0x40030030) = 0xA5;
+    *((volatile uint32_t*)0x40030030) = 0xDD;
 
-  // Set Systick to 1ms interval, common to all SAM3 variants
-  if (SysTick_Config(SystemCoreClock / 1000))
-  {
-    // Capture error
-    while (true);
-  }
+    // init gpio
+    gpio_init_all();
 
-  // Disable watchdog
-  WDT_Disable(WDT);
+    // NVIC set vector table location
+    *((volatile uint32_t *)0xE000ED08) = 2048 | 0x1FFFFF80;
 
-  // Initialize C library
-  __libc_init_array();
-
-  // Disable pull-up on every pin
-  for (int i = 0; i < PINS_COUNT; i++)
-	  digitalWrite(i, LOW);
-
-  // Initialize Serial port U(S)ART pins
-  PIO_Configure(
-    g_APinDescription[PINS_UART].pPort,
-    g_APinDescription[PINS_UART].ulPinType,
-    g_APinDescription[PINS_UART].ulPin,
-    g_APinDescription[PINS_UART].ulPinConfiguration);
-  digitalWrite(0, HIGH); // Enable pullup for RX0
-  PIO_Configure(
-    g_APinDescription[PINS_USART0].pPort,
-    g_APinDescription[PINS_USART0].ulPinType,
-    g_APinDescription[PINS_USART0].ulPin,
-    g_APinDescription[PINS_USART0].ulPinConfiguration);
-  PIO_Configure(
-    g_APinDescription[PINS_USART1].pPort,
-    g_APinDescription[PINS_USART1].ulPinType,
-    g_APinDescription[PINS_USART1].ulPin,
-    g_APinDescription[PINS_USART1].ulPinConfiguration);
-  PIO_Configure(
-    g_APinDescription[PINS_USART3].pPort,
-    g_APinDescription[PINS_USART3].ulPinType,
-    g_APinDescription[PINS_USART3].ulPin,
-    g_APinDescription[PINS_USART3].ulPinConfiguration);
-
-  // Initialize USB pins
-  PIO_Configure(
-    g_APinDescription[PINS_USB].pPort,
-    g_APinDescription[PINS_USB].ulPinType,
-    g_APinDescription[PINS_USB].ulPin,
-    g_APinDescription[PINS_USB].ulPinConfiguration);
-
-  // Initialize Analog Controller
-  pmc_enable_periph_clk(ID_ADC);
-  adc_init(ADC, SystemCoreClock, ADC_FREQ_MAX, ADC_STARTUP_FAST);
-  adc_configure_timing(ADC, 0, ADC_SETTLING_TIME_3, 1);
-  adc_configure_trigger(ADC, ADC_TRIG_SW, 0); // Disable hardware trigger.
-  adc_disable_interrupt(ADC, 0xFFFFFFFF); // Disable all ADC interrupts.
-  adc_disable_all_channel(ADC);
-
-  // Initialize analogOutput module
-  analogOutputInit();
 }
 
 #ifdef __cplusplus

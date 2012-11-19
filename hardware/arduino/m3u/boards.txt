@@ -1,11 +1,19 @@
 
 silabs_acb_x_dbg.name=Silicon Laboratories SiM3U1XX ACB
+
 silabs_acb_x_dbg.upload.tool=avrdude
 silabs_acb_x_dbg.upload.protocol=wiring
 silabs_acb_x_dbg.upload.maximum_size=262144
-silabs_acb_x_dbg.upload.use_1200bps_touch=true
-silabs_acb_x_dbg.upload.wait_for_upload_port=false
-silabs_acb_x_dbg.upload.native_usb=false
+silabs_acb_x_dbg.upload.speed=115200
+
+silabs_acb_x_dbg.bootloader.tool=avrdude
+silabs_acb_x_dbg.bootloader.low_fuses=0xFF
+silabs_acb_x_dbg.bootloader.high_fuses=0xD8
+silabs_acb_x_dbg.bootloader.extended_fuses=0xFD
+silabs_acb_x_dbg.bootloader.file=stk500v2/stk500boot_v2_mega2560.hex
+silabs_acb_x_dbg.bootloader.unlock_bits=0x3F
+silabs_acb_x_dbg.bootloader.lock_bits=0x0F
+
 silabs_acb_x_dbg.build.mcu=cortex-m3
 silabs_acb_x_dbg.build.f_cpu=80000000L
 silabs_acb_x_dbg.build.core=arduino
@@ -15,4 +23,3 @@ silabs_acb_x_dbg.build.variant=silabs_acb_x
 silabs_acb_x_dbg.build.variant_system_lib=libsam_sam3x8e_gcc_rel.a
 silabs_acb_x_dbg.build.vid=0x2341
 silabs_acb_x_dbg.build.pid=0x003e
-

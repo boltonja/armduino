@@ -141,59 +141,21 @@ uint8_t _hid_idle = 1;
 
 int WEAK HID_GetInterface(uint8_t* interfaceNum)
 {
-	interfaceNum[0] += 1;	// uses 1
-	return USBD_SendControl(0,&_hidInterface,sizeof(_hidInterface));
+	return 0;
 }
 
 int WEAK HID_GetDescriptor(int i)
 {
-	return USBD_SendControl(0,_hidReportDescriptor,sizeof(_hidReportDescriptor));
+	return 0;
 }
 
 void WEAK HID_SendReport(uint8_t id, const void* data, uint32_t len)
 {
-	uint8_t p[64];
-	const uint8_t *d = reinterpret_cast<const uint8_t *>(data);
 
-	p[0] = id;
-	for (uint32_t i=0; i<len; i++)
-		p[i+1] = d[i];
-	USBD_Send(HID_TX, p, len+1);
 }
 
 bool WEAK HID_Setup(Setup& setup)
 {
-	uint8_t r = setup.bRequest;
-	uint8_t requestType = setup.bmRequestType;
-
-	if (REQUEST_DEVICETOHOST_CLASS_INTERFACE == requestType)
-	{
-		if (HID_GET_REPORT == r)
-		{
-			//HID_GetReport();
-			return true;
-		}
-		if (HID_GET_PROTOCOL == r)
-		{
-			//Send8(_hid_protocol);	// TODO
-			return true;
-		}
-	}
-
-	if (REQUEST_HOSTTODEVICE_CLASS_INTERFACE == requestType)
-	{
-		if (HID_SET_PROTOCOL == r)
-		{
-			_hid_protocol = setup.wValueL;
-			return true;
-		}
-
-		if (HID_SET_IDLE == r)
-		{
-			_hid_idle = setup.wValueL;
-			return true;
-		}
-	}
 	return false;
 }
 
@@ -215,45 +177,32 @@ void Mouse_::end(void)
 
 void Mouse_::click(uint8_t b)
 {
-	_buttons = b;
-	move(0,0,0);
-	_buttons = 0;
-	move(0,0,0);
+
 }
 
 void Mouse_::move(signed char x, signed char y, signed char wheel)
 {
-	uint8_t m[4];
-	m[0] = _buttons;
-	m[1] = x;
-	m[2] = y;
-	m[3] = wheel;
-	HID_SendReport(1,m,4);
+
 }
 
 void Mouse_::buttons(uint8_t b)
 {
-	if (b != _buttons)
-	{
-		_buttons = b;
-		move(0,0,0);
-	}
+
 }
 
 void Mouse_::press(uint8_t b)
 {
-	buttons(_buttons | b);
+
 }
 
 void Mouse_::release(uint8_t b)
 {
-	buttons(_buttons & ~b);
+
 }
 
 bool Mouse_::isPressed(uint8_t b)
 {
-	if ((b & _buttons) > 0)
-		return true;
+
 	return false;
 }
 
@@ -275,7 +224,7 @@ void Keyboard_::end(void)
 
 void Keyboard_::sendReport(KeyReport* keys)
 {
-	HID_SendReport(2,keys,sizeof(KeyReport));
+
 }
 
 #define SHIFT 0x80
@@ -420,42 +369,7 @@ uint8_t USBPutChar(uint8_t c);
 // call release(), releaseAll(), or otherwise clear the report and resend.
 size_t Keyboard_::press(uint8_t k)
 {
-	uint8_t i;
-	if (k >= 136) {			// it's a non-printing key (not a modifier)
-		k = k - 136;
-	} else if (k >= 128) {	// it's a modifier key
-		_keyReport.modifiers |= (1<<(k-128));
-		k = 0;
-	} else {				// it's a printing key
-		k = _asciimap[k];
-		if (!k) {
-			setWriteError();
-			return 0;
-		}
-		if (k & 0x80) {						// it's a capital letter or other character reached with shift
-			_keyReport.modifiers |= 0x02;	// the left shift modifier
-			k &= 0x7F;
-		}
-	}
 
-	// Add k to the key report only if it's not already present
-	// and if there is an empty slot.
-	if (_keyReport.keys[0] != k && _keyReport.keys[1] != k &&
-		_keyReport.keys[2] != k && _keyReport.keys[3] != k &&
-		_keyReport.keys[4] != k && _keyReport.keys[5] != k) {
-
-		for (i=0; i<6; i++) {
-			if (_keyReport.keys[i] == 0x00) {
-				_keyReport.keys[i] = k;
-				break;
-			}
-		}
-		if (i == 6) {
-			setWriteError();
-			return 0;
-		}
-	}
-	sendReport(&_keyReport);
 	return 1;
 }
 
@@ -464,55 +378,19 @@ size_t Keyboard_::press(uint8_t k)
 // it shouldn't be repeated any more.
 size_t Keyboard_::release(uint8_t k)
 {
-	uint8_t i;
-	if (k >= 136) {			// it's a non-printing key (not a modifier)
-		k = k - 136;
-	} else if (k >= 128) {	// it's a modifier key
-		_keyReport.modifiers &= ~(1<<(k-128));
-		k = 0;
-	} else {				// it's a printing key
-		k = _asciimap[k];
-		if (!k) {
-			return 0;
-		}
-		if (k & 0x80) {							// it's a capital letter or other character reached with shift
-			_keyReport.modifiers &= ~(0x02);	// the left shift modifier
-			k &= 0x7F;
-		}
-	}
 
-	// Test the key report to see if k is present.  Clear it if it exists.
-	// Check all positions in case the key is present more than once (which it shouldn't be)
-	for (i=0; i<6; i++) {
-		if (0 != k && _keyReport.keys[i] == k) {
-			_keyReport.keys[i] = 0x00;
-		}
-	}
-
-	sendReport(&_keyReport);
 	return 1;
 }
 
 void Keyboard_::releaseAll(void)
 {
-	_keyReport.keys[0] = 0;
-	_keyReport.keys[1] = 0;
-	_keyReport.keys[2] = 0;
-	_keyReport.keys[3] = 0;
-	_keyReport.keys[4] = 0;
-	_keyReport.keys[5] = 0;
-	_keyReport.modifiers = 0;
-	sendReport(&_keyReport);
+
 }
 
 size_t Keyboard_::write(uint8_t c)
 {
-	uint8_t p = 0;
 
-	p = press(c);	// Keydown
-	release(c);		// Keyup
-
-	return (p);		// Just return the result of press() since release() almost always returns 1
+	return (1);		// Just return the result of press() since release() almost always returns 1
 }
 
 #endif

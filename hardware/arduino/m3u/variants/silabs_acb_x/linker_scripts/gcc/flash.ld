@@ -40,6 +40,7 @@ MEMORY
 	ram (rwx)   : ORIGIN = 0x20001000, LENGTH = 0x00007000 /* sram, 32K */
 }
 
+
 /* Section Definitions */
 SECTIONS
 {

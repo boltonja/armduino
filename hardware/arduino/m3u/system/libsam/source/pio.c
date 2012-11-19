@@ -322,6 +322,7 @@ extern void PIO_SetOutput( Pio* pPio, uint32_t dwMask, uint32_t dwDefaultValue,
  *
  * \return 1 if the pins have been configured properly; otherwise 0.
  */
+#if 0
 extern uint32_t PIO_Configure( Pio* pPio, const EPioType dwType, const uint32_t dwMask, const uint32_t dwAttribute )
 {
     /* Configure pins */
@@ -358,7 +359,7 @@ extern uint32_t PIO_Configure( Pio* pPio, const EPioType dwType, const uint32_t 
 
     return 1 ;
 }
-
+#endif
 /**
  * \brief Returns 1 if one or more PIO of the given Pin are configured to output a
  * high level (even if they are not output).

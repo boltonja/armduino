@@ -103,9 +103,10 @@ extern int _read(int file, char *ptr, int len)
 
 extern int _write( int file, char *ptr, int len )
 {
-    int iIndex ;
+    int iIndex = 0;
 
-
+// FIXME [silabs]: function changed
+#if 0
 //    for ( ; *ptr != 0 ; ptr++ )
     for ( iIndex=0 ; iIndex < len ; iIndex++, ptr++ )
     {
@@ -118,7 +119,7 @@ extern int _write( int file, char *ptr, int len )
 		  // Send character
 		  UART->UART_THR = *ptr;
     }
-
+#endif
     return iIndex ;
 }
 

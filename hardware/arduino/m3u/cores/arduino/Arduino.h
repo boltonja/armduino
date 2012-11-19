@@ -31,8 +31,9 @@ extern "C"{
 #endif // __cplusplus
 
 // Includes Atmel CMSIS
+#define REG_SET_CLR(base, set_true, mask) (*(volatile uint32_t*)((uint32_t)&(base) + (4 << !(set_true)))) = (mask)
 #include <chip.h>
-
+#include "gpio.h"
 #include "wiring_constants.h"
 
 #define clockCyclesPerMicrosecond() ( SystemCoreClock / 1000000L )
@@ -92,25 +93,11 @@ typedef void (*voidFuncPtr)( void ) ;
 /* Definitions and types for pins */
 typedef enum _EAnalogChannel
 {
-  NO_ADC=-1,
-  ADC0=0,
-  ADC1,
-  ADC2,
-  ADC3,
-  ADC4,
-  ADC5,
-  ADC6,
-  ADC7,
-  ADC8,
-  ADC9,
-  ADC10,
+
   ADC11,
   ADC12,
   ADC13,
-  ADC14,
-  ADC15,
-  DA0,
-  DA1
+
 } EAnalogChannel ;
 
 #define ADC_CHANNEL_NUMBER_NONE 0xffffffff
@@ -163,22 +150,42 @@ typedef enum _ETCChannel
 #define PIN_ATTR_TIMER         (1UL<<4)
 
 /* Types used for the tables below */
-typedef struct _PinDescription
-{
-  Pio* pPort ;
-  uint32_t ulPin ;
-  uint32_t ulPeripheralId ;
-  EPioType ulPinType ;
-  uint32_t ulPinConfiguration ;
-  uint32_t ulPinAttribute ;
-  EAnalogChannel ulAnalogChannel ; /* Analog pin in the Arduino context (label on the board) */
-  EAnalogChannel ulADCChannelNumber ; /* ADC Channel number in the SAM device */
-  EPWMChannel ulPWMChannel ;
-  ETCChannel ulTCChannel ;
-} PinDescription ;
+#define ADCx 0xFF
 
+typedef struct stm32_pin_info {
+    gpio_dev *gpio_device;      /**< Maple pin's GPIO device */
+    void *timer_device;    /**< Pin's timer device, if any. */
+    const void *adc_device;  /**< ADC device, if any. */
+    uint8_t gpio_bit;             /**< Pin's GPIO port bit. */
+    uint8_t timer_channel;        /**< Timer channel, or 0 if none. */
+    uint8_t adc_channel;          /**< Pin ADC channel, or ADCx if none. */
+    uint8_t exti_triger;          /**< External interrupt trigger, or 0 if none. */
+} stm32_pin_info;
+extern const stm32_pin_info PIN_MAP[];
+extern const stm32_pin_info PIN_MAP_SHORTS[];
+/**
+ * @brief Pins capable of PWM output.
+ *
+ * Its length is BOARD_NR_PWM_PINS.
+ */
+extern const uint8_t boardPWMPins[];
+
+/**
+ * @brief Array of pins capable of analog input.
+ *
+ * Its length is BOARD_NR_ADC_PINS.
+ */
+extern const uint8_t boardADCPins[];
+
+/**
+ * @brief Pins which are connected to external hardware.
+ *
+ * For example, on Maple boards, it always at least includes
+ * BOARD_LED_PIN.  Its length is BOARD_NR_USED_PINS.
+ */
+extern const uint8_t boardUsedPins[];
 /* Pins table to be instanciated into variant.cpp */
-extern const PinDescription g_APinDescription[] ;
+//extern const PinDescription g_APinDescription[] ;
 
 #ifdef __cplusplus
 } // extern "C"
