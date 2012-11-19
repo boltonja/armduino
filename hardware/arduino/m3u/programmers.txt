@@ -1,0 +1,8 @@
+arduinoisp.name=Arduino as ISP
+arduinoisp.communication=serial
+arduinoisp.protocol=wiring
+arduinoisp.speed=115200
+arduinoisp.program.protocol=wiring
+arduinoisp.program.speed=115200
+arduinoisp.program.tool=avrdude
+arduinoisp.program.extra_params=-P{serial.port} -b{program.speed}

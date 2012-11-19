@@ -35,7 +35,8 @@
  */
 
 #include "../chip.h"
-
+// FIXME [silabs]:
+typedef void Pio;
 #include <stdint.h>
 
 /*
@@ -119,9 +120,9 @@ extern void PIO_SetInput( Pio* pPio, uint32_t dwMask, uint32_t dwAttribute ) ;
 extern void PIO_SetOutput( Pio* pPio, uint32_t dwMask, uint32_t dwDefaultValue,
                                       uint32_t dwMultiDriveEnable, uint32_t dwPullUpEnable ) ;
 
-extern uint32_t PIO_Configure( Pio* pPio, const EPioType dwType, const uint32_t dwMask, const uint32_t dwAttribute ) ;
+//extern uint32_t PIO_Configure( Pio* pPio, const EPioType dwType, const uint32_t dwMask, const uint32_t dwAttribute ) ;
 
-extern uint32_t PIO_GetOutputDataStatus( const Pio* pPio, const uint32_t dwMask ) ;
+//extern uint32_t PIO_GetOutputDataStatus( const Pio* pPio, const uint32_t dwMask ) ;
 
 
 #ifdef __cplusplus

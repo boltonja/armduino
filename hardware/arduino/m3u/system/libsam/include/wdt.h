@@ -47,7 +47,8 @@
 #include "../chip.h"
 
 #include <stdint.h>
-
+// FIXME [silabs]:
+typedef void Wdt;
 #ifdef __cplusplus
  extern "C" {
 #endif

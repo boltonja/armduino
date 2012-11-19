@@ -31,7 +31,8 @@
 #define ADC_H_INCLUDED
 
 #include "../chip.h"
-
+// FIXME [silabs]:
+typedef void Adc;
 /// @cond 0
 /**INDENT-OFF**/
 #ifdef __cplusplus
@@ -50,24 +51,15 @@ extern "C" {
 #define ADC_STARTUP_FAST     12
 
 /* Definitions for ADC resolution */
-#if SAM3S_SERIES || SAM4S_SERIES || SAM3XA_SERIES
-enum adc_resolution_t {
-	ADC_10_BITS = ADC_MR_LOWRES_BITS_10,    /* ADC 10-bit resolution */
-	ADC_12_BITS = ADC_MR_LOWRES_BITS_12     /* ADC 12-bit resolution */
-};
-#elif SAM3N_SERIES
-enum adc_resolution_t {
-	ADC_8_BITS = ADC_MR_LOWRES_BITS_8,      /* ADC 8-bit resolution */
-	ADC_10_BITS = ADC_MR_LOWRES_BITS_10     /* ADC 10-bit resolution */
-} ;
-#elif SAM3U_SERIES
-enum adc_resolution_t {
-	ADC_8_BITS = ADC_MR_LOWRES_BITS_8,      /* ADC 8-bit resolution */
-	ADC_10_BITS = ADC12B_MR_LOWRES_BITS_10, /* ADC 10-bit resolution */
- 	ADC_12_BITS = ADC12B_MR_LOWRES_BITS_12  /* ADC 12-bit resolution */
-} ;
-#endif
 
+enum adc_resolution_t {
+	ADC_10_BITS = 0,    /* ADC 10-bit resolution */
+	ADC_12_BITS = 1     /* ADC 12-bit resolution */
+};
+
+
+// FIXME [silabs]: adc_trigger_t
+#if 0
 /* Definitions for ADC trigger */
 enum adc_trigger_t {
 	ADC_TRIG_SW = ADC_MR_TRGEN_DIS,  /* Starting a conversion is only possible by software. */
@@ -86,8 +78,20 @@ enum adc_trigger_t {
 															ADC_MR_TRGEN  /* PWM Event Line 1 */
 #endif
 } ;
+#endif
+/* Definitions for ADC trigger */
+enum adc_trigger_t {
+    ADC_TRIG_SW = 0,  /* Starting a conversion is only possible by software. */
+    ADC_TRIG_EXT = 1,  /* External trigger */
+    ADC_TRIG_TIO_CH_0 = 2,  /* TIO Output of the Timer Counter Channel 0 */
+    ADC_TRIG_TIO_CH_1 = 3,  /* TIO Output of the Timer Counter Channel 1 */
+    ADC_TRIG_TIO_CH_2 = 4,  /* TIO Output of the Timer Counter Channel 2 */
+#if SAM3S_SERIES || SAM4S_SERIES || SAM3XA_SERIES || SAM3U_SERIES
+    ADC_TRIG_PWM_EVENT_LINE_0 = 5, /* PWM Event Line 0 */
+    ADC_TRIG_PWM_EVENT_LINE_1 = 6  /* PWM Event Line 1 */
+#endif
+} ;
 
-#if SAM3S_SERIES || SAM4S_SERIES || SAM3N_SERIES || SAM3XA_SERIES
 /* Definitions for ADC channel number */
 enum adc_channel_num_t {
 	ADC_CHANNEL_0  = 0,
@@ -107,19 +111,7 @@ enum adc_channel_num_t {
 	ADC_CHANNEL_14 = 14,
 	ADC_TEMPERATURE_SENSOR = 15,
 } ;
-#elif SAM3U_SERIES
-/* Definitions for ADC channel number */
-enum adc_channel_num_t {
-	ADC_CHANNEL_0  = 0,
-	ADC_CHANNEL_1  = 1,
-	ADC_CHANNEL_2  = 2,
-	ADC_CHANNEL_3  = 3,
-	ADC_CHANNEL_4  = 4,
-	ADC_CHANNEL_5  = 5,
-	ADC_CHANNEL_6  = 6,
-	ADC_CHANNEL_7  = 7,
-} ;
-#endif
+
 /* Definitions for ADC gain value */
 enum adc_gainvalue_t{
 	ADC_GAINVALUE_0 = 0,
@@ -181,7 +173,7 @@ void adc_enable_interrupt(Adc *p_adc, const uint32_t ul_source);
 void adc_disable_interrupt(Adc *p_adc, const uint32_t ul_source);
 uint32_t adc_get_status(const Adc *p_adc);
 uint32_t adc_get_interrupt_mask(const Adc *p_adc);
-Pdc *adc_get_pdc_base(const Adc *p_adc);
+void adc_get_pdc_base(const Adc *p_adc);
 
 #if SAM3S_SERIES || SAM4S_SERIES || SAM3XA_SERIES
 void adc_configure_timing(Adc *p_adc, const uint8_t uc_tracking,

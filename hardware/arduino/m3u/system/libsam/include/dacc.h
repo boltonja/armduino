@@ -31,7 +31,8 @@
 #define DACC_H_INCLUDED
 
 #include "../chip.h"
-
+// FIXME [silabs]:
+typedef void Dacc;
 /// @cond 0
 /**INDENT-OFF**/
 #ifdef __cplusplus
@@ -67,7 +68,7 @@ uint32_t dacc_get_interrupt_status(Dacc *p_dacc);
 void dacc_write_conversion_data(Dacc *p_dacc, uint32_t ul_data);
 void dacc_set_writeprotect(Dacc *p_dacc, uint32_t ul_enable);
 uint32_t dacc_get_writeprotect_status(Dacc *p_dacc);
-Pdc *dacc_get_pdc_base(Dacc *p_dacc);
+void dacc_get_pdc_base(Dacc *p_dacc);
 
 #if (SAM3N_SERIES) || defined(__DOXYGEN__)
 void dacc_enable(Dacc *p_dacc);

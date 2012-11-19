@@ -23,38 +23,25 @@
 extern "C" {
 #endif
 
+// FIXME [silabs]: stubbed file
 uint32_t millis( void )
 {
-// todo: ensure no interrupts
-	return GetTickCount() ;
+    return 0;
 }
 
 uint32_t micros( void )
 {
-    uint32_t ticks ;
-    uint32_t count ;
-
-    SysTick->CTRL;
-    do {
-        ticks = SysTick->VAL;
-        count = GetTickCount();
-    } while (SysTick->CTRL & SysTick_CTRL_COUNTFLAG_Msk);
-
-    return count * 1000 + (SysTick->LOAD + 1 - ticks) / (SystemCoreClock/1000000) ;
+    return 0;
 }
 
 void delay( uint32_t ms )
 {
-    uint32_t end = GetTickCount() + ms;
-    while (GetTickCount() < end)
-    	yield();
+
 }
 
 void delayMicroseconds( uint32_t us )
 {
-    uint32_t start = micros();
-    while ((micros() - start) < us)
-        ;
+
 }
 
 /*
@@ -62,10 +49,7 @@ void delayMicroseconds( uint32_t us )
  */
 void SysTick_Handler( void )
 {
-	tickReset();
 
-	// Increment tick count each ms
-	TimeTick_Increment() ;
 }
 
 #if defined ( __ICCARM__ ) /* IAR Ewarm 5.41+ */
