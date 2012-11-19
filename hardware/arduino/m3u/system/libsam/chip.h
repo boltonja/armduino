@@ -41,11 +41,14 @@
 /*
  * Peripherals
  */
+#ifdef SILABS_TODO
 #include "include/adc.h"
 #include "include/dacc.h"
 #include "include/interrupt_sam_nvic.h"
+#endif
 #include "include/pio.h"
 #include "include/pmc.h"
+#ifdef SILABS_TODO
 #include "include/pwmc.h"
 #include "include/rtc.h"
 #include "include/rtt.h"
@@ -54,10 +57,13 @@
 #include "include/twi.h"
 #include "include/usart.h"
 #include "include/wdt.h"
+#endif
 
 #include "include/timetick.h"
+#ifdef SILABS_TODO
 #include "include/USB_device.h"
 #include "include/USB_host.h"
+#endif
 
 #if SAM3XA_SERIES
 #include "include/uotghs_device.h"
