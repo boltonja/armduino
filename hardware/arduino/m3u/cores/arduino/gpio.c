@@ -29,6 +29,7 @@
  * @brief STM32F2 GPIO.
  */
 
+#include "Arduino.h"
 #include "gpio.h"
 #include "rcc.h"
 

@@ -16,6 +16,9 @@
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
+//fixme: silabs import timer_set_mode from other project
+#define timer_set_mode(a,b,c) while (0) {}
+
 #include "Arduino.h"
 #include "gpio.h"
 #ifdef __cplusplus

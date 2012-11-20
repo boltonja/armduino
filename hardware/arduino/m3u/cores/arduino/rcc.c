@@ -29,6 +29,7 @@
  * @brief STM32F2 RCC.
  */
 
+#include "Arduino.h"
 #include "rcc.h"
 
 volatile uint32_t g_clk_sys_freq = 0;
