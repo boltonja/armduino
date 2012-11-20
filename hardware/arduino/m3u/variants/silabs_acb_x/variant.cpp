@@ -371,7 +371,7 @@ void init( void )
     gpio_init_all();
 
     // NVIC set vector table location
-    *((volatile uint32_t *)0xE000ED08) = 2048 | 0x1FFFFF80;
+    //*((volatile uint32_t *)0xE000ED08) = 2048 | 0x1FFFFF80;
 
 }
 
