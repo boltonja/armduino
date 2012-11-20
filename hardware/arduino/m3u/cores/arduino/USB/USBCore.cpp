@@ -115,14 +115,14 @@ uint32_t _cdcComposite = 0;
 #define USB_RECV_TIMEOUT
 class LockEP
 {
-	irqflags_t flags;
+	uint8_t flags;
 public:
-	LockEP(uint32_t ep) : flags(cpu_irq_save())
+	LockEP(uint32_t ep)
 	{
 	}
 	~LockEP()
 	{
-		cpu_irq_restore(flags);
+
 	}
 };
 
@@ -130,7 +130,7 @@ public:
 uint32_t USBD_Available(uint32_t ep)
 {
 	LockEP lock(ep);
-	return UDD_FifoByteCount(ep & 0xF);
+	return 1;
 }
 
 //	Non Blocking receive
@@ -267,12 +267,7 @@ USBDevice_ USBDevice;
 
 USBDevice_::USBDevice_()
 {
-	UDD_SetStack(&USB_ISR);
 
-	if (UDD_Init() == 0UL)
-	{
-		_usbInitialized=1UL;
-	}
 }
 
 bool USBDevice_::attach(void)

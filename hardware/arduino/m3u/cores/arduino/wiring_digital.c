@@ -48,7 +48,7 @@
  void pinMode( uint32_t pin_num, uint32_t dwMode ) {
      WiringPinMode mode = dwMode;
      gpio_pin_mode outputMode;
-     bool pwm = false;
+     uint8_t pwm = false;
      const stm32_pin_info *gpio_pin = &PIN_MAP[pin_num];
 
 
