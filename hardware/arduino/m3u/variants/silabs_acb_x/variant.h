@@ -32,7 +32,43 @@
 #ifdef __cplusplus
 extern "C"{
 #endif // __cplusplus
+#include "gpio.h"
+typedef struct stm32_pin_info {
+    gpio_dev *gpio_device;      /**< Maple pin's GPIO device */
+    void *timer_device;    /**< Pin's timer device, if any. */
+    const void *adc_device;  /**< ADC device, if any. */
+    uint8_t gpio_bit;             /**< Pin's GPIO port bit. */
+    uint8_t timer_channel;        /**< Timer channel, or 0 if none. */
+    uint8_t adc_channel;          /**< Pin ADC channel, or ADCx if none. */
+    uint8_t exti_triger;          /**< External interrupt trigger, or 0 if none. */
+} stm32_pin_info;
+extern const stm32_pin_info PIN_MAP[];
+extern const stm32_pin_info PIN_MAP_SHORTS[];
+/**
+ * @brief Pins capable of PWM output.
+ *
+ * Its length is BOARD_NR_PWM_PINS.
+ */
+extern const uint8_t boardPWMPins[];
 
+/**
+ * @brief Array of pins capable of analog input.
+ *
+ * Its length is BOARD_NR_ADC_PINS.
+ */
+extern const uint8_t boardADCPins[];
+
+/**
+ * @brief Pins which are connected to external hardware.
+ *
+ * For example, on Maple boards, it always at least includes
+ * BOARD_LED_PIN.  Its length is BOARD_NR_USED_PINS.
+ */
+extern const uint8_t boardUsedPins[];
+/* Pins table to be instanciated into variant.cpp */
+//extern const PinDescription g_APinDescription[] ;
+#define PMAP_ROW(gpio_dev, gpio_bit, timer_dev, timer_ch, adc_dev, adc_ch, exti_trg) \
+    { gpio_dev, timer_dev, adc_dev, gpio_bit, timer_ch, adc_ch, exti_trg}
 /**
  * Libc porting layers
  */

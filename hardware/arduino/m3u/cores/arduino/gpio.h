@@ -41,7 +41,7 @@ extern "C"{
  */
 
 /** GPIO register map type */
-
+#define REG_SET_CLR(base, set_true, mask) (*(volatile uint32_t*)((uint32_t)&(base) + (4 << !(set_true)))) = (mask)
 typedef struct gpio_reg_map
 {
     volatile uint32_t PB; // Base Address + 0x0

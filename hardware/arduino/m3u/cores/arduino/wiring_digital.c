@@ -20,7 +20,7 @@
 #define timer_set_mode(a,b,c) while (0) {}
 
 #include "Arduino.h"
-#include "gpio.h"
+
 #ifdef __cplusplus
  extern "C" {
 #endif

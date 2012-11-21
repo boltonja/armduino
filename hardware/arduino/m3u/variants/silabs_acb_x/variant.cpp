@@ -103,7 +103,7 @@ extern "C" {
 //      Periph:  Default SiM3U1 peripheral used.
 //      Shorted:
 //      Alternate: Supported alternate SiM3U1 peripheral.
-extern const stm32_pin_info PIN_MAP[BOARD_NR_GPIO_PINS] = {
+const stm32_pin_info PIN_MAP[BOARD_NR_GPIO_PINS] = {
     /*       GPIO     -    Timer  -   ADC    -    EXTI      Pin        Function      Periph     Shorted Alternate */
 
     PMAP_ROW(GPIOD,   5,   NULL,  0,  NULL,  ADCx,  11), /* D0/PD5     UART_RX       UART1_RX           I2C0_SCL   */
@@ -174,19 +174,19 @@ extern const stm32_pin_info PIN_MAP[BOARD_NR_GPIO_PINS] = {
 
 // Array of pins you can use for pwmWrite(). Keep it in Flash because
 // it doesn't change, and so we don't waste RAM.
-extern const uint8_t boardPWMPins[] = {
+const uint8_t boardPWMPins[] = {
     D30, D31, D32, D33, D34, D35, A1, D22, D23, D24, A9, A11
 };
 
 // Array of pins you can use for analogRead().
-extern const uint8_t boardADCPins[] = {
+const uint8_t boardADCPins[] = {
     A0, A2, A3, A4, A5, A6, A7, A12, A13, A14, A15
 };
 
 // Array of pins that the board uses for something special. Other than
 // the button and the LED, it's usually best to leave these pins alone
 // unless you know what you're doing.
-extern const uint8_t boardUsedPins[] = {
+const uint8_t boardUsedPins[] = {
 
 };
 
@@ -225,7 +225,7 @@ static const si_xbar_info xbar_i2c1[] = {XBAR_I2C0_ROW(PIN_TO_PB_MASK2(BOARD_I2C
 static const si_xbar_info xbar_i2c2[] = {XBAR_I2C1_ROW(PIN_TO_PB_MASK2(BOARD_I2C2_SDA_PIN, BOARD_I2C2_SCL_PIN), XBAR_NUM(BOARD_I2C2_SDA_PIN, 0))};
 static const si_xbar_info xbar_ahb_out[] = {XBAR_AHB_OUT_ROW(PIN_TO_PB_MASK(BOARD_AHB_OUT_PIN), XBAR_NUM(BOARD_AHB_OUT_PIN, 1))};
 
-extern const xbar_dev_info XBAR_MAP[XBAR_NULL] = {
+const xbar_dev_info XBAR_MAP[XBAR_NULL] = {
     // USART
     XBAR_ROW(xbar_usart1, XBAR_NUM(BOARD_USART1_TX_PIN, 1)),
     XBAR_ROW(xbar_usart2, XBAR_NUM(BOARD_USART2_TX_PIN, 1)),
@@ -255,7 +255,7 @@ extern const xbar_dev_info XBAR_MAP[XBAR_NULL] = {
     XBAR_ROW(xbar_ahb_out, XBAR_NUM(BOARD_AHB_OUT_PIN, 1)),
 };
 
-extern const stm32_pin_info PIN_MAP_SHORTS[BOARD_NR_SHORTED_PINS] = {
+const stm32_pin_info PIN_MAP_SHORTS[BOARD_NR_SHORTED_PINS] = {
         PIN_ROW_D30_SHORTED
         PIN_ROW_D31_SHORTED
         PIN_ROW_D32_SHORTED
@@ -371,7 +371,7 @@ void init( void )
     gpio_init_all();
 
     // NVIC set vector table location
-    //*((volatile uint32_t *)0xE000ED08) = 2048 | 0x1FFFFF80;
+    *((volatile uint32_t *)0xE000ED08) = 2048;
 
 }
 
