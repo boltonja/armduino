@@ -37,7 +37,7 @@ int main( void )
 {
 	init();
 
-	//delay(1);
+	delay(1);
 
 #if defined(USBCON)
 	//USBDevice.attach();
