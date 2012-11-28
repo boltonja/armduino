@@ -48,14 +48,10 @@ SECTIONS
         _sfixed = .;
         KEEP(*(.vectors .vectors.*))
         *(.text .text.* .gnu.linkonce.t.*)
-        *(.plt)
         *(.glue_7t) *(.glue_7)
-          /* *(.rodata .rodata* .gnu.linkonce.r.*) */
+        *(.rodata .rodata* .gnu.linkonce.r.*)
         *(.ARM.extab* .gnu.linkonce.armextab.*)
-        *(.gcc_except_table)
-        *(.eh_frame_hdr)
-        *(.eh_frame)
-        
+
         /* Support C constructors, and C destructors in both user code
            and the C library. This also provides support for C++ code. */
         . = ALIGN(4);
@@ -106,31 +102,23 @@ SECTIONS
     . = ALIGN(4);
     _etext = .;
 
-    .relocate :
+    .relocate : AT (_etext)
     {
         . = ALIGN(4);
         _srelocate = .;
-        *(.got.plt) *(.got)
-        *(.data .data.* .gnu.linkonce.d.*)
+        *(.ramfunc .ramfunc.*);
+        *(.data .data.*);
         . = ALIGN(4);
         _erelocate = .;
-    } > ram AT> rom
-
-    .rodata :
-      {
-        *(.rodata .rodata.* .gnu.linkonce.r.*)
-        /* ROM image configuration; for C startup */
-        . = ALIGN(4);
-        LONG(LOADADDR(.data));
-      } > rom
+    } > ram
 
     /* .bss section which is used for uninitialized data */
-    .bss ALIGN(4) :
+    .bss ALIGN(4) (NOLOAD) :
     {
         . = ALIGN(4);
         _sbss = . ;
         _szero = .;
-        *(.bss .bss.* .gnu.linkonce.b.*)
+        *(.bss .bss.*)
         *(COMMON)
         . = ALIGN(4);
         _ebss = . ;
