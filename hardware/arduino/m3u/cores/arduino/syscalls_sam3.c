@@ -105,21 +105,20 @@ extern int _write( int file, char *ptr, int len )
 {
     int iIndex = 0;
 
-// FIXME [silabs]: function changed
-#if 0
+// FIXME [silabs]:
 //    for ( ; *ptr != 0 ; ptr++ )
     for ( iIndex=0 ; iIndex < len ; iIndex++, ptr++ )
     {
 //        UART_PutChar( *ptr ) ;
 
 		// Check if the transmitter is ready
-		  while ((UART->UART_SR & UART_SR_TXRDY) != UART_SR_TXRDY)
+		  //while ((UART->UART_SR & UART_SR_TXRDY) != UART_SR_TXRDY)
 			;
 
 		  // Send character
-		  UART->UART_THR = *ptr;
+		  //UART->UART_THR = *ptr;
     }
-#endif
+
     return iIndex ;
 }
 

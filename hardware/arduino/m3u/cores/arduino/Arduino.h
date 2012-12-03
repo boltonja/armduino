@@ -45,7 +45,7 @@ void yield(void);
 #include "wiring_digital.h"
 #include "wiring_analog.h"
 #include "wiring_shift.h"
-#include "WInterrupts.h"
+
 
 /* sketch */
 extern void setup( void ) ;
@@ -115,29 +115,6 @@ typedef enum _EPWMChannel
   PWM_CH7
 } EPWMChannel ;
 
-// Definitions for TC channels
-typedef enum _ETCChannel
-{
-  NOT_ON_TIMER=-1,
-  TC0_CHA0=0,
-  TC0_CHB0,
-  TC0_CHA1,
-  TC0_CHB1,
-  TC0_CHA2,
-  TC0_CHB2,
-  TC1_CHA3,
-  TC1_CHB3,
-  TC1_CHA4,
-  TC1_CHB4,
-  TC1_CHA5,
-  TC1_CHB5,
-  TC2_CHA6,
-  TC2_CHB6,
-  TC2_CHA7,
-  TC2_CHB7,
-  TC2_CHA8,
-  TC2_CHB8
-} ETCChannel ;
 
 /**
  * Pin Attributes to be OR-ed
@@ -155,7 +132,7 @@ typedef enum _ETCChannel
 
 #ifdef __cplusplus
 } // extern "C"
-
+#include "WInterrupts.h"
 #include "WCharacter.h"
 #include "WString.h"
 #include "Tone.h"

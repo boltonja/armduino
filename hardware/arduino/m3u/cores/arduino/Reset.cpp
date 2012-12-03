@@ -25,6 +25,7 @@ extern "C" {
 
 void banzai() {
     *(volatile uint32_t*)0x4002D060 = 0x00000040;
+    while (1);
 }
 
 static int ticks = -1;

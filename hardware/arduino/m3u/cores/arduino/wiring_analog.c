@@ -21,60 +21,87 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-// fixme [silabs]: tc type
-typedef int Tc;
-static int _readResolution = 10;
+
+static int _readResolution = 12;
 static int _writeResolution = 8;
 
 void analogReadResolution(int res) {
-    // FIXME [silabs]: stub function
+    _readResolution = res;
 }
 
 void analogWriteResolution(int res) {
-    // FIXME [silabs]: stub function
+    // Limit to 16 bits otherwise conversion problems (see pwm res map below).
+    if (res > 16) {
+        res = 16;
+    }
+    _writeResolution = res;
 }
 
 static inline uint32_t mapResolution(uint32_t value, uint32_t from, uint32_t to) {
-    // FIXME [silabs]: stub function
+    if (from == to)
+        return value;
+    if (from > to)
+        return value >> (from-to);
+    else
+        return value << (to-from);
 }
 
 eAnalogReference analog_reference = AR_DEFAULT;
 
 void analogReference(eAnalogReference ulMode)
 {
-    // FIXME [silabs]: stub function
+    //analog_reference = ulMode;
 }
 
-uint32_t analogRead(uint32_t ulPin)
+/* Unlike Wiring and Arduino, this assumes that the pin's mode is set
+ * to INPUT_ANALOG. That's faster, but it does require some extra work
+ * on the user's part. Not too much, we think ;). */
+uint32_t analogRead(uint32_t pin)
 {
-    // FIXME [silabs]: stub function
-	return 0;
+    const adc_dev *dev = PIN_MAP[pin].adc_device;
+    if (dev == NULL) {
+        return 0;
+    }
+    uint32_t value = adc_read(dev, PIN_MAP[pin].adc_channel);
+
+    // TODO [silabs]: find way to determine adc resolution. Make an analog class?
+    return mapResolution(value, 12, _readResolution);
 }
 
-static void TC_SetCMR_ChannelA(Tc *tc, uint32_t chan, uint32_t v)
-{
-    // FIXME [silabs]: stub function
-}
-
-static void TC_SetCMR_ChannelB(Tc *tc, uint32_t chan, uint32_t v)
-{
-    // FIXME [silabs]: stub function
-}
-
-static uint8_t PWMEnabled = 0;
-static uint8_t pinEnabled[PINS_COUNT];
-static uint8_t TCChanEnabled[] = {0, 0, 0, 0, 0, 0, 0, 0, 0};
-
-void analogOutputInit(void) {
-    // FIXME [silabs]: stub function
-}
 
 // Right now, PWM output only works on the pins with
 // hardware support.  These are defined in the appropriate
 // pins_*.c file.  For the rest of the pins, we default
 // to digital output.
-void analogWrite(uint32_t ulPin, uint32_t ulValue) {
-    // FIXME [silabs]: stub function
+void analogWrite(uint32_t pin, uint32_t value) {
+
+    const stm32_pin_info *gpio_pin = &PIN_MAP[pin];
+    if (pin >= BOARD_NR_GPIO_PINS) {
+        return;
+    }
+
+    // TODO [silabs]: add DAC here
+    if (0) {
+        return;
+    }
+
+    // PWM
+    // Use shorted pins if possible. They have the EPCA module for the silabs board.
+    uint32_t short_num = board_get_short_num(gpio_pin->gpio_device, gpio_pin->gpio_bit);
+    gpio_pin = short_num ? &PIN_MAP_SHORTS[short_num - 1] : gpio_pin;
+    if (gpio_pin->timer_device != NULL) {
+        timer_dev *dev = gpio_pin->timer_device;
+        uint8_t cc_channel = gpio_pin->timer_channel;
+        timer_set_compare(dev, cc_channel, ((uint32_t)value * (uint32_t)timer_get_reload(dev)) / ((1 << _writeResolution) - 1));
+        return;
+    }
+
+    // Digital Write
+    pinMode(pin, OUTPUT);
+    if (value < (_writeResolution / 2))
+        digitalWrite(pin, LOW);
+    else
+        digitalWrite(pin, HIGH);
 }
 
 #ifdef __cplusplus

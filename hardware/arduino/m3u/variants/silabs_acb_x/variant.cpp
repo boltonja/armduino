@@ -371,8 +371,6 @@ void init( void )
 
     // init gpio
     gpio_init_all();
-
-    // Using RTC, so GPIOs are best setup beforehand.
     setup_flash();
     setup_clocks();
     setup_nvic();

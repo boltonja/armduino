@@ -104,11 +104,7 @@ enum BitOrder {
 	MSBFIRST = 1
 };
 
-//      LOW 0
-//      HIGH 1
-#define CHANGE 2
-#define FALLING 3
-#define RISING 4
+
 
 #define DEFAULT 1
 #define EXTERNAL 0

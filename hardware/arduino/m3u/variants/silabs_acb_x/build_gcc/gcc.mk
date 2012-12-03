@@ -17,6 +17,7 @@
 #
 
 # Tool suffix when cross-compiling
+ARM_GCC_TOOLCHAIN
 CROSS_COMPILE = $(ARM_GCC_TOOLCHAIN)/arm-none-eabi-
 
 # Compilation tools

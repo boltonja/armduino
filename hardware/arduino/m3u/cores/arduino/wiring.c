@@ -24,17 +24,6 @@
 extern "C" {
 #endif
 
-// FIXME [silabs]: stubbed file
-uint32_t millis( void )
-{
-    return 0;
-}
-
-uint32_t micros( void )
-{
-    return 0;
-}
-
 void delay(uint32_t ms) {
     uint32 i;
     for (i = 0; i < ms; i++) {
@@ -46,13 +35,6 @@ void delayMicroseconds(uint32_t us) {
     delay_us(us);
 }
 
-/*
- * Cortex-M3 Systick IT handler: MOVED TO MAIN DUE TO WEAK SYMBOL ISSUE NOT RESOLVED
- */
-void SysTick_Handler( void )
-{
-
-}
 
 
 #ifdef __cplusplus

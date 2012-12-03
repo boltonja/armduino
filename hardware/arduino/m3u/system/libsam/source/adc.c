@@ -270,7 +270,7 @@ uint16 adc_read(const adc_dev *dev, uint8 channel) {
     REG_SET_CLR(regs->CONTROL, 1, SARADC_CR_ADBUSY_MASK);
 
     while (!(regs->FIFOSTATUS & SARADC_FIFOSTATUS_FIFOLVL_MASK));
-    val = regs->DATA * 3300 / 4095;
+    val = regs->DATA;
 
     // Set previous channel
     adc_set_tslot_chnl(dev, 0, prev_chnl);

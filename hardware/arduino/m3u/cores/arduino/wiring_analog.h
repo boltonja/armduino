@@ -70,8 +70,6 @@ extern void analogReadResolution(int res);
  */
 extern void analogWriteResolution(int res);
 
-extern void analogOutputInit( void ) ;
-
 #ifdef __cplusplus
 }
 #endif

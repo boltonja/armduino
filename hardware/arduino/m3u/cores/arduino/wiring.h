@@ -26,7 +26,7 @@ extern "C" {
 /**
  *
  */
-extern void init( void ) ;
+extern void init(void) ;
 
 /**
  * \brief Returns the number of milliseconds since the Arduino board began running the current program.
@@ -35,7 +35,17 @@ extern void init( void ) ;
  *
  * \return Number of milliseconds since the program started (uint32_t)
  */
-extern uint32_t millis( void ) ;
+static inline uint32_t millis(void) {
+    return systick_uptime();
+}
+
+#define CYCLES_PER_MICROSECOND (F_CPU / 1000000)
+#define CLOCK_SPEED_MHZ                 CYCLES_PER_MICROSECOND
+#define CLOCK_SPEED_HZ                  (CLOCK_SPEED_MHZ * 1000000UL)
+
+#ifndef SYSTICK_RELOAD_VAL
+#define SYSTICK_RELOAD_VAL              (CLOCK_SPEED_HZ / 1000 - 1)
+#endif
 
 /**
  * \brief Returns the number of microseconds since the Arduino board began running the current program.
@@ -47,6 +57,22 @@ extern uint32_t millis( void ) ;
  *
  * \note There are 1,000 microseconds in a millisecond and 1,000,000 microseconds in a second.
  */
+static inline uint32_t micros(void) {
+    uint32 ms;
+    uint32 cycle_cnt;
+
+    do {
+        ms = millis();
+        cycle_cnt = systick_get_count();
+    } while (ms != millis());
+
+    // Could fetch a clock speed variable, but then micros loses timing consistency.
+    return ((ms * 1000) +
+            (SYSTICK_RELOAD_VAL + 1 - cycle_cnt) / CYCLES_PER_MICROSECOND);
+
+}
+
+
 extern uint32_t micros( void ) ;
 
 /**
