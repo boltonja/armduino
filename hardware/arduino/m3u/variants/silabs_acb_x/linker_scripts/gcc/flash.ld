@@ -38,24 +38,116 @@ MEMORY
   rom (rx)  : ORIGIN = 2048, LENGTH = 256K - 2048
 }
 
+/*
+ * These force the linker to search for vector table symbols.
+ *
+ * These symbols vary by STM32 family (and also within families).
+ * It's up to the build system to configure the link's search path
+ * properly for the target MCU.
+ */
+EXTERN(__msp_init)
+EXTERN(__exc_reset)
+EXTERN(__exc_nmi)
+EXTERN(__exc_hardfault)
+EXTERN(__exc_memmanage)
+EXTERN(__exc_busfault)
+EXTERN(__exc_usagefault)
+EXTERN(__stm32reservedexception7)
+EXTERN(__stm32reservedexception8)
+EXTERN(__stm32reservedexception9)
+EXTERN(__stm32reservedexception10)
+EXTERN(__exc_svc)
+EXTERN(__exc_debug_monitor)
+EXTERN(__stm32reservedexception13)
+EXTERN(__exc_pendsv)
+EXTERN(__exc_systick)
+
+EXTERN(__irq_wwdg)
+EXTERN(__irq_exti0)
+EXTERN(__irq_exti1)
+EXTERN(__irq_rtc_wkup)   
+EXTERN(__irq_dma1_stream0)
+EXTERN(__irq_dma1_stream1)
+EXTERN(__irq_dma1_stream2)
+EXTERN(__irq_dma1_stream3)
+EXTERN(__irq_dma1_stream4)
+EXTERN(__irq_dma1_stream5)
+EXTERN(__irq_dma1_stream6)
+EXTERN(__irq_dma1_stream7)
+EXTERN(__irq_dma1_stream8)
+EXTERN(__irq_dma1_stream9)
+EXTERN(__irq_dma1_stream10)
+EXTERN(__irq_dma1_stream11)
+EXTERN(__irq_dma1_stream12)
+EXTERN(__irq_dma1_stream13)
+EXTERN(__irq_dma1_stream14)
+EXTERN(__irq_dma1_stream15)
+EXTERN(__irq_tim1_low)
+EXTERN(__irq_tim1_high)
+EXTERN(__irq_tim2_low)
+EXTERN(__irq_tim2_high)
+EXTERN(__irq_epca1)
+EXTERN(__irq_pca1)
+EXTERN(__irq_pca2)
+EXTERN(__irq_usart1)
+EXTERN(__irq_usart2)
+EXTERN(__irq_spi1)
+EXTERN(__irq_spi2)
+EXTERN(__irq_spi3)
+EXTERN(__irq_i2c1)
+EXTERN(__irq_i2c2)
+EXTERN(__irq_usb)
+EXTERN(__irq_adc1)
+EXTERN(__irq_adc2)      
+EXTERN(__irq_cmp1)
+EXTERN(__irq_cmp2)
+EXTERN(__irq_capsense)
+EXTERN(__irq_i2s1rx)
+EXTERN(__irq_i2s1tx)
+EXTERN(__irq_aes)
+EXTERN(__irq_vddlow)
+EXTERN(__irq_rtcfail)
+EXTERN(__irq_pmatch)
+EXTERN(__irq_uart1)
+EXTERN(__irq_uart2)
+EXTERN(__irq_dac1)
+EXTERN(__irq_dac2)
+EXTERN(__irq_lptimer)
+EXTERN(__irq_pll)
+EXTERN(__irq_vbusinvalid)
+EXTERN(__irq_vreglow)
+
+/* C runtime initialization function. */
+EXTERN(start_c)
+
+/* main entry point */
+EXTERN(main)
+
+/* Initial stack pointer value. */
+EXTERN(__msp_init)
+PROVIDE(__msp_init = ORIGIN(ram) + LENGTH(ram));
+
+/* Reset vector and chip reset entry point */
+EXTERN(start_c)
+ENTRY(start_c)
+PROVIDE(__exc_reset = start_c);
+
+/* STM32 vector table. */
+EXTERN(__sim3_vector_table)
 
 /* Section Definitions */
 SECTIONS
-{
+{        
     .text :
     {
         . = ALIGN(4);
         _sfixed = .;
-        KEEP(*(.vectors .vectors.*))
+        *(.sim3.interrupt_vector)
         *(.text .text.* .gnu.linkonce.t.*)
-        *(.plt)
         *(.glue_7t) *(.glue_7)
-          /* *(.rodata .rodata* .gnu.linkonce.r.*) */
+        *(.rodata .rodata* .gnu.linkonce.r.*)
         *(.ARM.extab* .gnu.linkonce.armextab.*)
-        *(.gcc_except_table)
-        *(.eh_frame_hdr)
-        *(.eh_frame)
-        
+
         /* Support C constructors, and C destructors in both user code
            and the C library. This also provides support for C++ code. */
         . = ALIGN(4);
@@ -106,31 +198,23 @@ SECTIONS
     . = ALIGN(4);
     _etext = .;
 
-    .relocate :
+    .relocate : AT (_etext)
     {
         . = ALIGN(4);
         _srelocate = .;
-        *(.got.plt) *(.got)
-        *(.data .data.* .gnu.linkonce.d.*)
+        *(.ramfunc .ramfunc.*);
+        *(.data .data.*);
         . = ALIGN(4);
         _erelocate = .;
-    } > ram AT> rom
-
-    .rodata :
-      {
-        *(.rodata .rodata.* .gnu.linkonce.r.*)
-        /* ROM image configuration; for C startup */
-        . = ALIGN(4);
-        LONG(LOADADDR(.data));
-      } > rom
+    } > ram
 
     /* .bss section which is used for uninitialized data */
-    .bss ALIGN(4) :
+    .bss ALIGN(4) (NOLOAD) :
     {
         . = ALIGN(4);
         _sbss = . ;
         _szero = .;
-        *(.bss .bss.* .gnu.linkonce.b.*)
+        *(.bss .bss.*)
         *(COMMON)
         . = ALIGN(4);
         _ebss = . ;

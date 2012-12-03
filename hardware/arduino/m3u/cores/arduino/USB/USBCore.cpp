@@ -18,7 +18,7 @@
 #include "USBAPI.h"
 #include "Reset.h"
 #include <stdio.h>
-
+#include "USBCore.h"
 //#define TRACE_CORE(x)	x
 #define TRACE_CORE(x)
 
@@ -66,7 +66,7 @@ const uint16_t STRING_IPRODUCT[17] = {
 #elif USB_PID == USB_PID_DUE
 	'A','r','d','u','i','n','o',' ','D','u','e',' ',' ',' ',' ',' '
 #else
-#error "Need an USB PID"
+	'A','r','d','u','i','n','o',' ','D','u','e',' ',' ',' ',' ',' '
 #endif
 };
 
@@ -81,6 +81,9 @@ const uint16_t STRING_IMANUFACTURER[12] = {
 #define DEVICE_CLASS 0x00
 #endif
 
+// fixme [silabs]: usb manufacturer and product ids
+#define IMANUFACTURER 01
+#define IPRODUCT 02
 //	DEVICE DESCRIPTOR
 const DeviceDescriptor USB_DeviceDescriptor =
 	D_DEVICE(0x00,0x00,0x00,64,USB_VID,USB_PID,0x100,IMANUFACTURER,IPRODUCT,0,1);

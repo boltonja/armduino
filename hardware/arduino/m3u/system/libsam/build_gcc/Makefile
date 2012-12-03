@@ -24,105 +24,40 @@ SUBMAKE_OPTIONS=--no-builtin-rules --no-builtin-variables --no-print-directory
 # Rules
 #-------------------------------------------------------------------------------
 
-# libsam_sam3s4c_gcc_rel.a libsam_sam3u4e_gcc_rel.a libsam_sam3x8e_gcc_rel.a libsam_sam3x8h_gcc_rel.a
-all: libsam_sam3s4c_gcc_dbg.a libsam_sam3u4e_gcc_dbg.a libsam_sam3x8e_gcc_dbg.a libsam_sam3x8h_gcc_dbg.a
+all: silabs_acb_x
+#all: libsim_sim3u167_gcc_dbg.a
 
-arduino_due_u:
+silabs_acb_x:
 	@echo ------------------------------------------------------------------------------------
 	@echo --- Making $@
 	@echo ---
-	@$(MAKE) CHIP=__SAM3U4E__ $(SUBMAKE_OPTIONS) OUTPUT_BIN=../../../variants/arduino_due_u -f sam3.mk
+	@$(MAKE) CHIP=__SIM3U167__ $(SUBMAKE_OPTIONS) OUTPUT_BIN=../../../variants/silabs_acb_x -f sim3.mk
 	@echo ------------------------------------------------------------------------------------
 
-arduino_due_x:
+
+.PHONY: libsim_sim3u167_gcc_dbg.a
+libsim_sim3u167_gcc_dbg.a:
 	@echo ------------------------------------------------------------------------------------
 	@echo --- Making $@
 	@echo ---
-	@$(MAKE) CHIP=__SAM3X8E__ $(SUBMAKE_OPTIONS) OUTPUT_BIN=../../../variants/arduino_due_x -f sam3.mk
+	@$(MAKE) CHIP=__SIM3U167__ DEBUG=1 $(SUBMAKE_OPTIONS) -f sim3.mk
 	@echo ------------------------------------------------------------------------------------
 
-.PHONY: libsam_sam3s4c_gcc_dbg.a
-libsam_sam3s4c_gcc_dbg.a:
+.PHONY: libsim_sim3u167_gcc_rel.a
+libsim_sim3u167_gcc_rel.a:
 	@echo ------------------------------------------------------------------------------------
 	@echo --- Making $@
 	@echo ---
-	@$(MAKE) CHIP=__SAM3S4C__ DEBUG=1 $(SUBMAKE_OPTIONS) -f sam3.mk
-	@echo ------------------------------------------------------------------------------------
-
-.PHONY: libsam_sam3s4c_gcc_rel.a
-libsam_sam3s4c_gcc_rel.a:
-	@echo ------------------------------------------------------------------------------------
-	@echo --- Making $@
-	@echo ---
-	@$(MAKE) CHIP=__SAM3S4C__ $(SUBMAKE_OPTIONS) -f sam3.mk
-	@echo ------------------------------------------------------------------------------------
-
-.PHONY: libsam_sam3u4e_gcc_dbg.a
-libsam_sam3u4e_gcc_dbg.a:
-	@echo ------------------------------------------------------------------------------------
-	@echo --- Making $@
-	@echo ---
-	@$(MAKE) CHIP=__SAM3U4E__ DEBUG=1 $(SUBMAKE_OPTIONS) -f sam3.mk
-	@echo ------------------------------------------------------------------------------------
-
-.PHONY: libsam_sam3u4e_gcc_rel.a
-libsam_sam3u4e_gcc_rel.a:
-	@echo ------------------------------------------------------------------------------------
-	@echo --- Making $@
-	@echo ---
-	@$(MAKE) CHIP=__SAM3U4E__ $(SUBMAKE_OPTIONS) -f sam3.mk
-	@echo ------------------------------------------------------------------------------------
-
-.PHONY: libsam_sam3x8e_gcc_dbg.a
-libsam_sam3x8e_gcc_dbg.a:
-	@echo ------------------------------------------------------------------------------------
-	@echo --- Making $@
-	@echo ---
-	@$(MAKE) CHIP=__SAM3X8E__ DEBUG=1 $(SUBMAKE_OPTIONS) -f sam3.mk
-	@echo ------------------------------------------------------------------------------------
-
-.PHONY: libsam_sam3x8e_gcc_rel.a
-libsam_sam3x8e_gcc_rel.a:
-	@echo ------------------------------------------------------------------------------------
-	@echo --- Making $@
-	@echo ---
-	@$(MAKE) CHIP=__SAM3X8E__ $(SUBMAKE_OPTIONS) -f sam3.mk
-	@echo ------------------------------------------------------------------------------------
-
-.PHONY: libsam_sam3x8h_gcc_dbg.a
-libsam_sam3x8h_gcc_dbg.a:
-	@echo ------------------------------------------------------------------------------------
-	@echo --- Making $@
-	@echo ---
-	@$(MAKE) CHIP=__SAM3X8H__ DEBUG=1 $(SUBMAKE_OPTIONS) -f sam3.mk
-	@echo ------------------------------------------------------------------------------------
-
-.PHONY: libsam_sam3x8h_gcc_rel.a
-libsam_sam3x8h_gcc_rel.a:
-	@echo ------------------------------------------------------------------------------------
-	@echo --- Making $@
-	@echo ---
-	@$(MAKE) CHIP=__SAM3X8H__ $(SUBMAKE_OPTIONS) -f sam3.mk
+	@$(MAKE) CHIP=__SIM3U167__ $(SUBMAKE_OPTIONS) -f sim3.mk
 	@echo ------------------------------------------------------------------------------------
 
 .PHONY: clean
 clean:
 	@echo ------------------------------------------------------------------------------------
-	@echo --- Cleaning sam3s4c release and debug
-	@$(MAKE) CHIP=__SAM3S4C__ $(SUBMAKE_OPTIONS) -f sam3.mk $@
-	@$(MAKE) CHIP=__SAM3S4C__ DEBUG=1 $(SUBMAKE_OPTIONS) -f sam3.mk $@
-
-	@echo --- Cleaning sam3u4e release and debug
-	@$(MAKE) CHIP=__SAM3U4E__ $(SUBMAKE_OPTIONS) -f sam3.mk $@
-	@$(MAKE) CHIP=__SAM3U4E__ DEBUG=1 $(SUBMAKE_OPTIONS) -f sam3.mk $@
-
-	@echo --- Cleaning sam3x8e release and debug
-	@$(MAKE) CHIP=__SAM3X8E__ $(SUBMAKE_OPTIONS) -f sam3.mk $@
-	@$(MAKE) CHIP=__SAM3X8E__ DEBUG=1 $(SUBMAKE_OPTIONS) -f sam3.mk $@
-
-	@echo --- Cleaning sam3x8h release and debug
-	@$(MAKE) CHIP=__SAM3X8H__ $(SUBMAKE_OPTIONS) -f sam3.mk $@
-	@$(MAKE) CHIP=__SAM3X8H__ DEBUG=1 $(SUBMAKE_OPTIONS) -f sam3.mk $@
+	@echo --- Cleaning sim3u167 release and debug
+	@$(MAKE) CHIP=__SIM3U167__ $(SUBMAKE_OPTIONS) -f sim3.mk $@
+	@$(MAKE) CHIP=__SIM3U167__ DEBUG=1 $(SUBMAKE_OPTIONS) -f sim3.mk $@
+	@$(MAKE) CHIP=__SIM3U167__ $(SUBMAKE_OPTIONS) OUTPUT_BIN=../../../variants/silabs_acb_x -f sim3.mk $@
 	@echo ------------------------------------------------------------------------------------
 
 

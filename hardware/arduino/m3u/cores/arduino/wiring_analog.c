@@ -21,7 +21,8 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-
+// fixme [silabs]: tc type
+typedef int Tc;
 static int _readResolution = 10;
 static int _writeResolution = 8;
 

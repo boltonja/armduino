@@ -20,56 +20,64 @@
 #include <stdio.h>
 #include <string.h>
 #include "UARTClass.h"
-
+#include <variant.h>
 // Constructors ////////////////////////////////////////////////////////////////
 
-UARTClass::UARTClass( Uart* pUart, IRQn_Type dwIrq, uint32_t dwId, RingBuffer* pRx_buffer )
+UARTClass::UARTClass(struct usart_dev* dev, uint8_t* pBuff, uint16_t buffSize, uint8_t txPin, uint8_t rxPin)
 {
-
+    _dev = dev;
+    _pBuff = pBuff;
+    _buffSize = buffSize;
+    _txPin = txPin;
+    _rxPin = rxPin;
 }
 
 // Public Methods //////////////////////////////////////////////////////////////
 
-void UARTClass::begin( const uint32_t dwBaudRate )
+void UARTClass::begin(const uint32_t baud)
 {
+    const stm32_pin_info *txi = &PIN_MAP[this->_txPin];
+    const stm32_pin_info *rxi = &PIN_MAP[this->_rxPin];
 
+    usart_config_gpios_async(this->_dev,
+                             rxi->gpio_device, rxi->gpio_bit,
+                             txi->gpio_device, txi->gpio_bit,
+                             0);
+    usart_init(this->_dev, _pBuff, _buffSize);
+    usart_set_baud_rate(this->_dev, 0, baud);
+    usart_enable(this->_dev);
 }
 
 void UARTClass::end( void )
 {
-
+    usart_disable(this->_dev);
 }
 
 int UARTClass::available( void )
 {
-  return (uint32_t)0;
+    return usart_data_available(this->_dev);
 }
 
 int UARTClass::peek( void )
 {
-    return -1 ;
+    return rb_peek(_dev->rb);
 
 }
 
 int UARTClass::read( void )
 {
-
-  return 0 ;
+    // Block until a byte becomes available, to save user confusion.
+    while (!this->available())
+        ;
+    return usart_getc(this->_dev);
 }
 
 void UARTClass::flush( void )
 {
-
+    usart_reset_rx(this->_dev);
 }
 
 size_t UARTClass::write( const uint8_t uc_data )
 {
-
-  return 1;
+    usart_putc(this->_dev, uc_data);
 }
-
-void UARTClass::IrqHandler( void )
-{
-
-}
-

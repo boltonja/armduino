@@ -62,6 +62,9 @@ extern void digitalWrite( uint32_t dwPin, uint32_t dwVal ) ;
  */
 extern int digitalRead( uint32_t ulPin ) ;
 
+
+void togglePin(uint8_t pin);
+
 #ifdef __cplusplus
 }
 #endif

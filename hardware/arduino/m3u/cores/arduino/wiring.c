@@ -18,6 +18,7 @@
 
 #include "Arduino.h"
 #include "Reset.h"
+#include "delay.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -34,14 +35,15 @@ uint32_t micros( void )
     return 0;
 }
 
-void delay( uint32_t ms )
-{
-
+void delay(uint32_t ms) {
+    uint32 i;
+    for (i = 0; i < ms; i++) {
+        delayMicroseconds(1000);
+    }
 }
 
-void delayMicroseconds( uint32_t us )
-{
-
+void delayMicroseconds(uint32_t us) {
+    delay_us(us);
 }
 
 /*
@@ -52,20 +54,6 @@ void SysTick_Handler( void )
 
 }
 
-#if defined ( __ICCARM__ ) /* IAR Ewarm 5.41+ */
-extern signed int putchar( signed int c ) ;
-/**
- * \brief
- *
- * \param c  Character to output.
- *
- * \return The character that was output.
- */
-extern WEAK signed int putchar( signed int c )
-{
-    return c ;
-}
-#endif /* __ICCARM__ */
 
 #ifdef __cplusplus
 }

@@ -41,33 +41,32 @@
 /*
  * Peripherals
  */
-#ifdef SILABS_TODO
-#include "include/adc.h"
-#include "include/dacc.h"
-#include "include/interrupt_sam_nvic.h"
-#endif
-#include "include/pio.h"
-#include "include/pmc.h"
-#ifdef SILABS_TODO
-#include "include/pwmc.h"
-#include "include/rtc.h"
-#include "include/rtt.h"
-#include "include/spi.h"
-#include "include/tc.h"
-#include "include/twi.h"
-#include "include/usart.h"
-#include "include/wdt.h"
-#endif
+#include <libmaple/adc.h>
+#include <libmaple/dac.h>
+#include <libmaple/dma.h>
+#include <libmaple/exti.h>
+#include <libmaple/flash.h>
+#include <libmaple/fsmc.h>
+#include <libmaple/gpio.h>
+#include <libmaple/i2c.h>
+#include <libmaple/iwdg.h>
+#include <libmaple/libmaple_types.h>
+#include <libmaple/libmaple.h>
+#include <libmaple/nvic.h>
+#include <libmaple/pwr.h>
+#include <libmaple/rcc.h>
+#include <libmaple/ring_buffer.h>
+#include <libmaple/scb.h>
+#include <libmaple/spi.h>
+#include <libmaple/stm32.h>
+#include <libmaple/syscfg.h>
+#include <libmaple/systick.h>
+#include <libmaple/timer.h>
+#include <libmaple/usart.h>
+#include <libmaple/usb_cdcacm.h>
+#include <libmaple/usb.h>
+#include <libmaple/util.h>
+#include <libmaple/xbar.h>
 
-#include "include/timetick.h"
-#ifdef SILABS_TODO
-#include "include/USB_device.h"
-#include "include/USB_host.h"
-#endif
-
-#if SAM3XA_SERIES
-#include "include/uotghs_device.h"
-#include "include/uotghs_host.h"
-#endif /* SAM3XA_SERIES */
 
 #endif /* _LIB_SAM_ */

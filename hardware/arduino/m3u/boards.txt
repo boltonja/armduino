@@ -20,6 +20,6 @@ silabs_acb_x_dbg.build.core=arduino
 silabs_acb_x_dbg.build.extra_flags=-D__SAM3X8E__ -mthumb -DUSB_PID={build.pid} -DUSB_VID={build.vid} -DUSBCON
 silabs_acb_x_dbg.build.ldscript=linker_scripts/gcc/flash.ld
 silabs_acb_x_dbg.build.variant=silabs_acb_x
-silabs_acb_x_dbg.build.variant_system_lib=libsam_sam3x8e_gcc_rel.a
+silabs_acb_x_dbg.build.variant_system_lib=libsam_sim3u167_gcc_rel.a
 silabs_acb_x_dbg.build.vid=0x2341
 silabs_acb_x_dbg.build.pid=0x003e

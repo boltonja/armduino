@@ -28,25 +28,26 @@
 class UARTClass : public HardwareSerial
 {
   protected:
-    RingBuffer *_rx_buffer ;
+    uint8_t* _pBuff;
+    uint16_t _buffSize;
 
   protected:
-    Uart* _pUart ;
-    IRQn_Type _dwIrq ;
-    uint32_t _dwId ;
+    struct usart_dev* _dev;
+    uint8_t _txPin;
+    uint8_t _rxPin;
 
   public:
-    UARTClass( Uart* pUart, IRQn_Type dwIrq, uint32_t dwId, RingBuffer* pRx_buffer ) ;
+    UARTClass(struct usart_dev* dev, uint8_t* pBuff, uint16_t buffSize, uint8_t tx_pin, uint8_t rx_pin);
 
-    void begin( const uint32_t dwBaudRate ) ;
-    void end( void ) ;
-    int available( void ) ;
-    int peek( void ) ;
-    int read( void ) ;
-    void flush( void ) ;
-    size_t write( const uint8_t c ) ;
+    void begin(const uint32_t baud) ;
+    void end(void) ;
+    int available(void) ;
+    int peek(void) ;
+    int read(void) ;
+    void flush(void) ;
+    size_t write(const uint8_t c) ;
 
-    void IrqHandler( void ) ;
+    void IrqHandler(void) ;
 
 #if defined __GNUC__ /* GCC CS3 */
     using Print::write ; // pull in write(str) and write(buf, size) from Print
@@ -55,7 +56,7 @@ class UARTClass : public HardwareSerial
 //    virtual void write( const uint8_t *buffer, size_t size ) ;
 #endif
 
-    operator bool() { return true; }; // UART always active
+    operator bool() {return true;}; // UART always active
 };
 
 #endif // _UART_CLASS_

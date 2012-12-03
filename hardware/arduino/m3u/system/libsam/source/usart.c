@@ -1,409 +1,286 @@
-/* ----------------------------------------------------------------------------
- *         SAM Software Package License
- * ----------------------------------------------------------------------------
- * Copyright (c) 2011-2012, Atmel Corporation
+/******************************************************************************
+ * The MIT License
  *
- * All rights reserved.
+ * Copyright (c) 2010 Perry Hung.
+ * Copyright (c) 2011 LeafLabs, LLC.
  *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following condition is met:
+ * Permission is hereby granted, free of charge, to any person
+ * obtaining a copy of this software and associated documentation
+ * files (the "Software"), to deal in the Software without
+ * restriction, including without limitation the rights to use, copy,
+ * modify, merge, publish, distribute, sublicense, and/or sell copies
+ * of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
  *
- * - Redistributions of source code must retain the above copyright notice,
- * this list of conditions and the disclaimer below.
+ * The above copyright notice and this permission notice shall be
+ * included in all copies or substantial portions of the Software.
  *
- * Atmel's name may not be used to endorse or promote products derived from
- * this software without specific prior written permission.
- *
- * DISCLAIMER: THIS SOFTWARE IS PROVIDED BY ATMEL "AS IS" AND ANY EXPRESS OR
- * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
- * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT ARE
- * DISCLAIMED. IN NO EVENT SHALL ATMEL BE LIABLE FOR ANY DIRECT, INDIRECT,
- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
- * LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA,
- * OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
- * LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
- * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- * ----------------------------------------------------------------------------
- */
-
-/** \addtogroup usart_module Working with USART
- * The USART driver provides the interface to configure and use the USART peripheral.\n
- *
- * The USART supports several kinds of comminication modes such as full-duplex asynchronous/
- * synchronous serial commnunication,RS485 with driver control signal,ISO7816,SPI and Test modes.
- *
- * To start a USART transfer with \ref AT91SAM3S_PDC "PDC" support, the user could follow these steps:
- * <ul>
- * <li> Configure USART with expected mode and baudrate(see \ref USART_Configure), which could be done by:
- * -# Resetting and disabling transmitter and receiver by setting US_CR(Control Register). </li>
- * -# Conifguring the USART in a specific mode by setting USART_MODE bits in US_MR(Mode Register) </li>
- * -# Setting baudrate which is different from mode to mode.
-   </li>
- * <li> Enable transmitter or receiver respectively by set US_CR_TXEN or US_CR_RXEN in US_CR.</li>
- * <li> Read from or write to the peripheral with  \ref USART_ReadBuffer or \ref USART_WriteBuffer.
-        These operations could be done by polling or interruption. </li>
- * <li> For polling, check the status bit US_CSR_ENDRX/US_CSR_RXBUFF (READ) or US_CSR_ENDTX/
-        US_CSR_TXBUFE (WRITE).  </li>
- * <li> For interruption,"enable" the status bit through US_IER and
-        realize the hanler with USARTx_IrqHandler according to IRQ vector
-        table which is defined in board_cstartup_<toolchain>.c
-        To enable the interruption of USART,it should be configured with priority and enabled first through
-        NVIC .</li>
- * </ul>
- *
- * For more accurate information, please look at the USART section of the
- * Datasheet.
- *
- * Related files :\n
- * \ref usart.c\n
- * \ref usart.h\n
-*/
-
-
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+ * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+ * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS
+ * BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN
+ * ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
+ * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ *****************************************************************************/
 
 /**
- * \file
- *
- * Implementation of USART (Universal Synchronous Asynchronous Receiver Transmitter)
- * controller.
- *
+ * @file libmaple/usart.c
+ * @author Marti Bolivar <mbolivar@leaflabs.com>,
+ *         Perry Hung <perry@leaflabs.com>
+ * @brief Portable USART routines
  */
-/*------------------------------------------------------------------------------
- *         Headers
- *------------------------------------------------------------------------------*/
-#include "chip.h"
 
-#include <assert.h>
-#include <string.h>
-
-/*----------------------------------------------------------------------------
- *        Local definitions
- *----------------------------------------------------------------------------*/
+#include <libmaple/usart.h>
 
 
-/*------------------------------------------------------------------------------
- *         Exported functions
- *------------------------------------------------------------------------------*/
-
-/**
- * \brief Configures an USART peripheral with the specified parameters.
- *
- *
- *  \param usart  Pointer to the USART peripheral to configure.
- *  \param mode  Desired value for the USART mode register (see the datasheet).
- *  \param baudrate  Baudrate at which the USART should operate (in Hz).
- *  \param masterClock  Frequency of the system master clock (in Hz).
+/*
+ * Devices
  */
-void USART_Configure(Usart *usart,
-                            uint32_t mode,
-                            uint32_t baudrate,
-                            uint32_t masterClock)
-{
-    /* Reset and disable receiver & transmitter*/
-    usart->US_CR = US_CR_RSTRX | US_CR_RSTTX
-                   | US_CR_RXDIS | US_CR_TXDIS;
 
-    /* Configure mode*/
-    usart->US_MR = mode;
+static ring_buffer usart1_rb;
+static usart_dev usart1 = {
+    .regs     = USART1_BASE,
+    .rb       = &usart1_rb,
+    .clk_id   = CLK_UART1,
+    .xbar_id = XBAR_USART1,
+    .irq_num  = NVIC_UART1,
+};
+/** USART1 device */
+usart_dev *USART1 = &usart1;
 
-    /* Configure baudrate*/
-    /* Asynchronous, no oversampling*/
-    if ( ((mode & US_MR_SYNC) == 0) && ((mode & US_MR_OVER) == 0) )
-    {
-        usart->US_BRGR = (masterClock / baudrate) / 16;
-    }
+static ring_buffer usart2_rb;
+static usart_dev usart2 = {
+    .regs     = USART2_BASE,
+    .rb       = &usart2_rb,
+    .clk_id   = CLK_UART2,
+    .xbar_id = XBAR_USART2,
+    .irq_num  = NVIC_UART2,
+};
+/** USART2 device */
+usart_dev *USART2 = &usart2;
 
-    if( ((mode & US_MR_USART_MODE_SPI_MASTER) == US_MR_USART_MODE_SPI_MASTER)
-     || ((mode & US_MR_SYNC) == US_MR_SYNC))
-    {
-        if( (mode & US_MR_USCLKS_Msk) == US_MR_USCLKS_MCK)
-        {
-            usart->US_BRGR = masterClock / baudrate;
-        }
-        else
-        {
-            if ( (mode & US_MR_USCLKS_DIV) == US_MR_USCLKS_DIV)
-            {
-                usart->US_BRGR = masterClock / baudrate / 8;
-            }
-        }
-    }
-    /* TODO other modes*/
+static ring_buffer usart3_rb;
+static usart_dev usart3 = {
+    .regs     = USART3_BASE,
+    .rb       = &usart3_rb,
+    .clk_id   = CLK_USART1,
+    .xbar_id = XBAR_USART3,
+    .irq_num  = NVIC_USART1,
+};
+/** USART3 device */
+usart_dev *USART3 = &usart3;
+
+static ring_buffer usart4_rb;
+static usart_dev usart4 = {
+    .regs     = USART4_BASE,
+    .rb       = &usart4_rb,
+    .clk_id   = CLK_USART2,
+    .xbar_id = XBAR_USART4,
+    .irq_num  = NVIC_USART2,
+};
+/** USART4 device */
+usart_dev *USART4 = &usart4;
+
+/*
+ * Routines
+ */
+
+void usart_config_gpios_async(usart_dev *udev,
+                              gpio_dev *rx_dev, uint8 rx,
+                              gpio_dev *tx_dev, uint8 tx,
+                              unsigned flags) {
+    gpio_set_mode(rx_dev, rx, GPIO_DIGITAL_INPUT_PULLUP);
+    gpio_set_mode(tx_dev, tx, GPIO_DIGITAL_PP);
 }
-/**
- * \brief Enables or disables the transmitter of an USART peripheral.
- *
- *
- * \param usart  Pointer to an USART peripheral
- * \param enabled  If true, the transmitter is enabled; otherwise it is
- *                disabled.
- */
-void USART_SetTransmitterEnabled(Usart *usart, uint8_t enabled)
-{
-    if (enabled) {
 
-        usart->US_CR = US_CR_TXEN;
-    }
-    else {
+void usart_set_baud_rate(usart_dev *dev, uint32 clock_speed, uint32 baud) {
+    uint32 b_div;
 
-        usart->US_CR = US_CR_TXDIS;
+    /* Figure out the clock speed, if the user doesn't give one. */
+    if (clock_speed == 0) {
+        clock_speed = clk_get_bus_freq(dev->clk_id);
     }
+    ASSERT(clock_speed);
+    // Full duplex mode
+    REG_SET_CLR(dev->regs->MODE, 0, 0x08000000);
+    /* Convert desired baud rate to baud rate register setting. */
+    b_div = clock_speed / (2 * baud) - 1;
+    dev->regs->BAUDRATE = (b_div & 0xffff) | (b_div << 16);
 }
 
 /**
- * \brief Enables or disables the receiver of an USART peripheral
+ * @brief Call a function on each USART.
+ * @param fn Function to call.
+ */
+void usart_foreach(void (*fn)(usart_dev*)) {
+    fn(USART1);
+}
+
+/**
+ * @brief Get GPIO alternate function mode for a USART.
+ * @param dev USART whose gpio_af to get.
+ * @return gpio_af corresponding to dev.
+ */
+
+
+/*
+ * Interrupt handlers.
+ */
+
+void __irq_uart1(void) {
+    usart_irq(&usart1_rb, USART1_BASE);
+}
+void __irq_uart2(void) {
+    usart_irq(&usart2_rb, USART2_BASE);
+}
+void __irq_usart1(void) {
+    usart_irq(&usart3_rb, USART3_BASE);
+}
+void __irq_usart2(void) {
+    usart_irq(&usart4_rb, USART4_BASE);
+}
+
+/**
+ * @brief Initialize a serial port.
+ * @param dev         Serial port to be initialized
+ */
+void usart_init(usart_dev *dev, uint8_t *buff, uint16 buff_size) {
+    usart_reg_map *regs = dev->regs;
+    rb_init(dev->rb, buff_size, buff);
+    // Clocking must be enabled to modify registers
+    clk_enable_dev(dev->clk_id);
+
+    // Configuration: 8-bit, 1stop, no-parity
+
+    // tx configuration
+    REG_SET_CLR(regs->CONFIG, 0,
+            UART_CFGR_TDATLN_MASK | UART_CFGR_TPAREN_MASK | UART_CFGR_TSTPMD_MASK | UART_CFGR_TINVEN_MASK);
+    REG_SET_CLR(regs->CONFIG, 1,
+            UART_CFGR_TDATLN_8_BITS | UART_CFGR_TSTRTEN_EN | UART_CFGR_TSTPEN_EN | (1 << UART_CFGR_TSTPMD_BIT));
+
+    // rx configuration
+    REG_SET_CLR(regs->CONFIG, 0,
+            UART_CFGR_RDATLN_MASK | UART_CFGR_RSTPMD_MASK | UART_CFGR_RINVEN_MASK);
+    REG_SET_CLR(regs->CONFIG, 1,
+            UART_CFGR_RDATLN_8_BITS | UART_CFGR_RSTRTEN_EN | UART_CFGR_RSTPEN_EN | (1 << UART_CFGR_RSTPMD_BIT));
+
+    // Interrupt when a single byte is in rx buffer
+    REG_SET_CLR(regs->FIFOCN, 0 , 0x00000030);
+
+    // Enable IRQ on NVIC
+    nvic_clr_pending_irq(dev->irq_num);
+    nvic_irq_enable(dev->irq_num);
+}
+
+/**
+ * @brief Enable a serial port.
  *
+ * USART is enabled in single buffer transmission mode, multibuffer
+ * receiver mode, 8n1.
  *
- * \param usart  Pointer to an USART peripheral
- * \param enabled  If true, the receiver is enabled; otherwise it is disabled.
- */
-void USART_SetReceiverEnabled(Usart *usart,
-                                     uint8_t enabled)
-{
-    if (enabled) {
-
-        usart->US_CR = US_CR_RXEN;
-    }
-    else {
-
-        usart->US_CR = US_CR_RXDIS;
-    }
-}
-
-/**
- * \brief Sends one packet of data through the specified USART peripheral. This
- * function operates synchronously, so it only returns when the data has been
- * actually sent.
+ * Serial port must have a baud rate configured to work properly.
  *
+ * @param dev Serial port to enable.
+ * @see usart_set_baud_rate()
+ */
+typedef enum SI32_UART_STOP_BITS_Enum
+{
+   SI32_UART_A_STOP_BITS_0P5_BIT  = 0,
+   SI32_UART_A_STOP_BITS_1_BIT    = 1,
+   SI32_UART_A_STOP_BITS_1P5_BITS = 2,
+   SI32_UART_A_STOP_BITS_2_BITS   = 3
+} SI32_UART_A_STOP_BITS_Enum_Type;
+
+void usart_enable(usart_dev *dev) {;
+    usart_reg_map *regs = dev->regs;
+
+    // Enable tx/rx
+    REG_SET_CLR(regs->CONTROL, 1 , UART_CR_REN_EN | UART_CR_TEN_EN);
+
+    // Enable Interupts
+    REG_SET_CLR(regs->CONTROL, 1, UART_CR_RDREQIEN_EN);
+
+    // Enable usart GPIO pins
+    xbar_set_dev(dev->xbar_id, 1, 0, 0);
+}
+
+/**
+ * @brief Turn off a serial port.
+ * @param dev Serial port to be disabled
+ */
+void usart_disable(usart_dev *dev) {
+    usart_reg_map *regs = dev->regs;
+
+    // DISABLE INTERRUPTS
+    REG_SET_CLR(regs->CONTROL, 0, UART_CR_RDREQIEN_EN);
+    nvic_clr_pending_irq(dev->irq_num);
+
+    // DISABLE UART0 CLOCK
+    clk_disable_dev(dev->clk_id);
+
+    /* Clean up buffer */
+    usart_reset_rx(dev);
+
+    // Disable usart GPIO pins
+    xbar_set_dev(dev->xbar_id, 0, 0, 0);
+}
+
+/**
+ * @brief Nonblocking USART transmit
+ * @param dev Serial port to transmit over
+ * @param buf Buffer to transmit
+ * @param len Maximum number of bytes to transmit
+ * @return Number of bytes transmitted
+ */
+uint32 usart_tx(usart_dev *dev, const uint8 *buf, uint32 len) {
+    usart_reg_map *regs = dev->regs;
+    uint32 txed = 0;
+
+    while (((regs->FIFOCN >> 16) & 7) < 4 && (txed < len)) {
+        REG_CAST_BYTE(regs->DATA) = buf[txed++];
+    }
+    return txed;
+}
+
+/**
+ * @brief Nonblocking USART receive.
+ * @param dev Serial port to receive bytes from
+ * @param buf Buffer to store received bytes into
+ * @param len Maximum number of bytes to store
+ * @return Number of bytes received
+ */
+uint32 usart_rx(usart_dev *dev, uint8 *buf, uint32 len) {
+    uint32 rxed = 0;
+
+    while (usart_data_available(dev) && rxed < len) {
+        *buf++ = usart_getc(dev);
+        rxed++;
+    }
+    return rxed;
+}
+
+/**
+ * @brief Transmit an unsigned integer to the specified serial port in
+ *        decimal format.
  *
- * \param usart  Pointer to an USART peripheral.
- * \param data  Data to send including 9nth bit and sync field if necessary (in
- *        the same format as the US_THR register in the datasheet).
- * \param timeOut  Time out value (0 = no timeout).
- */
-void USART_Write(
-    Usart *usart,
-    uint16_t data,
-    volatile uint32_t timeOut)
-{
-    if (timeOut == 0) {
-
-        while ((usart->US_CSR & US_CSR_TXEMPTY) == 0);
-    }
-    else {
-
-        while ((usart->US_CSR & US_CSR_TXEMPTY) == 0) {
-
-            if (timeOut == 0) {
-
-//                TRACE_ERROR("USART_Write: Timed out.\n\r");
-                return;
-            }
-            timeOut--;
-        }
-    }
-
-    usart->US_THR = data;
-}
-
-/**
- * \brief Sends the contents of a data buffer through the specified USART peripheral.
- * This function returns immediately (1 if the buffer has been queued, 0
- * otherwise); poll the ENDTX and TXBUFE bits of the USART status register
- * to check for the transfer completion.
+ * This function blocks until the integer's digits have been
+ * completely transmitted.
  *
- * \param usart  Pointer to an USART peripheral.
- * \param buffer  Pointer to the data buffer to send.
- * \param size  Size of the data buffer (in bytes).
+ * @param dev Serial port to send on
+ * @param val Number to print
  */
-uint8_t USART_WriteBuffer(
-    Usart *usart,
-    void *buffer,
-    uint32_t size)
-{
-    /* Check if the first PDC bank is free*/
-    if ((usart->US_TCR == 0) && (usart->US_TNCR == 0)) {
+void usart_putudec(usart_dev *dev, uint32 val) {
+    char digits[12];
 
-        usart->US_TPR = (uint32_t) buffer;
-        usart->US_TCR = size;
-        usart->US_PTCR = US_PTCR_TXTEN;
+    int i = 0;
+    do {
+        digits[i++] = val % 10 + '0';
+        val /= 10;
+    } while (val > 0);
 
-        return 1;
+    while (--i >= 0) {
+        usart_putc(dev, digits[i]);
     }
-    /* Check if the second PDC bank is free*/
-    else if (usart->US_TNCR == 0) {
-
-        usart->US_TNPR = (uint32_t) buffer;
-        usart->US_TNCR = size;
-
-        return 1;
-    }
-    else {
-
-        return 0;
-    }
-}
-
-
-/**
- * \brief  Reads and return a packet of data on the specified USART peripheral. This
- * function operates asynchronously, so it waits until some data has been
- * received.
- *
- * \param usart  Pointer to an USART peripheral.
- * \param timeOut  Time out value (0 -> no timeout).
- */
-uint16_t USART_Read(
-    Usart *usart,
-    volatile uint32_t timeOut)
-{
-    if (timeOut == 0) {
-
-        while ((usart->US_CSR & US_CSR_RXRDY) == 0);
-    }
-    else {
-
-        while ((usart->US_CSR & US_CSR_RXRDY) == 0) {
-
-            if (timeOut == 0) {
-
-//                TRACE_ERROR( "USART_Read: Timed out.\n\r" ) ;
-                return 0;
-            }
-            timeOut--;
-        }
-    }
-
-    return usart->US_RHR;
-}
-
-/**
- * \brief  Reads data from an USART peripheral, filling the provided buffer until it
- * becomes full. This function returns immediately with 1 if the buffer has
- * been queued for transmission; otherwise 0.
- *
- * \param usart  Pointer to an USART peripheral.
- * \param buffer  Pointer to the buffer where the received data will be stored.
- * \param size  Size of the data buffer (in bytes).
- */
-uint8_t USART_ReadBuffer(Usart *usart,
-                                      void *buffer,
-                                      uint32_t size)
-{
-    /* Check if the first PDC bank is free*/
-    if ((usart->US_RCR == 0) && (usart->US_RNCR == 0)) {
-
-        usart->US_RPR = (uint32_t) buffer;
-        usart->US_RCR = size;
-        usart->US_PTCR = US_PTCR_RXTEN;
-
-        return 1;
-    }
-    /* Check if the second PDC bank is free*/
-    else if (usart->US_RNCR == 0) {
-
-        usart->US_RNPR = (uint32_t) buffer;
-        usart->US_RNCR = size;
-
-        return 1;
-    }
-    else {
-
-        return 0;
-    }
-}
-
-/**
- * \brief  Returns 1 if some data has been received and can be read from an USART;
- * otherwise returns 0.
- *
- * \param usart  Pointer to an Usart instance.
- */
-uint8_t USART_IsDataAvailable(Usart *usart)
-{
-    if ((usart->US_CSR & US_CSR_RXRDY) != 0) {
-
-        return 1;
-    }
-    else {
-
-        return 0;
-    }
-}
-
-/**
- * \brief  Sets the filter value for the IRDA demodulator.
- *
- * \param pUsart  Pointer to an Usart instance.
- * \param filter  Filter value.
- */
-void USART_SetIrdaFilter(Usart *pUsart, uint8_t filter)
-{
-    assert( pUsart != NULL ) ;
-
-    pUsart->US_IF = filter;
-}
-
-/**
- * \brief  Sends one packet of data through the specified USART peripheral. This
- * function operates synchronously, so it only returns when the data has been
- * actually sent.
- *
- * \param usart  Pointer to an USART peripheral.
- * \param c  Character to send
- */
-void USART_PutChar(
-    Usart *usart,
-    uint8_t c)
-{
-    /* Wait for the transmitter to be ready*/
-    while ((usart->US_CSR & US_CSR_TXEMPTY) == 0);
-
-    /* Send character*/
-    usart->US_THR = c;
-
-    /* Wait for the transfer to complete*/
-    while ((usart->US_CSR & US_CSR_TXEMPTY) == 0);
-}
-
-/**
- * \brief   Return 1 if a character can be read in USART
- */
-uint32_t USART_IsRxReady(Usart *usart)
-{
-    return (usart->US_CSR & US_CSR_RXRDY);
-}
-/**
- * \brief   Get present status
- */
-uint32_t USART_GetStatus(Usart *usart)
-{
-    return usart->US_CSR;
-}
-/**
- * \brief   Enable interrupt
- */
-void USART_EnableIt(Usart *usart,uint32_t mode)
-{
-    usart->US_IER = mode;
-}
-/**
- * \brief   Disable interrupt
- */
-void USART_DisableIt(Usart *usart,uint32_t mode)
-{
-    usart->US_IDR = mode;
-}
-/**
- * \brief  Reads and returns a character from the USART.
- *
- * \note This function is synchronous (i.e. uses polling).
- * \param usart  Pointer to an USART peripheral.
- * \return Character received.
- */
-uint8_t USART_GetChar(Usart *usart)
-{
-    while ((usart->US_CSR & US_CSR_RXRDY) == 0);
-    return usart->US_RHR;
 }

@@ -32,7 +32,6 @@
 #ifdef __cplusplus
 extern "C"{
 #endif // __cplusplus
-#include "gpio.h"
 typedef struct stm32_pin_info {
     gpio_dev *gpio_device;      /**< Maple pin's GPIO device */
     void *timer_device;    /**< Pin's timer device, if any. */
@@ -370,12 +369,14 @@ static const uint8_t CANTX = 69;
 
 #ifdef __cplusplus
 
-#if 0
-extern UARTClass Serial;
-extern USARTClass Serial1;
-extern USARTClass Serial2;
-extern USARTClass Serial3;
-#endif
+
+extern UARTClass Serial1;
+extern UARTClass Serial2;
+extern UARTClass Serial3;
+extern UARTClass Serial4;
+extern UARTClass &Serial;
+// todo [silabs]: Declare Spi as a reference here
+//HardwareSPI &Spi;
 #endif
 
 #endif /* _VARIANT_SILABS_ACB_X_ */

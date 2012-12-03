@@ -33,8 +33,6 @@ extern "C"{
 // Includes Atmel CMSIS
 #define REG_SET_CLR(base, set_true, mask) (*(volatile uint32_t*)((uint32_t)&(base) + (4 << !(set_true)))) = (mask)
 #include <chip.h>
-#include "gpio.h"
-#include "rcc.h"
 #include "wiring_constants.h"
 
 #define clockCyclesPerMicrosecond() ( SystemCoreClock / 1000000L )
@@ -164,19 +162,11 @@ typedef enum _ETCChannel
 #include "WMath.h"
 #include "HardwareSerial.h"
 #include "wiring_pulse.h"
-
+#include "HardwareTimer.h"
 #endif // __cplusplus
 
 // Include board variant
 #include "variant.h"
 
-// USB Device
-#define USB_VID            0x2341 // arduino LLC vid
-#define USB_PID_LEONARDO   0x0034
-#define USB_PID_MICRO      0x0035
-#define USB_PID_DUE        0x003E
-#include "USB/USBDesc.h"
-#include "USB/USBCore.h"
-#include "USB/USBAPI.h"
 
 #endif // Arduino_h

@@ -16,38 +16,13 @@
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
-//fixme: silabs import timer_set_mode from other project
-#define timer_set_mode(a,b,c) while (0) {}
 
 #include "Arduino.h"
 
 #ifdef __cplusplus
  extern "C" {
 #endif
-// FIXME [silabs]: timer_mode should be typedef'd in timer.h
- typedef enum timer_mode {
-     /**
-      * The timer stops counting, channel interrupts are detached, and
-      * no state changes are output. */
-     TIMER_DISABLED,
 
-     /** PWM output. */
-     TIMER_PWM,
-
-     /* TIMER_PWM_CENTER_ALIGNED, TODO: Center-aligned PWM output mode. */
-
-     /**
-      * The timer counts from 0 to its reload value repeatedly; every
-      * time the counter value reaches one of the channel compare
-      * values, the corresponding interrupt is fired. */
-     TIMER_OUTPUT_COMPARE,
-
-     /* TIMER_INPUT_CAPTURE, TODO: In this mode, the timer can measure the
-      *                            pulse lengths of input signals */
-     /* TIMER_ONE_PULSE, TODO: In this mode, the timer can generate a single
-      *                        pulse on a GPIO pin for a specified amount of
-      *                        time. */
- } timer_mode;
  void pinMode( uint32_t pin_num, uint32_t dwMode ) {
      WiringPinMode mode = dwMode;
      gpio_pin_mode outputMode;
@@ -75,7 +50,7 @@
          case INPUT_ANALOG:
              outputMode = GPIO_ANALOG;
              break;
-         case PWM111:
+         case PWM:
              outputMode = GPIO_DIGITAL_PP;
              pwm = true;
              break;
@@ -142,6 +117,16 @@ int digitalRead(uint32_t pin) {
      return gpio_read_bit(PIN_MAP[pin].gpio_device, PIN_MAP[pin].gpio_bit) ?
          HIGH : LOW;
  }
+
+void togglePin(uint8 pin) {
+    if (pin >= BOARD_NR_GPIO_PINS) {
+        return;
+    }
+
+    gpio_toggle_bit(PIN_MAP[pin].gpio_device, PIN_MAP[pin].gpio_bit);
+
+}
+
 
 #ifdef __cplusplus
 }

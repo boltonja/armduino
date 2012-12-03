@@ -20,17 +20,10 @@
 
 
 
-
-
-
-#define TIMER1 0
-#define TIMER2 0
-#define TIMER3 0
-#define TIMER4 0
-#define TIMER5 0
-#define ADC1 0
-#define ADC2 0
-#define ADC3 0
+#include <libmaple/usart.h>
+#include <libmaple/timer.h>
+#include <libmaple/adc.h>
+#include <libmaple/gpio.h>
 
 #define PIN_ROW_D30_NOT_SHORTED PMAP_ROW(&gpioe,   5, TIMER1,  6,  NULL,  ADCx,   0),
 #define PIN_ROW_D30_SHORTED
@@ -321,36 +314,53 @@ void UART_Handler(void)
 /*
  * USART objects
  */
-#if 0
-RingBuffer rx_buffer2;
-RingBuffer rx_buffer3;
-RingBuffer rx_buffer4;
+#define DEFINE_HWSERIAL(name, buff, size, n)                                   \
+        UARTClass name(USART##n, \
+                        buff, \
+                        size, \
+                        BOARD_USART##n##_TX_PIN,                   \
+                        BOARD_USART##n##_RX_PIN)
 
-USARTClass Serial1(USART0, USART0_IRQn, ID_USART0, &rx_buffer2);
-USARTClass Serial2(USART1, USART1_IRQn, ID_USART1, &rx_buffer3);
-USARTClass Serial3(USART3, USART3_IRQn, ID_USART3, &rx_buffer4);
+
+
+#define USART_RING_BUFF_SIZE 64
+struct rbuffTag {
+    uint8_t buff[USART_RING_BUFF_SIZE];
+}usart_rbuffers[4];
+
+DEFINE_HWSERIAL(Serial1, usart_rbuffers[0].buff, USART_RING_BUFF_SIZE, 1);
+DEFINE_HWSERIAL(Serial2, usart_rbuffers[1].buff, USART_RING_BUFF_SIZE, 2);
+DEFINE_HWSERIAL(Serial3, usart_rbuffers[2].buff, USART_RING_BUFF_SIZE, 3);
+DEFINE_HWSERIAL(Serial4, usart_rbuffers[3].buff, USART_RING_BUFF_SIZE, 4);
+UARTClass &Serial = Serial2;
 
 // IT handlers
 void USART0_Handler(void)
 {
-  Serial1.IrqHandler();
+
 }
 
 void USART1_Handler(void)
 {
-  Serial2.IrqHandler();
+
 }
 
 void USART3_Handler(void)
 {
-  Serial3.IrqHandler();
+
 }
-#endif
+
 // ----------------------------------------------------------------------------
 
 
 void __libc_init_array(void);
-
+static void setup_flash(void);
+static void setup_clocks(void);
+static void setup_nvic(void);
+static void setup_adcs(void);
+static void setup_timers(void);
+void board_setup_clock_prescalers(uint32_t sys_freq);
+void board_setup_rtc(void);
 void init( void )
 {
     // Turn off watchdog
@@ -362,7 +372,178 @@ void init( void )
     // init gpio
     gpio_init_all();
 
-    // NVIC set vector table location
-    *((volatile uint32_t *)0xE000ED08) = 2048;
+    // Using RTC, so GPIOs are best setup beforehand.
+    setup_flash();
+    setup_clocks();
+    setup_nvic();
+    systick_init(clk_get_sys_freq() / 1000 - 1);
+    setup_adcs();
+    setup_timers();
 
+}
+
+
+
+/*
+ * Auxiliary routines
+ */
+
+static void setup_flash(void) {
+    // Enable flash controller clock
+    clk_enable_dev(CLK_FLCTRL);
+
+    // Turn on as many Flash "go faster" features as
+    // possible. flash_enable_features() just ignores any flags it
+    // can't support.
+    flash_enable_features(FLASH_PREFETCH | FLASH_ICACHE | FLASH_DCACHE);
+
+    // Erase a page at address
+    //void flash_erase_page(uint32 address);
+
+    // Writes 16 bits to flash
+    //void flash_write_data(uint32 address, uint16 data[], int32 count);
+}
+
+
+static void setup_clocks(void) {
+    uint32 clk_freq = F_CPU;
+    clk_sysclk_src src;
+
+    // Overclock guard
+    clk_freq = clk_freq > 80000000 ? 80000000 : clk_freq;
+
+    if (CYCLES_PER_MICROSECOND == 2.5) {
+        clk_freq = 2500000;
+        src = CLK_SRC_LP_DIV;
+    }
+    else if (CYCLES_PER_MICROSECOND > 23) {
+        // If using pll, then calculate actual frequency changed from bit truncation
+        clk_freq = (clk_freq >= 23000000) ? pll_get_actl_freq(RTC_XTAL_HZ, clk_freq) : clk_freq;
+        src = CLK_SRC_PLL;
+    }
+    else {
+        clk_freq = 20000000;
+        src = CLK_SRC_LP;
+    }
+
+
+    // Init pll and rtc
+    board_setup_rtc();
+    clk_enable_dev(CLK_PLL);
+    pll_set_ref(PLL_SRC_RTC);
+
+    board_setup_clock_prescalers(clk_freq);
+
+/*
+ * To change system frequency, call following in order:
+ *  1) pll_set_freq  - (if using pll)
+ *  2) Get the last clock freqency
+ *  3) clk_set_clk_variable
+ *  4) clk_switch_sysclk/clk_rcfg_devices - order depends on if we scale up or down.
+ */
+
+    if (src == CLK_SRC_PLL) {
+        pll_set_freq(clk_freq);
+    }
+    uint32 last_clk_freq = clk_get_sys_freq();
+    clk_set_clk_variable(clk_freq);
+    // If new clock is faster, then reconfigure first. This way an under clocked flash speed mode won't cause a crash.
+    last_clk_freq < clk_freq ? clk_rcfg_devices() : clk_switch_sysclk(src);
+    !(last_clk_freq < clk_freq) ? clk_rcfg_devices() : clk_switch_sysclk(src);
+}
+
+/*
+ * These addresses are where usercode starts when a bootloader is
+ * present.
+ */
+extern uint32 _sfixed;
+#define USER_ADDR_ROM ((uint32)&_sfixed)
+#define USER_ADDR_RAM 0x20000000
+
+static void setup_nvic(void) {
+    nvic_init(USER_ADDR_ROM, 0);
+}
+
+static void adc_default_config(const adc_dev *dev) {
+    adc_enable_single_swstart(dev);
+    // Default Group Configuration:
+    //  Grp 0: 10Bit, Seq Len 1;    Grp 1: 10Bit, Seq Len 16
+    //  Grp 2: 12Bit, Seq Len 1;    Grp 3: 12Bit, Seq Len 16
+    adc_grp_num w_adc_grp = (adc_grp_num)2;
+    for (int i = 0; i < 8; i++) {
+        adc_set_tslot_grp(dev, i, w_adc_grp); /**< Associate a timeslot with a group characteristic */
+    }
+}
+
+static void setup_adcs(void) {
+    adc_foreach(adc_default_config);
+}
+
+static void timer_default_config(timer_dev *dev) {
+    timer_init(dev);
+    timer_pause(dev);
+    // Set channel polarities to 0
+    uint32 chnl = 1;
+    while (timer_has_cc_channel(dev, chnl)) {
+        timer_cc_set_pol(dev, chnl++, 0);
+    }
+    timer_resume(dev);
+}
+
+static void setup_timers(void) {
+
+    timer_foreach(timer_default_config);
+}
+
+void board_setup_clock_prescalers(uint32_t sys_freq) {
+    uint32 apb_div = CLK_APB_HCLK_DIV_1;
+    uint32 ahb_div = CLK_AHB_SYSCLK_DIV_1;
+
+    // Set limit on apb bus to 50 MHz
+    apb_div = (sys_freq / (1 << ahb_div)) > 50000000 ? CLK_APB_HCLK_DIV_2 : CLK_APB_HCLK_DIV_1;
+    clk_set_prescalers(CLK_PRESCALE_APB, apb_div);
+    clk_set_prescalers(CLK_PRESCALE_AHB, ahb_div);
+}
+
+void board_setup_rtc(void) {
+    volatile uint32_t *rtc_base = (volatile uint32 *)0x40029000;
+
+    // Set RTC pins as analog
+    gpio_set_modef(GPIOA, 9, GPIO_ANALOG, GPIO_DRIVE_WEAK);
+    gpio_set_modef(GPIOA, 10, GPIO_ANALOG, GPIO_DRIVE_WEAK);
+
+    // Enable clock
+    clk_enable_dev(CLK_MISC0);
+
+    // Clear interrupts
+    nvic_clr_pending_irq(NVIC_RTC0ALRM);
+    nvic_irq_enable(NVIC_RTC0ALRM);
+
+    // enable high speed mode
+    REG_SET_CLR(*(volatile uint32 *)((uint32)rtc_base + 0x10), 1, 1 << 7);
+
+    // disable auto gain control
+    REG_SET_CLR(*rtc_base, 0, 0x00040000);
+    // enable bias doubler
+    REG_SET_CLR(*rtc_base, 1, 1 << 16);
+    // enable auto load cap stepping
+    REG_SET_CLR(*rtc_base, 1, 1 << 3);
+    // set clk source as rtc
+    REG_SET_CLR(*rtc_base, 0, 1 << 30);
+    // set as crystal oscillator
+    REG_SET_CLR(*rtc_base, 1, 0x00020000);
+    // enable module
+    REG_SET_CLR(*rtc_base, 1, 1 << 31);
+
+    // Wait at least 20 ms
+    delay(20);
+
+    // Poll clock until stable
+    while (!((*(volatile uint32 *)((uint32)rtc_base + 0x10)) & 0x20));
+
+    // Poll load capacitance ready
+    while (!((*(volatile uint32 *)((uint32)rtc_base + 0x10)) & 0x100));
+
+    // Wait at least 2 ms
+    delay(2);
 }

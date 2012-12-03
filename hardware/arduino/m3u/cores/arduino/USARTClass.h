@@ -24,7 +24,7 @@
 
 // Includes Atmel CMSIS
 #include <chip.h>
-
+#if 0
 class USARTClass : public HardwareSerial
 {
   protected:
@@ -57,5 +57,5 @@ class USARTClass : public HardwareSerial
 
     operator bool() { return true; }; // USART always active
 };
-
+#endif
 #endif // _USART_CLASS_

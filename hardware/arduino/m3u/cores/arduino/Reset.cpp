@@ -22,10 +22,9 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-// FIXME [silabs]: stub function
-__attribute__ ((long_call, section (".ramfunc")))
-void banzai() {
 
+void banzai() {
+    *(volatile uint32_t*)0x4002D060 = 0x00000040;
 }
 
 static int ticks = -1;

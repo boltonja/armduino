@@ -22,7 +22,7 @@
 #include "USARTClass.h"
 
 // Constructors ////////////////////////////////////////////////////////////////
-
+#if 0
 USARTClass::USARTClass( Usart* pUsart, IRQn_Type dwIrq, uint32_t dwId, RingBuffer* pRx_buffer )
 {
 
@@ -72,4 +72,5 @@ void USARTClass::IrqHandler( void )
 {
 
 }
+#endif
 
