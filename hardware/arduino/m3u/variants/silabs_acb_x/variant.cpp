@@ -25,11 +25,13 @@
 #include <libmaple/adc.h>
 #include <libmaple/gpio.h>
 
+#define PIN_NOT_USED PMAP_ROW(NULL,0,NULL,0,NULL,ADCx,0),
+
 #define PIN_ROW_D30_NOT_SHORTED PMAP_ROW(&gpioe,   5, TIMER1,  6,  NULL,  ADCx,   0),
 #define PIN_ROW_D30_SHORTED
 #if defined(PIN_D30_SHORTED)
 #define PIN_ROW_D30_SHORTED PMAP_ROW(&gpioe,   5, TIMER1,  6,  NULL,  ADCx,   0),
-#define PIN_ROW_D30_NOT_SHORTED
+#define PIN_ROW_D30_NOT_SHORTED PIN_NOT_USED
 #define D30 D3
 #endif
 
@@ -37,7 +39,7 @@
 #define PIN_ROW_D31_SHORTED
 #if defined(PIN_D31_SHORTED)
 #define PIN_ROW_D31_SHORTED PMAP_ROW(&gpioe,   4, TIMER1,  5,  NULL,  ADCx,   0),
-#define PIN_ROW_D31_NOT_SHORTED
+#define PIN_ROW_D31_NOT_SHORTED PIN_NOT_USED
 #define D31 D5
 #endif
 
@@ -45,7 +47,7 @@
 #define PIN_ROW_D32_SHORTED
 #if defined(PIN_D32_SHORTED)
 #define PIN_ROW_D32_SHORTED PMAP_ROW(&gpioe,   3, TIMER1,  4,  NULL,  ADCx,   0),
-#define PIN_ROW_D32_NOT_SHORTED
+#define PIN_ROW_D32_NOT_SHORTED PIN_NOT_USED
 #define D32 D6
 #endif
 
@@ -53,7 +55,7 @@
 #define PIN_ROW_D33_SHORTED
 #if defined(PIN_D33_SHORTED)
 #define PIN_ROW_D33_SHORTED PMAP_ROW(&gpioe,   2, TIMER1,  3,  NULL,  ADCx,   0),
-#define PIN_ROW_D33_NOT_SHORTED
+#define PIN_ROW_D33_NOT_SHORTED PIN_NOT_USED
 #define D33 D9
 #endif
 
@@ -61,7 +63,7 @@
 #define PIN_ROW_D34_SHORTED
 #if defined(PIN_D34_SHORTED)
 #define PIN_ROW_D34_SHORTED PMAP_ROW(&gpioe,   1, TIMER1,  2,  NULL,  ADCx,   0),
-#define PIN_ROW_D34_NOT_SHORTED
+#define PIN_ROW_D34_NOT_SHORTED PIN_NOT_USED
 #define D34 D10
 #endif
 
@@ -69,7 +71,7 @@
 #define PIN_ROW_D35_SHORTED
 #if defined(PIN_D35_SHORTED)
 #define PIN_ROW_D35_SHORTED PMAP_ROW(&gpioe,   0, TIMER1,  1,  NULL,  ADCx,   0),
-#define PIN_ROW_D35_NOT_SHORTED
+#define PIN_ROW_D35_NOT_SHORTED PIN_NOT_USED
 #define D35 D11
 #endif
 
@@ -96,6 +98,8 @@
 const stm32_pin_info  __attribute__ ((used)) PIN_MAP[BOARD_NR_GPIO_PINS] = {
     /*       GPIO     -    Timer  -   ADC    -    EXTI      Pin        Function      Periph     Shorted Alternate */
 
+    // 0 .. 53 - Digital pins
+    // ----------------------
     PMAP_ROW(&gpiod,   5,   NULL,  0,  NULL,  ADCx,  11), /* D0/PD5     UART_RX       UART1_RX           I2C0_SCL   */
     PMAP_ROW(&gpiod,   4,   NULL,  0,  NULL,  ADCx,  10), /* D1/PD4     UART_TX       UART1_TX           I2C0_SDA   */
     PMAP_ROW(&gpiod,   7,   NULL,  0,  NULL,  ADCx,  13), /* D2/PD7     EXT_INT       INT0.12            I2S_RS_SCK */
@@ -123,12 +127,15 @@ const stm32_pin_info  __attribute__ ((used)) PIN_MAP[BOARD_NR_GPIO_PINS] = {
     PMAP_ROW(&gpioa,  15, TIMER3,  2,  NULL,  ADCx,  12), /* D24/PA15                 PCA1_CEX1                     */
     PMAP_ROW(&gpiob,   0,   NULL,  0,  NULL,  ADCx,   0), /* D25/PB0                                                */
     PMAP_ROW(&gpiob,   2,   NULL,  0,  NULL,  ADCx,   0), /* D26/PB2                                                */
-    PIN_ROW_D30_NOT_SHORTED                              /* D30/PE5    PWM           EPCA_CEX5  D3                 */
-    PIN_ROW_D31_NOT_SHORTED                              /* D31/PE4    PWM           EPCA_CEX4  D5                 */
-    PIN_ROW_D32_NOT_SHORTED                              /* D32/PE3    PWM           EPCA_CEX3  D6                 */
-    PIN_ROW_D33_NOT_SHORTED                              /* D33/PE2    PWM           EPCA_CEX2  D9                 */
-    PIN_ROW_D34_NOT_SHORTED                              /* D34/PE1    PWM           EPCA_CEX1  D10                */
-    PIN_ROW_D35_NOT_SHORTED                              /* D35/PE0    PWM           EPCA_CEX0  D11                */
+    PIN_NOT_USED                                          /* D27    ~ Pin Not Used ~                                */
+    PIN_NOT_USED                                          /* D28    ~ Pin Not Used ~                                */
+    PIN_NOT_USED                                          /* D29    ~ Pin Not Used ~                                */
+    PIN_ROW_D30_NOT_SHORTED                               /* D30/PE5    PWM           EPCA_CEX5  D3                 */
+    PIN_ROW_D31_NOT_SHORTED                               /* D31/PE4    PWM           EPCA_CEX4  D5                 */
+    PIN_ROW_D32_NOT_SHORTED                               /* D32/PE3    PWM           EPCA_CEX3  D6                 */
+    PIN_ROW_D33_NOT_SHORTED                               /* D33/PE2    PWM           EPCA_CEX2  D9                 */
+    PIN_ROW_D34_NOT_SHORTED                               /* D34/PE1    PWM           EPCA_CEX1  D10                */
+    PIN_ROW_D35_NOT_SHORTED                               /* D35/PE0    PWM           EPCA_CEX0  D11                */
     PMAP_ROW(&gpioc,   0,   NULL,  0,  ADC2,     2,   1), /* D36/PC0                                                */
     PMAP_ROW(&gpioc,   1,   NULL,  0,  ADC2,     1,   2), /* D37/PC1                                                */
     PMAP_ROW(&gpioc,   2,   NULL,  0,  ADC2,     0,   3), /* D38/PC2                                                */
@@ -136,13 +143,20 @@ const stm32_pin_info  __attribute__ ((used)) PIN_MAP[BOARD_NR_GPIO_PINS] = {
     PMAP_ROW(&gpioc,   4,   NULL,  0,  NULL,  ADCx,   5), /* D40/PC4                                                */
     PMAP_ROW(&gpioc,   5,   NULL,  0,  NULL,  ADCx,   6), /* D41/PC5                                                */
     PMAP_ROW(&gpioc,   6,   NULL,  0,  NULL,  ADCx,   7), /* D42/PC6    SPI_SCK      SPI1_SCK                       */
+    PIN_NOT_USED                                          /* D43    ~ Pin Not Used ~                                */
+    PIN_NOT_USED                                          /* D44    ~ Pin Not Used ~                                */
     PMAP_ROW(&gpioc,   7,   NULL,  0,  NULL,  ADCx,   8), /* D45/PC7    SPI_MISO     SPI1_MISO                      */
     PMAP_ROW(&gpioc,   8,   NULL,  0,  NULL,  ADCx,   0), /* D46/PC8    SPI_MOSI     SPI1_MOSI                      */
+    PIN_NOT_USED                                          /* D47    ~ Pin Not Used ~                                */
+    PIN_NOT_USED                                          /* D48    ~ Pin Not Used ~                                */
     PMAP_ROW(&gpioc,  11,   NULL,  0,  NULL,  ADCx,   0), /* D49/PC11                                               */
     PMAP_ROW(&gpioc,  12,   NULL,  0,  NULL,  ADCx,   0), /* D50/PC12                                               */
     PMAP_ROW(&gpioc,  13,   NULL,  0,  NULL,  ADCx,   0), /* D51/PC13                                               */
     PMAP_ROW(&gpioc,  14,   NULL,  0,  NULL,  ADCx,   0), /* D52/PC14                                               */
+    PIN_NOT_USED                                          /* D53    ~ Pin Not Used ~                                */
 
+    // 54 .. 70 - Analog pins
+    // ----------------------
     PMAP_ROW(&gpioa,   8,   NULL,  0,  ADC1,     7,   0), /* A0/PA8     ADC0          ADC0.7                        */
     PMAP_ROW(&gpioa,  11, TIMER2,  1,  ADC1,     9,   0), /* A1/PA11    ADC1          ADC0.9             PCA0_CEX0  */
     PMAP_ROW(&gpiob,   1,   NULL,  0,  ADC1,    11,   0), /* A2/PB1     ADC2          ADC0.11                       */
@@ -245,7 +259,7 @@ const xbar_dev_info XBAR_MAP[XBAR_NULL] = {
     XBAR_ROW(xbar_ahb_out, XBAR_NUM(BOARD_AHB_OUT_PIN, 1)),
 };
 
-const stm32_pin_info PIN_MAP_SHORTS[BOARD_NR_SHORTED_PINS] = {
+const stm32_pin_info PIN_MAP_SHORTS[] = {
         PIN_ROW_D30_SHORTED
         PIN_ROW_D31_SHORTED
         PIN_ROW_D32_SHORTED
