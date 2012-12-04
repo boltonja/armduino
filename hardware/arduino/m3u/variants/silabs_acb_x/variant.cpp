@@ -333,6 +333,9 @@ DEFINE_HWSERIAL(Serial2, usart_rbuffers[1].buff, USART_RING_BUFF_SIZE, 2);
 DEFINE_HWSERIAL(Serial3, usart_rbuffers[2].buff, USART_RING_BUFF_SIZE, 3);
 DEFINE_HWSERIAL(Serial4, usart_rbuffers[3].buff, USART_RING_BUFF_SIZE, 4);
 UARTClass &Serial = Serial2;
+HardwareSPI Spi1(SPI1);
+HardwareSPI Spi2(SPI2);
+HardwareSPI Spi3(SPI3);
 
 // IT handlers
 void USART0_Handler(void)

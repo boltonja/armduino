@@ -62,8 +62,5 @@ class SPIClass {
 	void (*initCb)(void);
 };
 
-#if SPI_INTERFACES_COUNT > 0
-extern SPIClass SPI;
-#endif
 
 #endif
