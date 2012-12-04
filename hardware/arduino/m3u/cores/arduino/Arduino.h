@@ -78,7 +78,7 @@ typedef enum _EExt_Interrupts
   EXTERNAL_NUM_INTERRUPTS
 } EExt_Interrupts ;
 
-typedef void (*voidFuncPtr)( void ) ;
+//typedef void (*voidFuncPtr)( void ) ;
 
 /* Define attribute */
 #if defined   ( __CC_ARM   ) /* Keil uVision 4 */

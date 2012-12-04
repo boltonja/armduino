@@ -376,10 +376,6 @@ extern UARTClass Serial3;
 extern UARTClass Serial4;
 extern UARTClass &Serial;
 
-extern SPIClass Spi1
-extern SPIClass Spi2
-extern SPIClass Spi3;
-extern SPIClass &Spi;
 #endif
 
 #endif /* _VARIANT_SILABS_ACB_X_ */

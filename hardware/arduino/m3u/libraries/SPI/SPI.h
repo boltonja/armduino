@@ -14,53 +14,145 @@
 #include "variant.h"
 #include <stdio.h>
 
-#define SPI_MODE0 0x02
-#define SPI_MODE1 0x00
-#define SPI_MODE2 0x03
-#define SPI_MODE3 0x01
 
-enum SPITransferMode {
-	SPI_CONTINUE,
-	SPI_LAST
-};
-
+/**
+ * @brief Wirish SPI interface.
+ *
+ * This implementation uses software slave management, so the caller
+ * is responsible for controlling the slave select line.
+ */
 class SPIClass {
-  public:
-	SPIClass(Spi *_spi, uint32_t _id, void(*_initCb)(void));
+public:
+    /**
+     * @param spiPortNumber Number of the SPI port to manage.
+     */
+    SPIClass(spi_dev *spi_device);
 
-	byte transfer(uint8_t _data, SPITransferMode _mode = SPI_LAST) { return transfer(BOARD_SPI_DEFAULT_SS, _data, _mode); }
-	byte transfer(byte _channel, uint8_t _data, SPITransferMode _mode = SPI_LAST);
+    /*
+     * Set up/tear down
+     */
 
-	// SPI Configuration methods
+    /**
+     * @brief Turn on a SPI port and set its GPIO pin modes for use as master.
+     *
+     * SPI port is enabled in full duplex mode, with software slave management.
+     *
+     * @param frequency Communication frequency
+     * @param bitOrder Either LSBFIRST (little-endian) or MSBFIRST (big-endian)
+     * @param mode SPI mode to use, one of SPI_MODE_0, SPI_MODE_1,
+     *             SPI_MODE_2, and SPI_MODE_3.
+     */
+    void begin(uint32 frequency, uint32 bitOrder, uint32 mode);
 
-	void attachInterrupt(void);
-	void detachInterrupt(void);
+    /**
+     * @brief Equivalent to begin(SPI_1_125MHZ, MSBFIRST, 0).
+     */
+    void begin(void);
 
-	void begin(void);
-	void end(void);
+    /**
+     * @brief Turn on a SPI port and set its GPIO pin modes for use as a slave.
+     *
+     * SPI port is enabled in full duplex mode, with software slave management.
+     *
+     * @param bitOrder Either LSBFIRST (little-endian) or MSBFIRST(big-endian)
+     * @param mode SPI mode to use
+     */
+    void beginSlave(uint32 bitOrder, uint32 mode);
 
-	// Attach/Detach pin to/from SPI controller
-	void begin(uint8_t _pin);
-	void end(uint8_t _pin);
+    /**
+     * @brief Equivalent to beginSlave(MSBFIRST, 0).
+     */
+    void beginSlave(void);
 
-	// These methods sets a parameter on a single pin
-	void setBitOrder(uint8_t _pin, BitOrder);
-	void setDataMode(uint8_t _pin, uint8_t);
-	void setClockDivider(uint8_t _pin, uint8_t);
+    /**
+     * @brief Disables the SPI port, but leaves its GPIO pin modes unchanged.
+     */
+    void end(void);
+    void end(uint8_t pin);
+    /*
+     * I/O
+     */
 
-	// These methods sets the same parameters but on default pin BOARD_SPI_DEFAULT_SS
-	void setBitOrder(BitOrder _order) { setBitOrder(BOARD_SPI_DEFAULT_SS, _order); };
-	void setDataMode(uint8_t _mode) { setDataMode(BOARD_SPI_DEFAULT_SS, _mode); };
-	void setClockDivider(uint8_t _div) { setClockDivider(BOARD_SPI_DEFAULT_SS, _div); };
+    /**
+     * @brief Return the next unread byte.
+     *
+     * If there is no unread byte waiting, this function will block
+     * until one is received.
+     */
+    uint8 read(void);
 
-  private:
-	Spi *spi;
-	uint32_t id;
-	BitOrder bitOrder[SPI_CHANNELS_NUM];
-	uint32_t divider[SPI_CHANNELS_NUM];
-	uint32_t mode[SPI_CHANNELS_NUM];
-	void (*initCb)(void);
+    /**
+     * @brief Read length bytes, storing them into buffer.
+     * @param buffer Buffer to store received bytes into.
+     * @param length Number of bytes to store in buffer.  This
+     *               function will block until the desired number of
+     *               bytes have been read.
+     */
+    void read(uint8 *buffer, uint32 length);
+
+    /**
+     * @brief Transmit a byte.
+     * @param data Byte to transmit.
+     */
+    void write(uint8 data);
+
+    /**
+     * @brief Transmit multiple bytes.
+     * @param buffer Bytes to transmit.
+     * @param length Number of bytes in buffer to transmit.
+     */
+    void write(const uint8 *buffer, uint32 length);
+    void write(const uint8 *data, uint32 length, uint8 slaveNum);
+    /**
+     * @brief Transmit a byte, then return the next unread byte.
+     *
+     * This function transmits before receiving.
+     *
+     * @param data Byte to transmit.
+     * @return Next unread byte.
+     */
+    uint8 transfer(uint8 data);
+    uint8 transfer(uint8 byte, uint8 slaveNum);
+
+    /*
+     * Pin accessors
+     */
+
+    /**
+     * @brief Return the number of the MISO (master in, slave out) pin
+     */
+    uint8 misoPin(void);
+
+    /**
+     * @brief Return the number of the MOSI (master out, slave in) pin
+     */
+    uint8 mosiPin(void);
+
+    /**
+     * @brief Return the number of the SCK (serial clock) pin
+     */
+    uint8 sckPin(void);
+
+    /**
+     * @brief Return the number of the NSS (slave select) pin
+     */
+    uint8 nssPin(void);
+
+    /* Escape hatch */
+
+    /**
+     * @brief Get a pointer to the underlying libmaple spi_dev for
+     *        this SPIClass instance.
+     */
+    spi_dev* c_dev(void) { return this->spi_d; }
+
+private:
+    spi_dev *spi_d;
 };
 
+extern SPIClass Spi1;
+extern SPIClass Spi2;
+extern SPIClass Spi3;
+extern SPIClass &SPI;
 
 #endif

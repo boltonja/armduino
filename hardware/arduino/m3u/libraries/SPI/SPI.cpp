@@ -32,9 +32,10 @@
 #include "SPI.h"
 
 
-HardwareSPI Spi1(1);
-HardwareSPI Spi2(2);
-HardwareSPI Spi3(3);
+SPIClass Spi1(SPI1);
+SPIClass Spi2(SPI2);
+SPIClass Spi3(SPI3);
+SPIClass &SPI = Spi3;
 
 
 struct spi_pins {
@@ -53,7 +54,7 @@ static void enable_device(spi_dev *dev,
                           spi_mode mode);
 
 
-static const spi_pins board_spi_pins[] __FLASH__ = {
+static const spi_pins board_spi_pins[] = {
 
     {BOARD_SPI1_NSS_PIN,
      BOARD_SPI1_SCK_PIN,
@@ -75,27 +76,15 @@ static const spi_pins board_spi_pins[] __FLASH__ = {
  * Constructor
  */
 
-HardwareSPI::HardwareSPI(uint32 spi_num) {
-    switch (spi_num) {
-    case 1:
-        this->spi_d = SPI1;
-        break;
-    case 2:
-        this->spi_d = SPI2;
-        break;
-    case 3:
-        this->spi_d = SPI3;
-        break;
-    default:
-        ASSERT(0);
-    }
+SPIClass::SPIClass(spi_dev *spi_device) :
+    spi_d(spi_device) {
 }
 
 /*
  * Set up/tear down
  */
 
-void HardwareSPI::begin(uint32 frequency, uint32 bitOrder, uint32 mode) {
+void SPIClass::begin(uint32 frequency, uint32 bitOrder, uint32 mode) {
 
     if (mode >= 4 || frequency > 10000000) {
 
@@ -107,13 +96,13 @@ void HardwareSPI::begin(uint32 frequency, uint32 bitOrder, uint32 mode) {
     enable_device(this->spi_d, true, frequency, end, m);
 }
 
-void HardwareSPI::begin(void) {
+void SPIClass::begin(void) {
 
     this->begin(4000000, MSBFIRST, 0);
 
 }
 
-void HardwareSPI::beginSlave(uint32 bitOrder, uint32 mode) {
+void SPIClass::beginSlave(uint32 bitOrder, uint32 mode) {
     if (mode >= 4) {
         ASSERT(0);
         return;
@@ -125,11 +114,11 @@ void HardwareSPI::beginSlave(uint32 bitOrder, uint32 mode) {
 
 }
 
-void HardwareSPI::beginSlave(void) {
+void SPIClass::beginSlave(void) {
     this->beginSlave(MSBFIRST, 0);
 }
 
-void HardwareSPI::end(void) {
+void SPIClass::end(void) {
     if (!spi_is_enabled(this->spi_d)) {
         return;
     }
@@ -138,17 +127,26 @@ void HardwareSPI::end(void) {
     spi_peripheral_disable(this->spi_d);
 }
 
+
+void SPIClass::end(uint8_t pin) {
+    // Disable spi
+    this->end();
+
+    // TODO [SPI]: Should disable multiple chip select pins when this is called.
+    pinMode(this->nssPin(), INPUT);
+}
+
 /*
  * I/O
  */
 
-uint8 HardwareSPI::read(void) {
+uint8 SPIClass::read(void) {
     uint8 buf[1];
     this->read(buf, 1);
     return buf[0];
 }
 
-void HardwareSPI::read(uint8 *buf, uint32 len) {
+void SPIClass::read(uint8 *buf, uint32 len) {
     uint32 rxed = 0;
     while (rxed < len) {
         while (!spi_is_rx_nonempty(this->spi_d))
@@ -157,11 +155,11 @@ void HardwareSPI::read(uint8 *buf, uint32 len) {
     }
 }
 
-void HardwareSPI::write(uint8 byte) {
+void SPIClass::write(uint8 byte) {
     this->write(&byte, 1);
 }
 
-void HardwareSPI::write(const uint8 *data, uint32 length) {
+void SPIClass::write(const uint8 *data, uint32 length) {
     uint32 txed = 0;
 
     // Transfer data
@@ -172,7 +170,8 @@ void HardwareSPI::write(const uint8 *data, uint32 length) {
     while (spi_is_busy(this->spi_d));
 }
 
-void HardwareSPI::write(const uint8 *data, uint32 length, uint8 slaveNum) {
+// TODO [SPI]: incorporate many slave selects for master mode.
+void SPIClass::write(const uint8 *data, uint32 length, uint8 slaveNum) {
     uint32 txed = 0;
 
     // Select chip
@@ -187,12 +186,12 @@ void HardwareSPI::write(const uint8 *data, uint32 length, uint8 slaveNum) {
     digitalWrite(this->nssPin(), HIGH);
 }
 
-uint8 HardwareSPI::transfer(uint8 byte) {
+uint8 SPIClass::transfer(uint8 byte) {
     this->write(byte);
     return this->read();
 }
 
-uint8 HardwareSPI::transfer(uint8 byte, uint8 slaveNum) {
+uint8 SPIClass::transfer(uint8 byte, uint8 slaveNum) {
     this->write(&byte, 1, slaveNum);
     return this->read();
 }
@@ -203,43 +202,20 @@ uint8 HardwareSPI::transfer(uint8 byte, uint8 slaveNum) {
  * Pin accessors
  */
 
-uint8 HardwareSPI::misoPin(void) {
+uint8 SPIClass::misoPin(void) {
     return dev_to_spi_pins(this->spi_d)->miso;
 }
 
-uint8 HardwareSPI::mosiPin(void) {
+uint8 SPIClass::mosiPin(void) {
     return dev_to_spi_pins(this->spi_d)->mosi;
 }
 
-uint8 HardwareSPI::sckPin(void) {
+uint8 SPIClass::sckPin(void) {
     return dev_to_spi_pins(this->spi_d)->sck;
 }
 
-uint8 HardwareSPI::nssPin(void) {
+uint8 SPIClass::nssPin(void) {
     return dev_to_spi_pins(this->spi_d)->nss;
-}
-
-/*
- * Deprecated functions
- */
-
-uint8 HardwareSPI::send(uint8 data) {
-    uint8 buf[] = {data};
-    return this->send(buf, 1);
-}
-
-uint8 HardwareSPI::send(uint8 *buf, uint32 len) {
-    uint32 txed = 0;
-    uint8 ret = 0;
-    while (txed < len) {
-        this->write(buf[txed++]);
-        ret = this->read();
-    }
-    return ret;
-}
-
-uint8 HardwareSPI::recv(void) {
-    return this->read();
 }
 
 /*
@@ -259,7 +235,7 @@ static const spi_pins* dev_to_spi_pins(spi_dev *dev) {
 
 /* Enables the device in master or slave full duplex mode.  If you
  * change this code, you must ensure that appropriate changes are made
- * to HardwareSPI::end(). */
+ * to SPIClass::end(). */
 static void enable_device(spi_dev *dev,
                           bool as_master,
                           uint32 freq,
@@ -279,30 +255,23 @@ static void enable_device(spi_dev *dev,
     }
 }
 
-
-static void disable_pwm(const stm32_pin_info *i) {
-    if (i->timer_device) {
-        timer_set_mode(i->timer_device, i->timer_channel, TIMER_DISABLED);
-    }
-}
-
 static void configure_gpios(spi_dev *dev, bool as_master) {
     const spi_pins *pins = dev_to_spi_pins(dev);
     if (!pins) {
         return;
     }
 
-    const stm32_pin_info *nssi = &PIN_MAP[pins->nss];
-    const stm32_pin_info *scki = &PIN_MAP[pins->sck];
-    const stm32_pin_info *misoi = &PIN_MAP[pins->miso];
-    const stm32_pin_info *mosii = &PIN_MAP[pins->mosi];
-
-    disable_pwm(nssi);
-    disable_pwm(scki);
-    disable_pwm(misoi);
-    disable_pwm(mosii);
-
-    spi_config_gpios(dev, as_master, nssi->gpio_device, nssi->gpio_bit,
-                     scki->gpio_device, scki->gpio_bit, misoi->gpio_bit,
-                     mosii->gpio_bit);
+    // Let pinMode take care of shorted pin cases on board.
+    if (as_master) {
+        pinMode(pins->nss, OUTPUT);
+        pinMode(pins->sck, OUTPUT);
+        pinMode(pins->miso, INPUT_PULLUP);
+        pinMode(pins->mosi, OUTPUT);
+    }
+    else {
+        pinMode(pins->nss, INPUT_PULLUP);
+        pinMode(pins->sck, INPUT_PULLUP);
+        pinMode(pins->miso, OUTPUT);
+        pinMode(pins->mosi, INPUT_PULLUP);
+    }
 }
