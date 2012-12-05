@@ -80,6 +80,7 @@ extern const uint8_t boardUsedPins[];
  *----------------------------------------------------------------------------*/
 /* Changing a shorted pin to an un-shorted pin:
  *   1) Comment out "#define PIN_Dx_SHORTED and change the sequence order
+ *
  */
 #define PIN_D30_SHORTED 0
 #define PIN_D31_SHORTED 1
@@ -87,6 +88,7 @@ extern const uint8_t boardUsedPins[];
 #define PIN_D33_SHORTED 3
 #define PIN_D34_SHORTED 4
 #define PIN_D35_SHORTED 5
+#define NR_SHORTED_PINS 6
 
 /* Pin aliases: these give the GPIO port/bit for each pin as an
  * enum. These are optional, but recommended. They make it easier to
@@ -105,13 +107,14 @@ enum {
 
 /* Board pins */
 enum {
-    D0, D1, D2, D3, D4, D5, D6, D7, D8, D9, D10,
-    D11, D12, D13, D14, D15, D16, D17, D18, D19,
-    D20, D21, D22, D23, D24, D25, D26, D27, D28,
-    D29, D30, D31, D32, D33, D34, D35, D36, D37,
-    D38, D39, D40, D41, D42, D43, D44, D45, D46,
-    D47, D48, D49, D50, D51, D52, D53, A0, A1, A2, A3, A4, A5,
-    A6, A7, A8, A9, A10, A11, A12, A13, A14, A15, AREF
+    D0,  D1,  D2,  D3,  D4,  D5,  D6,  D7,  D8,  D9,
+    D10, D11, D12, D13, D14, D15, D16, D17, D18, D19,
+    D20, D21, D22, D23, D24, D25, D26, D27, D28, D29,
+    D30, D31, D32, D33, D34, D35, D36, D37, D38, D39,
+    D40, D41, D42, D43, D44, D45, D46, D47, D48, D49,
+    D50, D51, D52, D53, A0,  A1,  A2,  A3,  A4,  A5,
+    A6,  A7,  A8,  A9,  A10, A11, A12, A13, A14, A15,
+    AREF
 };
 /*----------------------------------------------------------------------------*/
 
@@ -148,6 +151,12 @@ enum {
 
 /* Pin number for the built-in LED. */
 #define BOARD_LED_PIN           D13
+#define PIN_LED_13           (13u)
+#define PIN_LED_RXL          (72u)
+#define PIN_LED_TXL          (73u)
+#define PIN_LED              PIN_LED_13
+#define PIN_LED2             PIN_LED_RXL
+#define PIN_LED3             PIN_LED_TXL
 
 /* Number of USARTs/UARTs whose pins are broken out to headers. */
 #define BOARD_NR_USARTS         4
@@ -179,6 +188,20 @@ enum {
 #define BOARD_SPI3_MISO_PIN     D12
 #define BOARD_SPI3_SCK_PIN      D13
 
+
+#define BOARD_SPI_SS0        (BOARD_SPI3_NSS_PIN)
+#define BOARD_SPI_SS1        (4u)
+#define BOARD_SPI_SS2        (52u)
+#define BOARD_SPI_SS3        78
+
+
+static const uint8_t SS   = BOARD_SPI_SS0;
+static const uint8_t SS1  = BOARD_SPI_SS1;
+static const uint8_t SS2  = BOARD_SPI_SS2;
+static const uint8_t SS3  = BOARD_SPI_SS3;
+static const uint8_t MOSI = BOARD_SPI3_MOSI_PIN;
+static const uint8_t MISO = BOARD_SPI3_MISO_PIN;
+static const uint8_t SCK  = BOARD_SPI3_SCK_PIN;
 
 
 /* Timer pin numbers. */
@@ -232,53 +255,12 @@ enum {
 #define BOARD_NR_USED_PINS       0
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Number of pins defined in PinDescription array
-#define PINS_COUNT           (79u)
+#define PINS_COUNT          BOARD_NR_GPIO_PINSNS)
 
-// LEDs
-#define PIN_LED_13           (13u)
-#define PIN_LED_RXL          (72u)
-#define PIN_LED_TXL          (73u)
-#define PIN_LED              PIN_LED_13
-#define PIN_LED2             PIN_LED_RXL
-#define PIN_LED3             PIN_LED_TXL
 
-/*
- * SPI Interfaces
- */
-#define SPI_INTERFACES_COUNT 1
 
-#define SPI_INTERFACE        SPI0
-#define SPI_INTERFACE_ID     ID_SPI0
-#define SPI_CHANNELS_NUM 4
-#define PIN_SPI_SS0          (77u)
-#define PIN_SPI_SS1          (87u)
-#define PIN_SPI_SS2          (86u)
-#define PIN_SPI_SS3          (78u)
-#define PIN_SPI_MOSI         (75u)
-#define PIN_SPI_MISO         (74u)
-#define PIN_SPI_SCK          (76u)
-#define BOARD_SPI_SS0        (10u)
-#define BOARD_SPI_SS1        (4u)
-#define BOARD_SPI_SS2        (52u)
-#define BOARD_SPI_SS3        PIN_SPI_SS3
-#define BOARD_SPI_DEFAULT_SS BOARD_SPI_SS2
 
-#define BOARD_PIN_TO_SPI_PIN(x) \
-    (x==BOARD_SPI_SS0 ? PIN_SPI_SS0 : \
-    (x==BOARD_SPI_SS1 ? PIN_SPI_SS1 : \
-    (x==BOARD_SPI_SS2 ? PIN_SPI_SS2 : PIN_SPI_SS3 )))
-#define BOARD_PIN_TO_SPI_CHANNEL(x) \
-    (x==BOARD_SPI_SS0 ? 0 : \
-    (x==BOARD_SPI_SS1 ? 1 : \
-    (x==BOARD_SPI_SS2 ? 2 : 3)))
 
-static const uint8_t SS   = BOARD_SPI_SS0;
-static const uint8_t SS1  = BOARD_SPI_SS1;
-static const uint8_t SS2  = BOARD_SPI_SS2;
-static const uint8_t SS3  = BOARD_SPI_SS3;
-static const uint8_t MOSI = PIN_SPI_MOSI;
-static const uint8_t MISO = PIN_SPI_MISO;
-static const uint8_t SCK  = PIN_SPI_SCK;
 
 /*
  * Wire Interfaces
@@ -297,17 +279,7 @@ static const uint8_t SCK  = PIN_SPI_SCK;
 #define WIRE1_INTERFACE_ID   ID_TWI0
 #define WIRE1_ISR_HANDLER    TWI0_Handler
 
-/*
- * UART/USART Interfaces
- */
-// Serial
-#define PINS_UART            (81u)
-// Serial1
-#define PINS_USART0          (82u)
-// Serial2
-#define PINS_USART1          (83u)
-// Serial3
-#define PINS_USART3          (84u)
+
 
 /*
  * USB Interfaces
@@ -336,22 +308,7 @@ static const uint8_t CANTX = 69;
 /*
  * PWM
  */
-#define PWM_INTERFACE       PWM
-#define PWM_INTERFACE_ID    ID_PWM
 #define PWM_FREQUENCY       1000
-#define PWM_MAX_DUTY_CYCLE  255
-#define PWM_MIN_DUTY_CYCLE  0
-#define PWM_RESOLUTION      8
-
-/*
- * TC
- */
-#define TC_INTERFACE        TC0
-#define TC_INTERFACE_ID     ID_TC0
-#define TC_FREQUENCY        1000
-#define TC_MAX_DUTY_CYCLE   255
-#define TC_MIN_DUTY_CYCLE   0
-#define TC_RESOLUTION       8
 
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -367,7 +324,7 @@ static const uint8_t CANTX = 69;
 
 #ifdef __cplusplus
 
-
+uint8_t board_get_short_num(uint8_t pin);
 extern UARTClass Serial1;
 extern UARTClass Serial2;
 extern UARTClass Serial3;
@@ -377,4 +334,6 @@ extern UARTClass &Serial;
 #endif
 
 #endif /* _VARIANT_SILABS_ACB_X_ */
+
+
 

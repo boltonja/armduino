@@ -88,8 +88,11 @@ void analogWrite(uint32_t pin, uint32_t value) {
     // PWM
     // Use shorted pins if possible. They have the EPCA module for the silabs board.
     uint32_t short_num = board_get_short_num(gpio_pin->gpio_device, gpio_pin->gpio_bit);
-    gpio_pin = short_num ? &PIN_MAP_SHORTS[short_num - 1] : gpio_pin;
-    if (gpio_pin->timer_device != NULL) {
+    if (short_num != 0 || gpio_pin->timer_device != NULL) {
+        pinMode(gpio_pin->gpio_bit, PWM);
+        if (short_num != 0) {
+            gpio_pin = &PIN_MAP_SHORTS[short_num - 1];
+        }
         timer_dev *dev = gpio_pin->timer_device;
         uint8_t cc_channel = gpio_pin->timer_channel;
         timer_set_compare(dev, cc_channel, ((uint32_t)value * (uint32_t)timer_get_reload(dev)) / ((1 << _writeResolution) - 1));

@@ -147,19 +147,6 @@ static inline void timer_resume(timer_dev *dev) {
     }
 }
 
-static inline uint32 timer_actl_freq(timer_dev *dev, uint32 tmr_clk) {
-    uint32 bus_clk = clk_get_bus_freq(dev->clk_id);
-    // PCA modules
-    // 1) tmr_clk = bus_clk / (clk_div + 1)
-    // 2) clk_div = bus_clk / tmr_clk - 1
-    // => tmr_clk = bus_clk / ((bus_clk / tmr_clk - 1)  + 1)
-    // Timer modules
-    // 1) tmr_clk = bus_clk / (256 - clk_div)
-    // 2) clk_div = 256 - bus_clk / tmr_clk
-    // => tmr_clk = bus_clk / (256 - (256 - bus_clk / tmr_clk))
-    return dev->type == TIMER_BASIC ? bus_clk / (256 - (256 - bus_clk / tmr_clk)) :
-            bus_clk / ((bus_clk / tmr_clk - 1) + 1);
-}
 
 /**
  * @brief Returns the timer's counter value.
