@@ -110,6 +110,7 @@ const stm32_pin_info  __attribute__ ((used)) PIN_MAP[BOARD_NR_GPIO_PINS] = {
     PMAP_ROW(&gpioc,  10,   NULL,  0,  NULL,  ADCx,  16), /* D7/PC10                                                */
     PMAP_ROW(&gpiod,  10,   NULL,  0,  NULL,  ADCx,   0), /* D8/PD10                  I2C1_SDA                      */
     PMAP_ROW(&gpiod,  11,   NULL,  0,  NULL,  ADCx,   0), /* D9/PD11    (PWM)                    D33                */
+
     PMAP_ROW(&gpiod,   3,   NULL,  0,  NULL,  ADCx,   0), /* D10/PD3    SPI_SS(PWM)   SPI2_NSS   D34                */
     PMAP_ROW(&gpiod,   2,   NULL,  0,  NULL,  ADCx,   0), /* D11/PD2    SPI_MOSI(PWM) SPI2_MOSI  D35                */
     PMAP_ROW(&gpiod,   1,   NULL,  0,  NULL,  ADCx,   0), /* D12/PD1    SPI_MISO      SPI2_MISO                     */
@@ -120,6 +121,7 @@ const stm32_pin_info  __attribute__ ((used)) PIN_MAP[BOARD_NR_GPIO_PINS] = {
     PMAP_ROW(&gpioa,   3,   NULL,  0,  ADC1,     3,   0), /* D17/PA3    UART_RX       SPI0_MISO          ADC0.3     */
     PMAP_ROW(&gpioa,   4,   NULL,  0,  ADC1,     4,   0), /* D18/PA4    UART_TX       SPI0_MOSI          ADC0.4     */
     PMAP_ROW(&gpioa,   5,   NULL,  0,  ADC1,     5,   0), /* D19/PA5    UART_RX       SPI0_NSS           ADC0.5     */
+
     PMAP_ROW(&gpioa,   6,   NULL,  0,  NULL,  ADCx,   0), /* D20/PA6    I2C_SDA       USART1_TX                     */
     PMAP_ROW(&gpioa,   7,   NULL,  0,  ADC1,     6,   0), /* D21/PA7    I2C_SCL       USART1_RX          ADC0.6     */
     PMAP_ROW(&gpioa,  13, TIMER2,  2,  NULL,  ADCx,   0), /* D22/PA13                 PCA0_CEX1                     */
@@ -130,6 +132,7 @@ const stm32_pin_info  __attribute__ ((used)) PIN_MAP[BOARD_NR_GPIO_PINS] = {
     PIN_NOT_USED                                          /* D27    ~ Pin Not Used ~                                */
     PIN_NOT_USED                                          /* D28    ~ Pin Not Used ~                                */
     PIN_NOT_USED                                          /* D29    ~ Pin Not Used ~                                */
+
     PIN_ROW_D30_NOT_SHORTED                               /* D30/PE5    PWM           EPCA_CEX5  D3                 */
     PIN_ROW_D31_NOT_SHORTED                               /* D31/PE4    PWM           EPCA_CEX4  D5                 */
     PIN_ROW_D32_NOT_SHORTED                               /* D32/PE3    PWM           EPCA_CEX3  D6                 */
@@ -140,6 +143,7 @@ const stm32_pin_info  __attribute__ ((used)) PIN_MAP[BOARD_NR_GPIO_PINS] = {
     PMAP_ROW(&gpioc,   1,   NULL,  0,  ADC2,     1,   2), /* D37/PC1                                                */
     PMAP_ROW(&gpioc,   2,   NULL,  0,  ADC2,     0,   3), /* D38/PC2                                                */
     PMAP_ROW(&gpioc,   3,   NULL,  0,  NULL,  ADCx,   4), /* D39/PC3                                                */
+
     PMAP_ROW(&gpioc,   4,   NULL,  0,  NULL,  ADCx,   5), /* D40/PC4                                                */
     PMAP_ROW(&gpioc,   5,   NULL,  0,  NULL,  ADCx,   6), /* D41/PC5                                                */
     PMAP_ROW(&gpioc,   6,   NULL,  0,  NULL,  ADCx,   7), /* D42/PC6    SPI_SCK      SPI1_SCK                       */
@@ -150,6 +154,7 @@ const stm32_pin_info  __attribute__ ((used)) PIN_MAP[BOARD_NR_GPIO_PINS] = {
     PIN_NOT_USED                                          /* D47    ~ Pin Not Used ~                                */
     PIN_NOT_USED                                          /* D48    ~ Pin Not Used ~                                */
     PMAP_ROW(&gpioc,  11,   NULL,  0,  NULL,  ADCx,   0), /* D49/PC11                                               */
+
     PMAP_ROW(&gpioc,  12,   NULL,  0,  NULL,  ADCx,   0), /* D50/PC12                                               */
     PMAP_ROW(&gpioc,  13,   NULL,  0,  NULL,  ADCx,   0), /* D51/PC13                                               */
     PMAP_ROW(&gpioc,  14,   NULL,  0,  NULL,  ADCx,   0), /* D52/PC14                                               */
@@ -191,7 +196,7 @@ const uint8_t boardADCPins[] = {
 // the button and the LED, it's usually best to leave these pins alone
 // unless you know what you're doing.
 const uint8_t boardUsedPins[] = {
-
+D27,D28,D29,D43,D44,D47,D48,D53
 };
 
 
@@ -259,7 +264,8 @@ const xbar_dev_info XBAR_MAP[XBAR_NULL] = {
     XBAR_ROW(xbar_ahb_out, XBAR_NUM(BOARD_AHB_OUT_PIN, 1)),
 };
 
-const stm32_pin_info PIN_MAP_SHORTS[] = {
+
+const stm32_pin_info PIN_MAP_SHORTS[NR_SHORTED_PINS] = {
         PIN_ROW_D30_SHORTED
         PIN_ROW_D31_SHORTED
         PIN_ROW_D32_SHORTED
@@ -376,15 +382,10 @@ static void setup_adcs(void);
 static void setup_timers(void);
 void board_setup_clock_prescalers(uint32_t sys_freq);
 void board_setup_rtc(void);
+void disable_watchdog(void);
 void init( void )
 {
-    // Turn off watchdog
-    *((volatile uint32_t*)0x4002D020) = 0;
-    clk_enable_dev(CLK_MISC1);
-    *((volatile uint32_t*)0x40030030) = 0xA5;
-    *((volatile uint32_t*)0x40030030) = 0xDD;
-
-    // init gpio
+    disable_watchdog();
     gpio_init_all();
     setup_flash();
     setup_clocks();
@@ -393,9 +394,18 @@ void init( void )
     setup_adcs();
     setup_timers();
 
+
+
 }
 
-
+void disable_watchdog(void)
+{
+    // Turn off watchdog
+    *((volatile uint32_t*)0x4002D020) = 0;
+    clk_enable_dev(CLK_MISC1);
+    *((volatile uint32_t*)0x40030030) = 0xA5;
+    *((volatile uint32_t*)0x40030030) = 0xDD;
+}
 
 /*
  * Auxiliary routines
@@ -506,6 +516,9 @@ static void timer_default_config(timer_dev *dev) {
 static void setup_timers(void) {
 
     timer_foreach(timer_default_config);
+
+
+
 }
 
 void board_setup_clock_prescalers(uint32_t sys_freq) {

@@ -100,9 +100,6 @@ void gpio_init_all(void);
 void gpio_set_mode(gpio_dev *dev, uint8 pin, gpio_pin_mode mode);
 
 
-uint8 board_get_short_num(gpio_dev *dev, uint8 pin);
-
-
 static inline gpio_type gpio_get_type(gpio_dev *dev) {
     if (dev == GPIOE) {
         return GPIO_HIGHDRIVE;
