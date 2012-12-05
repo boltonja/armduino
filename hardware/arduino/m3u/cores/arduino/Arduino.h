@@ -38,6 +38,9 @@ extern "C"{
 #define clockCyclesPerMicrosecond() ( SystemCoreClock / 1000000L )
 #define clockCyclesToMicroseconds(a) ( ((a) * 1000L) / (SystemCoreClock / 1000L) )
 #define microsecondsToClockCycles(a) ( (a) * (SystemCoreClock / 1000000L) )
+/* Description: Returns 1 if a secondary shorted pin (e.g. D33). */
+unsigned char board_2ndry_shorted_pin(unsigned char pin);
+unsigned char board_get_short_num(unsigned char pin);
 
 void yield(void);
 

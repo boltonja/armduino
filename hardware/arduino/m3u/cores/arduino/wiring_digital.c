@@ -20,10 +20,14 @@
 #include "Arduino.h"
 
 #ifdef __cplusplus
- extern "C" {
+extern "C" {
 #endif
 
-void pinMode( uint32_t pin_num, uint32_t dwMode ) {
+
+void pinMode(uint32_t pin_num, uint32_t dwMode) {
+    // Don't use shorted pin
+    if (board_2ndry_shorted_pin(pin_num)) return;
+
     WiringPinMode mode = dwMode;
     gpio_pin_mode outputMode;
     uint8_t pwm = false;
@@ -64,20 +68,19 @@ void pinMode( uint32_t pin_num, uint32_t dwMode ) {
     }
 
     // Shorted pin?
-    uint32_t short_num = board_get_short_num(gpio_pin->gpio_device, gpio_pin->gpio_bit);
-    if (short_num) {
-        short_num -= 1;
+    uint32_t short_num = board_get_short_num(pin_num);
+    if (short_num != pin_num) {
         if (pwm == true) {
             // High impedance main pin. Set PWM on secondary
             gpio_set_mode(gpio_pin->gpio_device, gpio_pin->gpio_bit, GPIO_DIGITAL_INPUT_PULLUP);
-            gpio_pin = &PIN_MAP_SHORTS[short_num];
+            gpio_pin = &PIN_MAP[short_num];
             gpio_set_mode(gpio_pin->gpio_device, gpio_pin->gpio_bit, outputMode);
         }
         else {
             // Disable PWM on secondary. Set primary pin function and return.
-            gpio_set_af(PIN_MAP_SHORTS[short_num].gpio_device, PIN_MAP_SHORTS[short_num].gpio_bit, GPIOHD_FNCT_GPIO);
-            timer_set_mode(PIN_MAP_SHORTS[short_num].timer_device,
-            PIN_MAP_SHORTS[short_num].timer_channel, TIMER_DISABLED);
+            gpio_set_af(PIN_MAP[short_num].gpio_device, PIN_MAP[short_num].gpio_bit, GPIOHD_FNCT_GPIO);
+            timer_set_mode(PIN_MAP[short_num].timer_device,
+                    PIN_MAP[short_num].timer_channel, TIMER_DISABLED);
             gpio_set_mode(gpio_pin->gpio_device, gpio_pin->gpio_bit, outputMode);
             return;
         }
@@ -101,24 +104,24 @@ void pinMode( uint32_t pin_num, uint32_t dwMode ) {
     }
 }
 
-void digitalWrite( uint32_t pin, uint32_t val ) {
-    if (pin >= BOARD_NR_GPIO_PINS) {
+void digitalWrite(uint32_t pin, uint32_t val) {
+    if ((pin >= BOARD_NR_GPIO_PINS) || board_2ndry_shorted_pin(pin)) {
         return;
     }
     gpio_write_bit(PIN_MAP[pin].gpio_device, PIN_MAP[pin].gpio_bit, val);
 }
 
 int digitalRead(uint32_t pin) {
-    if (pin >= BOARD_NR_GPIO_PINS) {
-        return 0;
+    if ((pin >= BOARD_NR_GPIO_PINS) || board_2ndry_shorted_pin(pin)) {
+        return;
     }
 
     return gpio_read_bit(PIN_MAP[pin].gpio_device, PIN_MAP[pin].gpio_bit) ?
             HIGH : LOW;
- }
+}
 
 void togglePin(uint8 pin) {
-    if (pin >= BOARD_NR_GPIO_PINS) {
+    if ((pin >= BOARD_NR_GPIO_PINS) || board_2ndry_shorted_pin(pin)) {
         return;
     }
     gpio_toggle_bit(PIN_MAP[pin].gpio_device, PIN_MAP[pin].gpio_bit);

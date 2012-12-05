@@ -27,53 +27,6 @@
 
 #define PIN_NOT_USED PMAP_ROW(NULL,0,NULL,0,NULL,ADCx,0),
 
-#define PIN_ROW_D30_NOT_SHORTED PMAP_ROW(&gpioe,   5, TIMER1,  6,  NULL,  ADCx,   0),
-#define PIN_ROW_D30_SHORTED
-#if defined(PIN_D30_SHORTED)
-#define PIN_ROW_D30_SHORTED PMAP_ROW(&gpioe,   5, TIMER1,  6,  NULL,  ADCx,   0),
-#define PIN_ROW_D30_NOT_SHORTED PIN_NOT_USED
-#define D30 D3
-#endif
-
-#define PIN_ROW_D31_NOT_SHORTED PMAP_ROW(&gpioe,   4, TIMER1,  5,  NULL,  ADCx,   0),
-#define PIN_ROW_D31_SHORTED
-#if defined(PIN_D31_SHORTED)
-#define PIN_ROW_D31_SHORTED PMAP_ROW(&gpioe,   4, TIMER1,  5,  NULL,  ADCx,   0),
-#define PIN_ROW_D31_NOT_SHORTED PIN_NOT_USED
-#define D31 D5
-#endif
-
-#define PIN_ROW_D32_NOT_SHORTED PMAP_ROW(&gpioe,   3, TIMER1,  4,  NULL,  ADCx,   0),
-#define PIN_ROW_D32_SHORTED
-#if defined(PIN_D32_SHORTED)
-#define PIN_ROW_D32_SHORTED PMAP_ROW(&gpioe,   3, TIMER1,  4,  NULL,  ADCx,   0),
-#define PIN_ROW_D32_NOT_SHORTED PIN_NOT_USED
-#define D32 D6
-#endif
-
-#define PIN_ROW_D33_NOT_SHORTED PMAP_ROW(&gpioe,   2, TIMER1,  3,  NULL,  ADCx,   0),
-#define PIN_ROW_D33_SHORTED
-#if defined(PIN_D33_SHORTED)
-#define PIN_ROW_D33_SHORTED PMAP_ROW(&gpioe,   2, TIMER1,  3,  NULL,  ADCx,   0),
-#define PIN_ROW_D33_NOT_SHORTED PIN_NOT_USED
-#define D33 D9
-#endif
-
-#define PIN_ROW_D34_NOT_SHORTED PMAP_ROW(&gpioe,   1, TIMER1,  2,  NULL,  ADCx,   0),
-#define PIN_ROW_D34_SHORTED
-#if defined(PIN_D34_SHORTED)
-#define PIN_ROW_D34_SHORTED PMAP_ROW(&gpioe,   1, TIMER1,  2,  NULL,  ADCx,   0),
-#define PIN_ROW_D34_NOT_SHORTED PIN_NOT_USED
-#define D34 D10
-#endif
-
-#define PIN_ROW_D35_NOT_SHORTED PMAP_ROW(&gpioe,   0, TIMER1,  1,  NULL,  ADCx,   0),
-#define PIN_ROW_D35_SHORTED
-#if defined(PIN_D35_SHORTED)
-#define PIN_ROW_D35_SHORTED PMAP_ROW(&gpioe,   0, TIMER1,  1,  NULL,  ADCx,   0),
-#define PIN_ROW_D35_NOT_SHORTED PIN_NOT_USED
-#define D35 D11
-#endif
 
 // Pin map: this lets the basic I/O functions (digitalWrite(),
 // analogRead(), pwmWrite()) translate from pin numbers to STM32
@@ -133,12 +86,12 @@ const stm32_pin_info  __attribute__ ((used)) PIN_MAP[BOARD_NR_GPIO_PINS] = {
     PIN_NOT_USED                                          /* D28    ~ Pin Not Used ~                                */
     PIN_NOT_USED                                          /* D29    ~ Pin Not Used ~                                */
 
-    PIN_ROW_D30_NOT_SHORTED                               /* D30/PE5    PWM           EPCA_CEX5  D3                 */
-    PIN_ROW_D31_NOT_SHORTED                               /* D31/PE4    PWM           EPCA_CEX4  D5                 */
-    PIN_ROW_D32_NOT_SHORTED                               /* D32/PE3    PWM           EPCA_CEX3  D6                 */
-    PIN_ROW_D33_NOT_SHORTED                               /* D33/PE2    PWM           EPCA_CEX2  D9                 */
-    PIN_ROW_D34_NOT_SHORTED                               /* D34/PE1    PWM           EPCA_CEX1  D10                */
-    PIN_ROW_D35_NOT_SHORTED                               /* D35/PE0    PWM           EPCA_CEX0  D11                */
+    PMAP_ROW(&gpioe,   5, TIMER1,  6,  NULL,  ADCx,   0), /* D30/PE5    PWM           EPCA_CEX5  D3                 */
+    PMAP_ROW(&gpioe,   4, TIMER1,  5,  NULL,  ADCx,   0), /* D31/PE4    PWM           EPCA_CEX4  D5                 */
+    PMAP_ROW(&gpioe,   3, TIMER1,  4,  NULL,  ADCx,   0), /* D32/PE3    PWM           EPCA_CEX3  D6                 */
+    PMAP_ROW(&gpioe,   2, TIMER1,  3,  NULL,  ADCx,   0), /* D33/PE2    PWM           EPCA_CEX2  D9                 */
+    PMAP_ROW(&gpioe,   1, TIMER1,  2,  NULL,  ADCx,   0), /* D34/PE1    PWM           EPCA_CEX1  D10                */
+    PMAP_ROW(&gpioe,   0, TIMER1,  1,  NULL,  ADCx,   0), /* D35/PE0    PWM           EPCA_CEX0  D11                */
     PMAP_ROW(&gpioc,   0,   NULL,  0,  ADC2,     2,   1), /* D36/PC0                                                */
     PMAP_ROW(&gpioc,   1,   NULL,  0,  ADC2,     1,   2), /* D37/PC1                                                */
     PMAP_ROW(&gpioc,   2,   NULL,  0,  ADC2,     0,   3), /* D38/PC2                                                */
@@ -184,7 +137,7 @@ const stm32_pin_info  __attribute__ ((used)) PIN_MAP[BOARD_NR_GPIO_PINS] = {
 // Array of pins you can use for pwmWrite(). Keep it in Flash because
 // it doesn't change, and so we don't waste RAM.
 const uint8_t boardPWMPins[] = {
-    D30, D31, D32, D33, D34, D35, A1, D22, D23, D24, A9, A11
+    PIN_D30_SHORTED, PIN_D31_SHORTED, PIN_D32_SHORTED, PIN_D33_SHORTED, PIN_D34_SHORTED, PIN_D35_SHORTED, A1, D22, D23, D24, A9, A11
 };
 
 // Array of pins you can use for analogRead().
@@ -265,81 +218,78 @@ const xbar_dev_info XBAR_MAP[XBAR_NULL] = {
 };
 
 
-const stm32_pin_info PIN_MAP_SHORTS[NR_SHORTED_PINS] = {
-        PIN_ROW_D30_SHORTED
-        PIN_ROW_D31_SHORTED
-        PIN_ROW_D32_SHORTED
-        PIN_ROW_D33_SHORTED
-        PIN_ROW_D34_SHORTED
-        PIN_ROW_D35_SHORTED
-};
 
-/* Return 0 if not shorted */
-uint8_t board_get_short_num(gpio_dev *dev, uint8_t pin)
+/* Description: Returns the corresponding shorted pin (if there is one) or the pin itself. */
+uint8_t board_get_short_num(uint8_t pin)
 {
-#if BOARD_NR_SHORTED_PINS == 0
-    return 0;
-#endif // BOARD_NR_SHORTED_PINS == 0
-
-
-    // Primary pin
-    if (dev == GPIOD) {
-        switch (pin) {
+    switch (pin) {
 #if defined(PIN_D30_SHORTED)
-        case 6:
-            return PIN_D30_SHORTED + 1;
+    case PIN_D30_SHORTED:
+        return 30;
 #endif // defined(PIN_D30_SHORTED)
 #if defined(PIN_D31_SHORTED)
-        case 8:
-            return PIN_D31_SHORTED + 1;
+    case PIN_D31_SHORTED:
+        return 31;
 #endif // defined(PIN_D31_SHORTED)
 #if defined(PIN_D32_SHORTED)
-        case 9:
-            return PIN_D32_SHORTED + 1;
+    case PIN_D32_SHORTED:
+        return 32;
 #endif // defined(PIN_D32_SHORTED)
 #if defined(PIN_D33_SHORTED)
-        case 11:
-            return PIN_D33_SHORTED + 1;
+    case PIN_D33_SHORTED:
+        return 33;
 #endif // defined(PIN_D33_SHORTED)
 #if defined(PIN_D34_SHORTED)
-        case 3:
-            return PIN_D34_SHORTED + 1;
+    case PIN_D34_SHORTED:
+        return 34;
 #endif // defined(PIN_D34_SHORTED)
 #if defined(PIN_D35_SHORTED)
-        case 2:
-            return PIN_D35_SHORTED + 1;
+    case PIN_D35_SHORTED:
+        return 35;
 #endif // defined(PIN_D35_SHORTED)
-        default:
-            return 0;
-        }
+    default:
+        return pin;
+    }
+}
+
+/* Description: Returns 1 if a secondary shorted pin (e.g. D33). */
+uint8_t board_2ndry_shorted_pin(uint8_t pin)
+{
+    if (0 ||
+#if defined(PIN_D30_SHORTED)
+    pin == 30 ||
+#endif // defined(PIN_D30_SHORTED)
+#if defined(PIN_D31_SHORTED)
+    pin == 31 ||
+#endif // defined(PIN_D31_SHORTED)
+#if defined(PIN_D32_SHORTED)
+    pin == 32 ||
+#endif // defined(PIN_D32_SHORTED)
+#if defined(PIN_D33_SHORTED)
+    pin == 33 ||
+#endif // defined(PIN_D33_SHORTED)
+#if defined(PIN_D34_SHORTED)
+    pin == 34 ||
+#endif // defined(PIN_D34_SHORTED)
+#if defined(PIN_D35_SHORTED)
+    pin == 35 ||
+#endif // defined(PIN_D35_SHORTED)
+    0) {
+        return 1;
     }
     return 0;
 }
 
-#if 0
-/*
- * UART objects
- */
-RingBuffer rx_buffer1;
-
-UARTClass Serial(UART, UART_IRQn, ID_UART, &rx_buffer1);
-
-// IT handlers
-void UART_Handler(void)
-{
-  Serial.IrqHandler();
-}
-#endif
 // ----------------------------------------------------------------------------
 /*
  * USART objects
  */
-#define DEFINE_HWSERIAL(name, buff, size, n)                                   \
-        UARTClass name(USART##n, \
-                        buff, \
-                        size, \
-                        BOARD_USART##n##_TX_PIN,                   \
-                        BOARD_USART##n##_RX_PIN)
+#define DEFINE_HWSERIAL(name, buff, size, n)    \
+            UARTClass name(USART##n,            \
+                buff,                           \
+                size,                           \
+                BOARD_USART##n##_TX_PIN,        \
+                BOARD_USART##n##_RX_PIN)
 
 
 
@@ -355,25 +305,7 @@ DEFINE_HWSERIAL(Serial4, usart_rbuffers[3].buff, USART_RING_BUFF_SIZE, 4);
 UARTClass &Serial = Serial2;
 
 
-// IT handlers
-void USART0_Handler(void)
-{
-
-}
-
-void USART1_Handler(void)
-{
-
-}
-
-void USART3_Handler(void)
-{
-
-}
-
 // ----------------------------------------------------------------------------
-
-
 void __libc_init_array(void);
 static void setup_flash(void);
 static void setup_clocks(void);
@@ -393,9 +325,6 @@ void init( void )
     systick_init(clk_get_sys_freq() / 1000 - 1);
     setup_adcs();
     setup_timers();
-
-
-
 }
 
 void disable_watchdog(void)
