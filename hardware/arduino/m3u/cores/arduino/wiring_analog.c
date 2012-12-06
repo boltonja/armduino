@@ -59,12 +59,13 @@ void analogReference(eAnalogReference ulMode)
 uint32_t analogRead(uint32_t pin)
 {
     const adc_dev *dev = PIN_MAP[pin].adc_device;
-    if (dev == NULL) {
-        return 0;
+    if ((pin >= BOARD_NR_GPIO_PINS) || board_2ndry_shorted_pin(pin)) {
+        return;
     }
+    pinMode(pin, INPUT_ANALOG);
     uint32_t value = adc_read(dev, PIN_MAP[pin].adc_channel);
 
-    // TODO [silabs]: find way to determine adc resolution. Make an analog class?
+    // TODO [silabs]: adc resolution is not always 12.
     return mapResolution(value, 12, _readResolution);
 }
 
