@@ -46,6 +46,7 @@ struct spi_pins {
 };
 
 static const spi_pins* dev_to_spi_pins(spi_dev *dev);
+static void configure_gpios(spi_dev *dev, bool as_master);
 
 static void enable_device(spi_dev *dev,
                           bool as_master,
@@ -80,42 +81,60 @@ SPIClass::SPIClass(spi_dev *spi_device) :
     spi_d(spi_device) {
 }
 
+
+void SPIClass::begin(void) {
+    this->begin(this->nssPin());
+}
+
 /*
  * Set up/tear down
  */
 
-void SPIClass::begin(uint32 frequency, uint32 bitOrder, uint32 mode) {
+void SPIClass::begin(uint8_t _pin) {
+    spi_init(spi_d);
+    configure_gpios(spi_d, true);
+    pinMode(_pin, OUTPUT);
 
-    if (mode >= 4 || frequency > 10000000) {
-
-        ASSERT(0);
-        return;
-    }
-    spi_cfg_flag end = bitOrder == MSBFIRST ? SPI_FRAME_MSB : SPI_FRAME_LSB;
-    spi_mode m = (spi_mode)mode;
-    enable_device(this->spi_d, true, frequency, end, m);
+    setFrequency(_pin, 4000000);
+    setDataMode(_pin, SPI_MODE0);
+    setBitOrder(_pin, MSBFIRST);
 }
 
-void SPIClass::begin(void) {
-
-    this->begin(4000000, MSBFIRST, 0);
-
+void SPIClass::setBitOrder(uint8_t _pin, BitOrder _bitOrder) {
+    uint32_t ch = BOARD_PIN_TO_SPI_CHANNEL(_pin);
+    bitOrder[ch] = ((uint32_t)_bitOrder | SPI_DFF_8_BIT |
+            SPI_MASTER | SPI_MODE_MST_SLV_3WIRE);
 }
 
-void SPIClass::beginSlave(uint32 bitOrder, uint32 mode) {
-    if (mode >= 4) {
-        ASSERT(0);
-        return;
-    }
-    spi_cfg_flag end = bitOrder == MSBFIRST ? SPI_FRAME_MSB : SPI_FRAME_LSB;
-    spi_mode m = (spi_mode)mode;
-
-    enable_device(this->spi_d, false, 0, end, m);
-
+void SPIClass::setDataMode(uint8_t _pin, uint8_t _mode) {
+    uint32_t ch = BOARD_PIN_TO_SPI_CHANNEL(_pin);
+    mode[ch] = _mode;
 }
 
-void SPIClass::beginSlave(void) {
-    this->beginSlave(MSBFIRST, 0);
+void SPIClass::setFrequency(uint8_t _pin, uint32_t _frequency) {
+    uint32_t ch = BOARD_PIN_TO_SPI_CHANNEL(_pin);
+    frequency[ch] = _frequency;
+}
+
+void SPIClass::setClockDivider(uint8_t _pin, uint32_t divider) {
+    // Assume 84MHz to be compatible with Due.
+    setFrequency(_pin, 84000000 / divider);
+}
+
+void SPIClass::setBitOrder(BitOrder _bitOrder) {
+    setBitOrder(this->nssPin(), _bitOrder);
+}
+
+void SPIClass::setDataMode(uint8_t _mode) {
+    setDataMode(this->nssPin(), _mode);
+}
+
+void SPIClass::setFrequency(uint32_t _frequency) {
+    setFrequency(this->nssPin(), _frequency);
+}
+
+void SPIClass::setClockDivider(uint32_t divider) {
+    setClockDivider(this->nssPin(), divider);
 }
 
 void SPIClass::end(void) {
@@ -129,11 +148,7 @@ void SPIClass::end(void) {
 
 
 void SPIClass::end(uint8_t pin) {
-    // Disable spi
-    this->end();
-
-    // TODO [SPI]: Should disable multiple chip select pins when this is called.
-    pinMode(this->nssPin(), INPUT);
+    pinMode(pin, INPUT);
 }
 
 /*
@@ -155,10 +170,6 @@ void SPIClass::read(uint8 *buf, uint32 len) {
     }
 }
 
-void SPIClass::write(uint8 byte) {
-    this->write(&byte, 1);
-}
-
 void SPIClass::write(const uint8 *data, uint32 length) {
     uint32 txed = 0;
 
@@ -170,12 +181,12 @@ void SPIClass::write(const uint8 *data, uint32 length) {
     while (spi_is_busy(this->spi_d));
 }
 
-// TODO [SPI]: incorporate many slave selects for master mode.
-void SPIClass::write(const uint8 *data, uint32 length, uint8 slaveNum) {
+
+void SPIClass::write(const uint8 *data, uint32 length, uint8_t pin) {
     uint32 txed = 0;
 
     // Select chip
-    digitalWrite(this->nssPin(), LOW);
+    digitalWrite(pin, LOW);
     // Transfer data
     while (txed < length) {
         txed += spi_tx(this->spi_d, data + txed, length - txed);
@@ -183,16 +194,24 @@ void SPIClass::write(const uint8 *data, uint32 length, uint8 slaveNum) {
     // Wait till transfer is complete
     while (spi_is_busy(this->spi_d));
     // De-select chip
-    digitalWrite(this->nssPin(), HIGH);
+    digitalWrite(pin, HIGH);
 }
 
-uint8 SPIClass::transfer(uint8 byte) {
-    this->write(byte);
-    return this->read();
+byte SPIClass::transfer(uint8_t _data, SPITransferMode _mode) {
+    this->transfer(this->nssPin(), _data, _mode);
 }
 
-uint8 SPIClass::transfer(uint8 byte, uint8 slaveNum) {
-    this->write(&byte, 1, slaveNum);
+byte SPIClass::transfer(byte _pin, uint8_t _data, SPITransferMode _mode) {
+    uint32_t ch = BOARD_PIN_TO_SPI_CHANNEL(_pin);
+    spi_master_enable(spi_d, frequency[ch], (spi_mode)mode[ch], bitOrder[ch]);
+
+    if (_mode == SPI_CONTINUE) {
+        digitalWrite(_pin, LOW);
+        this->write(&_data, 1);
+    }
+    else {
+        this->write(&_data, 1, _pin);
+    }
     return this->read();
 }
 
@@ -222,7 +241,6 @@ uint8 SPIClass::nssPin(void) {
  * Auxiliary functions
  */
 
-static void configure_gpios(spi_dev *dev, bool as_master);
 
 static const spi_pins* dev_to_spi_pins(spi_dev *dev) {
     switch (dev->clk_id) {
@@ -263,7 +281,6 @@ static void configure_gpios(spi_dev *dev, bool as_master) {
 
     // Let pinMode take care of shorted pin cases on board.
     if (as_master) {
-        pinMode(pins->nss, OUTPUT);
         pinMode(pins->sck, OUTPUT);
         pinMode(pins->miso, INPUT_PULLUP);
         pinMode(pins->mosi, OUTPUT);

@@ -268,11 +268,11 @@ typedef enum spi_cfg_flag {
 
 
 typedef enum spi_mode {
-    SPI_MODE_0 = 0 | 0,                                 /**< Clock polarity low. Rising edge capture.   */
-    SPI_MODE_1 = 0 | SPI_CLKPHASE_EDGE,                 /**< Clock polarity low. Falling edge capture.  */
-    SPI_MODE_2 = SPI_CLKPOLAR_HIGH | 0,                 /**< Clock polarity high. Falling edge capture. */
-    SPI_MODE_3 = SPI_CLKPOLAR_HIGH | SPI_CLKPHASE_EDGE, /**< Clock polarity high. Rising edge capture.  */
-}spi_mode;
+    SPI_MODE0 = 0 | 0,                                 /**< Clock polarity low. Rising edge capture.   */
+    SPI_MODE1 = 0 | SPI_CLKPHASE_EDGE,                 /**< Clock polarity low. Falling edge capture.  */
+    SPI_MODE2 = SPI_CLKPOLAR_HIGH | 0,                 /**< Clock polarity high. Falling edge capture. */
+    SPI_MODE3 = SPI_CLKPOLAR_HIGH | SPI_CLKPHASE_EDGE, /**< Clock polarity high. Rising edge capture.  */
+} spi_mode;
 
 
 

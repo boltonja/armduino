@@ -174,36 +174,59 @@ extern const uint8_t boardUsedPins[];
 
 /* Number of SPI ports broken out to headers. */
 #define BOARD_NR_SPI            3
+#define SPI_CHANNELS_NUM        4
 
-/* SPI pin numbers. */
-#define BOARD_SPI1_NSS_PIN      D19
+// MOSI, MISO, SCK
 #define BOARD_SPI1_MOSI_PIN     D18
 #define BOARD_SPI1_MISO_PIN     D17
 #define BOARD_SPI1_SCK_PIN      D16
-#define BOARD_SPI2_NSS_PIN      D4
 #define BOARD_SPI2_MOSI_PIN     D46
 #define BOARD_SPI2_MISO_PIN     D45
 #define BOARD_SPI2_SCK_PIN      D42
-#define BOARD_SPI3_NSS_PIN      D10
 #define BOARD_SPI3_MOSI_PIN     D11
 #define BOARD_SPI3_MISO_PIN     D12
 #define BOARD_SPI3_SCK_PIN      D13
 
+// NSS (slave mode)
+#define BOARD_SPI1_NSS_PIN      D19
+#define BOARD_SPI2_NSS_PIN      D4
+#define BOARD_SPI3_NSS_PIN      D10
 
-#define BOARD_SPI_SS0        (BOARD_SPI3_NSS_PIN)
-#define BOARD_SPI_SS1        (4u)
-#define BOARD_SPI_SS2        (52u)
-#define BOARD_SPI_SS3        78
+// NSS (master mode)
+#define BOARD_SPI1_SS0          (BOARD_SPI1_NSS_PIN)
+#define BOARD_SPI1_SS1          4
+#define BOARD_SPI1_SS2          52
+#define BOARD_SPI1_SS3          255
+#define BOARD_SPI2_SS0          (BOARD_SPI2_NSS_PIN)
+#define BOARD_SPI2_SS1          255
+#define BOARD_SPI2_SS2          255
+#define BOARD_SPI2_SS3          255
+#define BOARD_SPI3_SS0          (BOARD_SPI3_NSS_PIN)
+#define BOARD_SPI3_SS1          255
+#define BOARD_SPI3_SS2          255
+#define BOARD_SPI3_SS3          255
+
+// Default SPI
+#define BOARD_SPI_SS0           BOARD_SPI3_SS0
+#define BOARD_SPI_SS1           BOARD_SPI3_SS1
+#define BOARD_SPI_SS2           BOARD_SPI3_SS2
+#define BOARD_SPI_SS3           BOARD_SPI3_SS3
+#define BOARD_SPI_DEFAULT_SS    BOARD_SPI_SS0
+
+static const uint8_t SS   =     BOARD_SPI_SS0;
+static const uint8_t SS1  =     BOARD_SPI_SS1;
+static const uint8_t SS2  =     BOARD_SPI_SS2;
+static const uint8_t SS3  =     BOARD_SPI_SS3;
+static const uint8_t MOSI =     BOARD_SPI3_MOSI_PIN;
+static const uint8_t MISO =     BOARD_SPI3_MISO_PIN;
+static const uint8_t SCK  =     BOARD_SPI3_SCK_PIN;
 
 
-static const uint8_t SS   = BOARD_SPI_SS0;
-static const uint8_t SS1  = BOARD_SPI_SS1;
-static const uint8_t SS2  = BOARD_SPI_SS2;
-static const uint8_t SS3  = BOARD_SPI_SS3;
-static const uint8_t MOSI = BOARD_SPI3_MOSI_PIN;
-static const uint8_t MISO = BOARD_SPI3_MISO_PIN;
-static const uint8_t SCK  = BOARD_SPI3_SCK_PIN;
-
+#define BOARD_PIN_TO_SPI_CHANNEL(x) \
+            (x == BOARD_SPI1_SS0 || BOARD_SPI2_SS0 || BOARD_SPI3_SS0 ? 0 : \
+            (x == BOARD_SPI1_SS1 || BOARD_SPI2_SS1 || BOARD_SPI3_SS1 ? 1 : \
+            (x == BOARD_SPI1_SS2 || BOARD_SPI2_SS2 || BOARD_SPI3_SS2 ? 2 : 3 \
+            )))
 
 /* Timer pin numbers. */
 #define BOARD_TIMER1C1_PIN      0xFE
