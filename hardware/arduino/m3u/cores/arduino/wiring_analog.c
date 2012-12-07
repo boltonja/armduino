@@ -58,10 +58,10 @@ void analogReference(eAnalogReference ulMode)
  * on the user's part. Not too much, we think ;). */
 uint32_t analogRead(uint32_t pin)
 {
-    const adc_dev *dev = PIN_MAP[pin].adc_device;
-    if ((pin >= BOARD_NR_GPIO_PINS) || board_2ndry_shorted_pin(pin)) {
+    if (board_pin_invalid(pin)) {
         return;
     }
+    const adc_dev *dev = PIN_MAP[pin].adc_device;
     pinMode(pin, INPUT_ANALOG);
     uint32_t value = adc_read(dev, PIN_MAP[pin].adc_channel);
 
@@ -75,11 +75,11 @@ uint32_t analogRead(uint32_t pin)
 // pins_*.c file.  For the rest of the pins, we default
 // to digital output.
 void analogWrite(uint32_t pin, uint32_t value) {
-
-    const stm32_pin_info *gpio_pin = &PIN_MAP[pin];
-    if ((pin >= BOARD_NR_GPIO_PINS) || board_2ndry_shorted_pin(pin)) {
+    if (board_pin_invalid(pin)) {
         return;
     }
+    const stm32_pin_info *gpio_pin = &PIN_MAP[pin];
+
 
     // TODO [silabs]: add DAC here
     if (0) {

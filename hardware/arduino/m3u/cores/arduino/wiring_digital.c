@@ -25,18 +25,15 @@ extern "C" {
 
 
 void pinMode(uint32_t pin_num, uint32_t dwMode) {
-    // Don't use shorted pin
-    if (board_2ndry_shorted_pin(pin_num)) return;
+    if (board_pin_invalid(pin_num)) {
+        return;
+    }
 
     WiringPinMode mode = dwMode;
     gpio_pin_mode outputMode;
     uint8_t pwm = false;
     const stm32_pin_info *gpio_pin = &PIN_MAP[pin_num];
 
-
-    if (pin_num >= BOARD_NR_GPIO_PINS) {
-        return;
-    }
 
     switch(mode) {
     case OUTPUT:
@@ -81,6 +78,7 @@ void pinMode(uint32_t pin_num, uint32_t dwMode) {
             gpio_set_af(PIN_MAP[short_num].gpio_device, PIN_MAP[short_num].gpio_bit, GPIOHD_FNCT_GPIO);
             timer_set_mode(PIN_MAP[short_num].timer_device,
                     PIN_MAP[short_num].timer_channel, TIMER_DISABLED);
+            gpio_set_mode(PIN_MAP[short_num].gpio_device, PIN_MAP[short_num].gpio_bit, GPIO_DIGITAL_INPUT_PULLUP);
             gpio_set_mode(gpio_pin->gpio_device, gpio_pin->gpio_bit, outputMode);
             return;
         }
@@ -105,14 +103,14 @@ void pinMode(uint32_t pin_num, uint32_t dwMode) {
 }
 
 void digitalWrite(uint32_t pin, uint32_t val) {
-    if ((pin >= BOARD_NR_GPIO_PINS) || board_2ndry_shorted_pin(pin)) {
+    if (board_pin_invalid(pin)) {
         return;
     }
     gpio_write_bit(PIN_MAP[pin].gpio_device, PIN_MAP[pin].gpio_bit, val);
 }
 
 int digitalRead(uint32_t pin) {
-    if ((pin >= BOARD_NR_GPIO_PINS) || board_2ndry_shorted_pin(pin)) {
+    if (board_pin_invalid(pin)) {
         return;
     }
 
@@ -121,7 +119,7 @@ int digitalRead(uint32_t pin) {
 }
 
 void togglePin(uint8 pin) {
-    if ((pin >= BOARD_NR_GPIO_PINS) || board_2ndry_shorted_pin(pin)) {
+    if (board_pin_invalid(pin)) {
         return;
     }
     gpio_toggle_bit(PIN_MAP[pin].gpio_device, PIN_MAP[pin].gpio_bit);

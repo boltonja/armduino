@@ -253,9 +253,9 @@ uint8_t board_get_short_num(uint8_t pin)
 }
 
 /* Description: Returns 1 if a secondary shorted pin (e.g. D33). */
-uint8_t board_2ndry_shorted_pin(uint8_t pin)
+uint8_t board_pin_invalid(uint8_t pin)
 {
-    if (0 ||
+    if (pin >= BOARD_NR_GPIO_PINS ||
 #if defined(PIN_D30_SHORTED)
     pin == 30 ||
 #endif // defined(PIN_D30_SHORTED)

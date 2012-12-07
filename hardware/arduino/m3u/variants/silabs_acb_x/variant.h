@@ -194,16 +194,16 @@ extern const uint8_t boardUsedPins[];
 
 // NSS (master mode)
 #define BOARD_SPI1_SS0          (BOARD_SPI1_NSS_PIN)
-#define BOARD_SPI1_SS1          4
-#define BOARD_SPI1_SS2          52
+#define BOARD_SPI1_SS1          255
+#define BOARD_SPI1_SS2          255
 #define BOARD_SPI1_SS3          255
 #define BOARD_SPI2_SS0          (BOARD_SPI2_NSS_PIN)
 #define BOARD_SPI2_SS1          255
 #define BOARD_SPI2_SS2          255
 #define BOARD_SPI2_SS3          255
-#define BOARD_SPI3_SS0          (BOARD_SPI3_NSS_PIN)
-#define BOARD_SPI3_SS1          255
-#define BOARD_SPI3_SS2          255
+#define BOARD_SPI3_SS0          BOARD_SPI3_NSS_PIN
+#define BOARD_SPI3_SS1          4
+#define BOARD_SPI3_SS2          52
 #define BOARD_SPI3_SS3          255
 
 // Default SPI
