@@ -33,19 +33,21 @@
 #ifndef _LIBMAPLE_LIBMAPLE_TYPES_H_
 #define _LIBMAPLE_LIBMAPLE_TYPES_H_
 
+#include <stdint.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-typedef unsigned char uint8;
-typedef unsigned short uint16;
-typedef long unsigned int uint32;
-typedef unsigned long long uint64;
+typedef uint8_t uint8;
+typedef uint16_t uint16;
+typedef uint32_t uint32;
+typedef uint64_t uint64;
 
-typedef signed char int8;
-typedef short int16;
-typedef int int32;
-typedef long long int64;
+typedef int8_t int8;
+typedef int16_t int16;
+typedef int32_t int32;
+typedef int64_t int64;
 
 typedef void (*voidFuncPtr)(void);
 typedef void (*voidArgumentFuncPtr)(void *);

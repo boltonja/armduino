@@ -51,10 +51,10 @@ extern "C" {
  * HardwareTimer routines
  */
 
-HardwareTimer::HardwareTimer(uint8 timerNum) {
+HardwareTimer::HardwareTimer(uint8_t timerNum) {
     clk_dev_id timerID = (clk_dev_id)(CLK_EPCA1 + (timerNum - 1));
     // Increment one timerID if not a PCA based timer
-    timerID = clk_dev_id((uint32)timerID + (timerID >= CLK_SSG ? 1 : 0));
+    timerID = clk_dev_id((uint32_t)timerID + (timerID >= CLK_SSG ? 1 : 0));
     this->dev = NULL;
     nvic_globalirq_disable(); // Hack to ensure we're the only ones using
                     // set_this_dev() and friends. TODO: use a lock.
@@ -73,33 +73,33 @@ void HardwareTimer::resume(void) {
     timer_resume(this->dev);
 }
 
-uint32 HardwareTimer::getPrescaleFactor(void) {
+uint32_t HardwareTimer::getPrescaleFactor(void) {
     return timer_get_prescaler(this->dev) + 1;
 }
 
-void HardwareTimer::setPrescaleFactor(uint32 factor) {
-    timer_set_prescaler(this->dev, (uint16)(factor - 1));
+void HardwareTimer::setPrescaleFactor(uint32_t factor) {
+    timer_set_prescaler(this->dev, (uint16_t)(factor - 1));
 }
 
-uint16 HardwareTimer::getOverflow() {
+uint16_t HardwareTimer::getOverflow() {
     return timer_get_reload(this->dev);
 }
 
-void HardwareTimer::setOverflow(uint16 val) {
+void HardwareTimer::setOverflow(uint16_t val) {
     timer_set_reload(this->dev, val);
 }
 
-uint16 HardwareTimer::getCount(void) {
+uint16_t HardwareTimer::getCount(void) {
     return timer_get_count(this->dev);
 }
 
-void HardwareTimer::setCount(uint16 val) {
-    uint16 ovf = this->getOverflow();
+void HardwareTimer::setCount(uint16_t val) {
+    uint16_t ovf = this->getOverflow();
     timer_set_count(this->dev, min(val, ovf));
 }
 
 #define MAX_RELOAD ((1 << 16) - 1)
-uint16 HardwareTimer::setPeriod(uint32 microseconds) {
+uint16_t HardwareTimer::setPeriod(uint32_t microseconds) {
     // Not the best way to handle this edge case?
     if (!microseconds) {
         this->setPrescaleFactor(1);
@@ -107,33 +107,35 @@ uint16 HardwareTimer::setPeriod(uint32 microseconds) {
         return this->getOverflow();
     }
 
-    uint32 period_cyc = microseconds * CYCLES_PER_MICROSECOND / 2;
-    uint16 prescaler = (uint16)(period_cyc / MAX_RELOAD + 1);
-    uint16 overflow = (uint16)((period_cyc + (prescaler / 2)) / prescaler);
+    uint32_t period_cyc = microseconds * CYCLES_PER_MICROSECOND / 2;
+    uint16_t prescaler = (uint16_t)(period_cyc / MAX_RELOAD + 1);
+    uint16_t overflow = (uint16_t)((period_cyc + (prescaler / 2)) / prescaler);
     this->setPrescaleFactor(prescaler);
     this->setOverflow(overflow);
     return overflow;
 }
 
 void HardwareTimer::setMode(int channel, timer_mode mode) {
-    timer_set_mode(this->dev, (uint8)channel, (timer_mode)mode);
+    timer_set_mode(this->dev, (uint8_t)channel, (timer_mode)mode);
 }
 
-uint16 HardwareTimer::getCompare(int channel) {
-    return timer_get_compare(this->dev, (uint8)channel);
+uint16_t HardwareTimer::getCompare(int channel) {
+    return timer_get_compare(this->dev, (uint8_t)channel);
 }
 
-void HardwareTimer::setCompare(int channel, uint16 val) {
-    uint16 ovf = this->getOverflow();
-    timer_set_compare(this->dev, (uint8)channel, min(val, ovf));
+void HardwareTimer::setCompare(int channel, uint16_t val) {
+    uint16_t ovf = this->getOverflow();
+    timer_set_compare(this->dev, (uint8_t)channel, min(val, ovf));
 }
+
+
 
 void HardwareTimer::attachInterrupt(int channel, voidFuncPtr handler) {
-    timer_attach_interrupt(this->dev, (uint8)channel, handler);
+    timer_attach_interrupt(this->dev, (uint8_t)channel, handler);
 }
 
 void HardwareTimer::detachInterrupt(int channel) {
-    timer_detach_interrupt(this->dev, (uint8)channel);
+    timer_detach_interrupt(this->dev, (uint8_t)channel);
 }
 
 void HardwareTimer::refresh(void) {

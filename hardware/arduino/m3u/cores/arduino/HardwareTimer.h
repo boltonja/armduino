@@ -189,7 +189,6 @@ public:
      * @see HardwareTimer::attachInterrupt()
      */
     void detachInterrupt(int channel);
-
     /**
      * @brief Reset the counter, and update the prescaler and overflow
      *        values.

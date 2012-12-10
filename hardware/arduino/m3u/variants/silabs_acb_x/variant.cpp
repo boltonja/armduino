@@ -315,6 +315,7 @@ static void setup_timers(void);
 void board_setup_clock_prescalers(uint32_t sys_freq);
 void board_setup_rtc(void);
 void disable_watchdog(void);
+
 void init( void )
 {
     disable_watchdog();
@@ -434,20 +435,28 @@ static void setup_adcs(void) {
 static void timer_default_config(timer_dev *dev) {
     timer_init(dev);
     timer_pause(dev);
-    // Set channel polarities to 0
+
+    uint32_t period_cyc = 1000 * F_CPU / 1000000 / 2;
+    uint16_t prescaler = (uint16)(period_cyc / 65535 + 1);
+    uint16_t overflow = (uint16)((period_cyc + (prescaler / 2)) / prescaler);
+
     uint32 chnl = 1;
+    timer_set_reload(dev, overflow);
+    timer_set_prescaler(dev, prescaler);
     while (timer_has_cc_channel(dev, chnl)) {
-        timer_cc_set_pol(dev, chnl++, 0);
+        // Set channel polarities to 0
+        timer_cc_set_pol(dev, chnl, 0);
+        timer_set_compare(dev, chnl, 0);
+        timer_set_mode(dev, chnl, TIMER_PWM);
+        chnl += 1;
     }
+
     timer_resume(dev);
 }
 
 static void setup_timers(void) {
 
     timer_foreach(timer_default_config);
-
-
-
 }
 
 void board_setup_clock_prescalers(uint32_t sys_freq) {

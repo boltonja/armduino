@@ -30,22 +30,11 @@ extern void SysTick_Handler( void )
 }
 */
 
-void __init_hardware__(void);
-
 /*
  * \brief Main entry point of Arduino application
  */
 int main( void )
 {
-	init();
-
-	delay(1);
-
-	__init_hardware__();
-#if defined(USBCON)
-	//USBDevice.attach();
-#endif
-
 	setup();
 
 	for (;;)
@@ -57,20 +46,3 @@ int main( void )
 	return 0;
 }
 
-void __init_hardware__(void)
-{
-    HardwareTimer *timerArray[] = {&Timer1, &Timer2, &Timer3, &Timer4, &Timer5};
-    // Set prescalers and overflows
-    for (int i = 0; i < 5; i++) {
-        timerArray[i]->pause();
-        timerArray[i]->setPeriod(1000000 / PWM_FREQUENCY);
-        timerArray[i]->resume();
-    }
-
-    // Set timer channels to PWM
-    for (int i = 1; i <= 6; i++) timerArray[0]->setMode(i, TIMER_PWM);
-    for (int i = 1; i <= 2; i++) timerArray[1]->setMode(i, TIMER_PWM);
-    for (int i = 1; i <= 1; i++) timerArray[2]->setMode(i, TIMER_PWM);
-    timerArray[3]->setMode(1, TIMER_PWM);
-    timerArray[4]->setMode(1, TIMER_PWM);
-}

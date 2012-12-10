@@ -279,7 +279,7 @@ static inline uint16 timer_get_compare(timer_dev *dev, uint8 channel) {
         return (uint16)(regs_b->CAPTURE >> 16);
     default:
         reg = dev->chnl_regs[channel];
-        // Divide 2 because DC = (overflow - .5 * compare) / overflow
+        // Divide by 2
         return (uint16)reg->CCAPVUPD / 2;
     }
 }

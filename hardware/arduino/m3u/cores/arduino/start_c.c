@@ -55,11 +55,10 @@ extern uint32_t _sstack;
 extern uint32_t _estack;
 
 extern void __libc_init_array(void);
-
-extern int main(void);
+extern int main(int, char**, char**);
+extern void init(void);
 void __attribute__((noreturn)) start_c2(void) {
     uint32_t *pSrc, *pDest;
-
 
 
     /* Initialize the relocate segment */
@@ -76,13 +75,14 @@ void __attribute__((noreturn)) start_c2(void) {
     for (pDest = &_szero; pDest < &_ezero;) {
         *pDest++ = 0;
     }
+    init();
 
 
     /* Initialize the C library */
     __libc_init_array();
 
     /* Branch to main function */
-    main();
+    main(0, 0, 0);
 
     /* Infinite loop */
     while (1);
