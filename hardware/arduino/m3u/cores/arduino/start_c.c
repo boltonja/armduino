@@ -57,6 +57,7 @@ extern uint32_t _estack;
 extern void __libc_init_array(void);
 extern int main(int, char**, char**);
 extern void init(void);
+
 void __attribute__((noreturn)) start_c2(void) {
     uint32_t *pSrc, *pDest;
 
@@ -76,8 +77,6 @@ void __attribute__((noreturn)) start_c2(void) {
         *pDest++ = 0;
     }
     init();
-
-
     /* Initialize the C library */
     __libc_init_array();
 
@@ -88,11 +87,15 @@ void __attribute__((noreturn)) start_c2(void) {
     while (1);
 }
 void __attribute__((noreturn)) start_c(void) {
-    __asm__ volatile("ldr   r1, =_estack \n\t"
+    __asm__ volatile(".fnstart \n\t"
+                     "ldr   r1, =_estack \n\t"
                      "mov   sp, r1 \n\t"
                      "ldr r1,=start_c2 \n\t"
-                     "bx r1"
-                     );
+                     "bx r1 \n\t"
+                     ".pool \n\t"
+                     ".cantunwind \n\t"
+                     ".fnend"
+            );
 }
 
 

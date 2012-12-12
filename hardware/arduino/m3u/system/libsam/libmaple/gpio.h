@@ -41,12 +41,12 @@ extern "C"{
  * Note: Series header must define:
  * - enum gpio_pin_mode (TODO think harder about portability here)
  */
+#include <series/gpio.h>
+
 #include <libmaple/libmaple_types.h>
 #include <libmaple/rcc.h>
 #include <libmaple/exti.h>
 #include <libmaple/xbar.h>
-
-#include <series/gpio.h>
 
 /*
  * Device type
@@ -97,7 +97,7 @@ static inline void gpio_set_mode(struct gpio_dev *dev,
 void gpio_init(gpio_dev *dev);
 void gpio_init_all(void);
 /* TODO flags argument version? */
-void gpio_set_mode(gpio_dev *dev, uint8 pin, gpio_pin_mode mode);
+
 
 
 static inline gpio_type gpio_get_type(gpio_dev *dev) {

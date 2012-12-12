@@ -359,7 +359,7 @@ static void setup_flash(void) {
 
 
 static void setup_clocks(void) {
-    uint32 clk_freq = F_CPU;
+    uint32 clk_freq = VARIANT_MCK;
     clk_sysclk_src src;
 
     // Overclock guard
@@ -436,7 +436,7 @@ static void timer_default_config(timer_dev *dev) {
     timer_init(dev);
     timer_pause(dev);
 
-    uint32_t period_cyc = 1000 * F_CPU / 1000000 / 2;
+    uint32_t period_cyc = 1000 * VARIANT_MCK / 1000000 / 2;
     uint16_t prescaler = (uint16)(period_cyc / 65535 + 1);
     uint16_t overflow = (uint16)((period_cyc + (prescaler / 2)) / prescaler);
 

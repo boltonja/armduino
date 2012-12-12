@@ -72,19 +72,11 @@ uint8_t const  SPI_MISO_PIN = MISO_PIN;
 uint8_t const  SPI_SCK_PIN = SCK_PIN;
 /** optimize loops for hardware SPI */
 #ifndef USE_SPI_LIB
-#define OPTIMIZE_HARDWARE_SPI
+//#define OPTIMIZE_HARDWARE_SPI
 #endif
 
 #else  // SOFTWARE_SPI
-// define software SPI pins so Mega can use unmodified GPS Shield
-/** SPI chip select pin */
-uint8_t const SD_CHIP_SELECT_PIN = 10;
-/** SPI Master Out Slave In pin */
-uint8_t const SPI_MOSI_PIN = 11;
-/** SPI Master In Slave Out pin */
-uint8_t const SPI_MISO_PIN = 12;
-/** SPI Clock pin */
-uint8_t const SPI_SCK_PIN = 13;
+
 #endif  // SOFTWARE_SPI
 //------------------------------------------------------------------------------
 /** Protect block zero from write if nonzero */
@@ -230,8 +222,8 @@ class Sd2Card {
   void error(uint8_t code) {errorCode_ = code;}
   uint8_t readRegister(uint8_t cmd, void* buf);
   uint8_t sendWriteCommand(uint32_t blockNumber, uint32_t eraseCount);
-  void chipSelectHigh(void);
-  void chipSelectLow(void);
+  void spiSend(uint8_t b);
+  uint8_t spiRec(void);
   void type(uint8_t value) {type_ = value;}
   uint8_t waitNotBusy(uint16_t timeoutMillis);
   uint8_t writeData(uint8_t token, const uint8_t* src);

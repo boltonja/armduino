@@ -115,7 +115,10 @@ void spi_master_enable(spi_dev *dev,
                        spi_mode mode,
                        uint32 flags) {
     // Set baud: clkdiv = bus / (2*baud) - 1
-    dev->regs->CLKRATE = clk_get_bus_freq(dev->clk_id) / (2 * baud) - 1;
+    // Bump up the bus freq to half of the divisor to account for bit deprecation from integer division.
+    //  1) bus = bus + (2*baud)/2
+    //  2) bus = bus + baud
+    dev->regs->CLKRATE = (clk_get_bus_freq(dev->clk_id) + baud) / (2 * baud) - 1;
     spi_reconfigure(dev, flags | mode);
 }
 

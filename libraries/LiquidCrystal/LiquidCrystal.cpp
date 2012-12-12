@@ -73,12 +73,12 @@ void LiquidCrystal::init(uint8_t fourbitmode, uint8_t rs, uint8_t rw, uint8_t en
     pinMode(_rw_pin, OUTPUT);
   }
   pinMode(_enable_pin, OUTPUT);
-  
+
   if (fourbitmode)
     _displayfunction = LCD_4BITMODE | LCD_1LINE | LCD_5x8DOTS;
   else 
     _displayfunction = LCD_8BITMODE | LCD_1LINE | LCD_5x8DOTS;
-  
+
   begin(16, 1);  
 }
 

@@ -35,7 +35,7 @@
 SPIClass Spi1(SPI1);
 SPIClass Spi2(SPI2);
 SPIClass Spi3(SPI3);
-SPIClass &SPI = Spi3;
+SPIClass &SPI = Spi2;
 
 
 struct spi_pins {

@@ -312,7 +312,8 @@ void timer_attach_interrupt(timer_dev *dev,
  */
 void timer_detach_interrupt(timer_dev *dev, uint8 interrupt) {
     timer_disable_irq(dev, interrupt);
-    dev->handlers[interrupt] = NULL;
+    dev->handlers[interrupt - 1] = 0;
+    return;
 }
 
 /*

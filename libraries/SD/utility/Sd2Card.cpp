@@ -25,88 +25,34 @@
 #ifdef USE_SPI_LIB
 #include <SPI.h>
 #endif
+
+
+
 // functions for hardware SPI
 /** Send a byte to the card */
-static void spiSend(uint8_t b) {
+void Sd2Card::spiSend(uint8_t b) {
 #ifndef USE_SPI_LIB
-  SPDR = b;
-  while (!(SPSR & (1 << SPIF)));
+
 #else
-  SPI.transfer(b);
+  SPI.transfer(chipSelectPin_, b);
 #endif
 }
 /** Receive a byte from the card */
-static  uint8_t spiRec(void) {
+ uint8_t Sd2Card::spiRec(void) {
 #ifndef USE_SPI_LIB
-  spiSend(0XFF);
-  return SPDR;
+  return 0;
 #else
-  return SPI.transfer(0xFF);
+  return SPI.transfer(chipSelectPin_, 0xFF);
 #endif
 }
 #else  // SOFTWARE_SPI
-//------------------------------------------------------------------------------
-/** nop to tune soft SPI timing */
-#define nop asm volatile ("nop\n\t")
-//------------------------------------------------------------------------------
-/** Soft SPI receive */
-uint8_t spiRec(void) {
-  uint8_t data = 0;
-  // no interrupts during byte receive - about 8 us
-  cli();
-  // output pin high - like sending 0XFF
-  fastDigitalWrite(SPI_MOSI_PIN, HIGH);
 
-  for (uint8_t i = 0; i < 8; i++) {
-    fastDigitalWrite(SPI_SCK_PIN, HIGH);
-
-    // adjust so SCK is nice
-    nop;
-    nop;
-
-    data <<= 1;
-
-    if (fastDigitalRead(SPI_MISO_PIN)) data |= 1;
-
-    fastDigitalWrite(SPI_SCK_PIN, LOW);
-  }
-  // enable interrupts
-  sei();
-  return data;
-}
-//------------------------------------------------------------------------------
-/** Soft SPI send */
-void spiSend(uint8_t data) {
-  // no interrupts during byte send - about 8 us
-  cli();
-  for (uint8_t i = 0; i < 8; i++) {
-    fastDigitalWrite(SPI_SCK_PIN, LOW);
-
-    fastDigitalWrite(SPI_MOSI_PIN, data & 0X80);
-
-    data <<= 1;
-
-    fastDigitalWrite(SPI_SCK_PIN, HIGH);
-  }
-  // hold SCK high for a few ns
-  nop;
-  nop;
-  nop;
-  nop;
-
-  fastDigitalWrite(SPI_SCK_PIN, LOW);
-  // enable interrupts
-  sei();
-}
 #endif  // SOFTWARE_SPI
 //------------------------------------------------------------------------------
 // send command and return error code.  Return zero for OK
 uint8_t Sd2Card::cardCommand(uint8_t cmd, uint32_t arg) {
   // end read if in partialBlockRead mode
   readEnd();
-
-  // select card
-  chipSelectLow();
 
   // wait up to 300 ms if busy
   waitNotBusy(300);
@@ -153,14 +99,8 @@ uint32_t Sd2Card::cardSize(void) {
     return 0;
   }
 }
-//------------------------------------------------------------------------------
-void Sd2Card::chipSelectHigh(void) {
-  digitalWrite(chipSelectPin_, HIGH);
-}
-//------------------------------------------------------------------------------
-void Sd2Card::chipSelectLow(void) {
-  digitalWrite(chipSelectPin_, LOW);
-}
+
+
 //------------------------------------------------------------------------------
 /** Erase a range of blocks.
  *
@@ -194,11 +134,11 @@ uint8_t Sd2Card::erase(uint32_t firstBlock, uint32_t lastBlock) {
     error(SD_CARD_ERROR_ERASE_TIMEOUT);
     goto fail;
   }
-  chipSelectHigh();
+
   return true;
 
  fail:
-  chipSelectHigh();
+
   return false;
 }
 //------------------------------------------------------------------------------
@@ -231,36 +171,17 @@ uint8_t Sd2Card::init(uint8_t sckRateID, uint8_t chipSelectPin) {
 
   // set pin modes
   pinMode(chipSelectPin_, OUTPUT);
-  chipSelectHigh();
-#ifndef USE_SPI_LIB
-  pinMode(SPI_MISO_PIN, INPUT);
-  pinMode(SPI_MOSI_PIN, OUTPUT);
-  pinMode(SPI_SCK_PIN, OUTPUT);
-#endif
 
-#ifndef SOFTWARE_SPI
-#ifndef USE_SPI_LIB
-  // SS must be in output mode even it is not chip select
   pinMode(SS_PIN, OUTPUT);
   digitalWrite(SS_PIN, HIGH); // disable any SPI device using hardware SS pin
-  // Enable SPI, Master, clock rate f_osc/128
-  SPCR = (1 << SPE) | (1 << MSTR) | (1 << SPR1) | (1 << SPR0);
-  // clear double speed
-  SPSR &= ~(1 << SPI2X);
-#else // USE_SPI_LIB
-  SPI.begin();
-#ifdef SPI_CLOCK_DIV128
-    SPI.setClockDivider(SPI_CLOCK_DIV128);
-#else
-    SPI.setClockDivider(255);
-#endif
-#endif // USE_SPI_LIB
-#endif // SOFTWARE_SPI
+
+  SPI.begin(chipSelectPin_);
+  SPI.setFrequency(chipSelectPin_, 4000000);
+
 
   // must supply min of 74 clock cycles with CS high.
   for (uint8_t i = 0; i < 10; i++) spiSend(0XFF);
 
-  chipSelectLow();
 
   // command to go idle in SPI mode
   while ((status_ = cardCommand(CMD0, 0)) != R1_IDLE_STATE) {
@@ -301,7 +222,7 @@ uint8_t Sd2Card::init(uint8_t sckRateID, uint8_t chipSelectPin) {
     // discard rest of ocr - contains allowed voltage range
     for (uint8_t i = 0; i < 3; i++) spiRec();
   }
-  chipSelectHigh();
+
 
 #ifndef SOFTWARE_SPI
   return setSckRate(sckRateID);
@@ -310,7 +231,7 @@ uint8_t Sd2Card::init(uint8_t sckRateID, uint8_t chipSelectPin) {
 #endif  // SOFTWARE_SPI
 
  fail:
-  chipSelectHigh();
+
   return false;
 }
 //------------------------------------------------------------------------------
@@ -378,24 +299,7 @@ uint8_t Sd2Card::readData(uint32_t block,
   }
 
 #ifdef OPTIMIZE_HARDWARE_SPI
-  // start first spi transfer
-  SPDR = 0XFF;
 
-  // skip data before offset
-  for (;offset_ < offset; offset_++) {
-    while (!(SPSR & (1 << SPIF)));
-    SPDR = 0XFF;
-  }
-  // transfer data
-  n = count - 1;
-  for (uint16_t i = 0; i < n; i++) {
-    while (!(SPSR & (1 << SPIF)));
-    dst[i] = SPDR;
-    SPDR = 0XFF;
-  }
-  // wait for last byte
-  while (!(SPSR & (1 << SPIF)));
-  dst[n] = SPDR;
 
 #else  // OPTIMIZE_HARDWARE_SPI
 
@@ -417,7 +321,7 @@ uint8_t Sd2Card::readData(uint32_t block,
   return true;
 
  fail:
-  chipSelectHigh();
+
   return false;
 }
 //------------------------------------------------------------------------------
@@ -426,18 +330,11 @@ void Sd2Card::readEnd(void) {
   if (inBlock_) {
       // skip data and crc
 #ifdef OPTIMIZE_HARDWARE_SPI
-    // optimize skip for hardware
-    SPDR = 0XFF;
-    while (offset_++ < 513) {
-      while (!(SPSR & (1 << SPIF)));
-      SPDR = 0XFF;
-    }
-    // wait for last crc byte
-    while (!(SPSR & (1 << SPIF)));
+
 #else  // OPTIMIZE_HARDWARE_SPI
     while (offset_++ < 514) spiRec();
 #endif  // OPTIMIZE_HARDWARE_SPI
-    chipSelectHigh();
+
     inBlock_ = 0;
   }
 }
@@ -454,11 +351,11 @@ uint8_t Sd2Card::readRegister(uint8_t cmd, void* buf) {
   for (uint16_t i = 0; i < 16; i++) dst[i] = spiRec();
   spiRec();  // get first crc byte
   spiRec();  // get second crc byte
-  chipSelectHigh();
+
   return true;
 
  fail:
-  chipSelectHigh();
+
   return false;
 }
 //------------------------------------------------------------------------------
@@ -475,37 +372,7 @@ uint8_t Sd2Card::readRegister(uint8_t cmd, void* buf) {
  * false, is returned for an invalid value of \a sckRateID.
  */
 uint8_t Sd2Card::setSckRate(uint8_t sckRateID) {
-  if (sckRateID > 6) {
-    error(SD_CARD_ERROR_SCK_RATE);
-    return false;
-  }
-#ifndef USE_SPI_LIB
-  // see avr processor datasheet for SPI register bit definitions
-  if ((sckRateID & 1) || sckRateID == 6) {
-    SPSR &= ~(1 << SPI2X);
-  } else {
-    SPSR |= (1 << SPI2X);
-  }
-  SPCR &= ~((1 <<SPR1) | (1 << SPR0));
-  SPCR |= (sckRateID & 4 ? (1 << SPR1) : 0)
-    | (sckRateID & 2 ? (1 << SPR0) : 0);
-#else // USE_SPI_LIB
-  int v;
-#ifdef SPI_CLOCK_DIV128
-  switch (sckRateID) {
-    case 0: v=SPI_CLOCK_DIV2; break;
-    case 1: v=SPI_CLOCK_DIV4; break;
-    case 2: v=SPI_CLOCK_DIV8; break;
-    case 3: v=SPI_CLOCK_DIV16; break;
-    case 4: v=SPI_CLOCK_DIV32; break;
-    case 5: v=SPI_CLOCK_DIV64; break;
-    case 6: v=SPI_CLOCK_DIV128; break;
-  }
-#else // SPI_CLOCK_DIV128
-  v = 2 << sckRateID;
-#endif // SPI_CLOCK_DIV128
-  SPI.setClockDivider(v);
-#endif // USE_SPI_LIB
+
   return true;
 }
 //------------------------------------------------------------------------------
@@ -535,7 +402,7 @@ uint8_t Sd2Card::waitStartBlock(void) {
   return true;
 
  fail:
-  chipSelectHigh();
+
   return false;
 }
 //------------------------------------------------------------------------------
@@ -574,11 +441,11 @@ uint8_t Sd2Card::writeBlock(uint32_t blockNumber, const uint8_t* src) {
     error(SD_CARD_ERROR_WRITE_PROGRAMMING);
     goto fail;
   }
-  chipSelectHigh();
+
   return true;
 
  fail:
-  chipSelectHigh();
+
   return false;
 }
 //------------------------------------------------------------------------------
@@ -587,7 +454,7 @@ uint8_t Sd2Card::writeData(const uint8_t* src) {
   // wait for previous write to finish
   if (!waitNotBusy(SD_WRITE_TIMEOUT)) {
     error(SD_CARD_ERROR_WRITE_MULTIPLE);
-    chipSelectHigh();
+
     return false;
   }
   return writeData(WRITE_MULTIPLE_TOKEN, src);
@@ -596,20 +463,6 @@ uint8_t Sd2Card::writeData(const uint8_t* src) {
 // send one block of data for write block or write multiple blocks
 uint8_t Sd2Card::writeData(uint8_t token, const uint8_t* src) {
 #ifdef OPTIMIZE_HARDWARE_SPI
-
-  // send data - optimized loop
-  SPDR = token;
-
-  // send two byte per iteration
-  for (uint16_t i = 0; i < 512; i += 2) {
-    while (!(SPSR & (1 << SPIF)));
-    SPDR = src[i];
-    while (!(SPSR & (1 << SPIF)));
-    SPDR = src[i+1];
-  }
-
-  // wait for last data byte
-  while (!(SPSR & (1 << SPIF)));
 
 #else  // OPTIMIZE_HARDWARE_SPI
   spiSend(token);
@@ -623,7 +476,7 @@ uint8_t Sd2Card::writeData(uint8_t token, const uint8_t* src) {
   status_ = spiRec();
   if ((status_ & DATA_RES_MASK) != DATA_RES_ACCEPTED) {
     error(SD_CARD_ERROR_WRITE);
-    chipSelectHigh();
+
     return false;
   }
   return true;
@@ -662,7 +515,7 @@ uint8_t Sd2Card::writeStart(uint32_t blockNumber, uint32_t eraseCount) {
   return true;
 
  fail:
-  chipSelectHigh();
+
   return false;
 }
 //------------------------------------------------------------------------------
@@ -675,11 +528,11 @@ uint8_t Sd2Card::writeStop(void) {
   if (!waitNotBusy(SD_WRITE_TIMEOUT)) goto fail;
   spiSend(STOP_TRAN_TOKEN);
   if (!waitNotBusy(SD_WRITE_TIMEOUT)) goto fail;
-  chipSelectHigh();
+
   return true;
 
  fail:
   error(SD_CARD_ERROR_STOP_TRAN);
-  chipSelectHigh();
+
   return false;
 }

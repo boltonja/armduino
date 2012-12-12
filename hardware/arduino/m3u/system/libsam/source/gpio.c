@@ -31,7 +31,7 @@
  */
 
 #include <libmaple/gpio.h>
-#include <libmaple/rcc.h>
+
 
 /*
  * GPIO routines

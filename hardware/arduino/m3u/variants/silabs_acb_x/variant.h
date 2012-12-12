@@ -49,12 +49,12 @@ enum {
  *   1) Comment out #define PIN_Dx_SHORTED
  *   2) Change boardPWMPins[] in variant.cpp
  */
-#define PIN_D30_SHORTED D3
-#define PIN_D31_SHORTED D5
-#define PIN_D32_SHORTED D6
-#define PIN_D33_SHORTED D9
-#define PIN_D34_SHORTED D10
-#define PIN_D35_SHORTED D11
+#define PIN_D30_SHORTED 3
+#define PIN_D31_SHORTED 5
+#define PIN_D32_SHORTED 6
+#define PIN_D33_SHORTED 9
+#define PIN_D34_SHORTED 10
+#define PIN_D35_SHORTED 11
 
 /*----------------------------------------------------------------------------
  *        Headers
@@ -128,7 +128,7 @@ extern const uint8_t boardUsedPins[];
 #define VARIANT_MAINOSC     32768
 
 /** Master clock frequency */
-#define VARIANT_MCK         80000000
+#define VARIANT_MCK         F_CPU
 
 /* System clock options:
  * 1) 2.5 MHz - This speed is not well supported by the peripherals. ex: baud rate must be lowered to ~56k
@@ -189,8 +189,8 @@ extern const uint8_t boardUsedPins[];
 
 // NSS (slave mode)
 #define BOARD_SPI1_NSS_PIN      D19
-#define BOARD_SPI2_NSS_PIN      D4
-#define BOARD_SPI3_NSS_PIN      D10
+#define BOARD_SPI2_NSS_PIN      D10
+#define BOARD_SPI3_NSS_PIN      255
 
 // NSS (master mode)
 #define BOARD_SPI1_SS0          (BOARD_SPI1_NSS_PIN)
@@ -198,8 +198,8 @@ extern const uint8_t boardUsedPins[];
 #define BOARD_SPI1_SS2          255
 #define BOARD_SPI1_SS3          255
 #define BOARD_SPI2_SS0          (BOARD_SPI2_NSS_PIN)
-#define BOARD_SPI2_SS1          255
-#define BOARD_SPI2_SS2          255
+#define BOARD_SPI2_SS1          4
+#define BOARD_SPI2_SS2          52
 #define BOARD_SPI2_SS3          255
 #define BOARD_SPI3_SS0          BOARD_SPI3_NSS_PIN
 #define BOARD_SPI3_SS1          4
@@ -207,19 +207,19 @@ extern const uint8_t boardUsedPins[];
 #define BOARD_SPI3_SS3          255
 
 // Default SPI
-#define BOARD_SPI_SS0           BOARD_SPI3_SS0
-#define BOARD_SPI_SS1           BOARD_SPI3_SS1
-#define BOARD_SPI_SS2           BOARD_SPI3_SS2
-#define BOARD_SPI_SS3           BOARD_SPI3_SS3
+#define BOARD_SPI_SS0           BOARD_SPI2_SS0
+#define BOARD_SPI_SS1           BOARD_SPI2_SS1
+#define BOARD_SPI_SS2           BOARD_SPI2_SS2
+#define BOARD_SPI_SS3           BOARD_SPI2_SS3
 #define BOARD_SPI_DEFAULT_SS    BOARD_SPI_SS0
 
 static const uint8_t SS   =     BOARD_SPI_SS0;
 static const uint8_t SS1  =     BOARD_SPI_SS1;
 static const uint8_t SS2  =     BOARD_SPI_SS2;
 static const uint8_t SS3  =     BOARD_SPI_SS3;
-static const uint8_t MOSI =     BOARD_SPI3_MOSI_PIN;
-static const uint8_t MISO =     BOARD_SPI3_MISO_PIN;
-static const uint8_t SCK  =     BOARD_SPI3_SCK_PIN;
+static const uint8_t MOSI =     BOARD_SPI2_MOSI_PIN;
+static const uint8_t MISO =     BOARD_SPI2_MISO_PIN;
+static const uint8_t SCK  =     BOARD_SPI2_SCK_PIN;
 
 
 #define BOARD_PIN_TO_SPI_CHANNEL(x) \

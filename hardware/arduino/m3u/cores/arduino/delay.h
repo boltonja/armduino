@@ -41,7 +41,7 @@ extern "C" {
 
 
 #ifndef STM32_DELAY_US_MULT
-#define STM32_DELAY_US_MULT             (7 * F_CPU / 1000000 / 20)
+#define STM32_DELAY_US_MULT             (7 * VARIANT_MCK / 1000000 / 20)
 #endif
 
 /*

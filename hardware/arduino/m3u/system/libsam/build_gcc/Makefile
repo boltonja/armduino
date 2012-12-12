@@ -60,4 +60,3 @@ clean:
 	@$(MAKE) CHIP=__SIM3U167__ $(SUBMAKE_OPTIONS) OUTPUT_BIN=../../../variants/silabs_acb_x -f sim3.mk $@
 	@echo ------------------------------------------------------------------------------------
 
-
