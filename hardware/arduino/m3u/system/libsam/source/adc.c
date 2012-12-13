@@ -40,7 +40,7 @@
  * Devices
  */
 
-static adc_dev adc1 = {
+adc_dev adc1 = {
     .regs   = ADC1_BASE,
     .clk_id = CLK_SARADC1,
     .irq_num = NVIC_SARADC1
@@ -48,7 +48,7 @@ static adc_dev adc1 = {
 /** ADC1 device. */
 const adc_dev *ADC1 = &adc1;
 
-static adc_dev adc2 = {
+adc_dev adc2 = {
     .regs   = ADC2_BASE,
     .clk_id = CLK_SARADC2,
     .irq_num = NVIC_SARADC2

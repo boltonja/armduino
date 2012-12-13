@@ -26,14 +26,15 @@
 #include <libmaple/gpio.h>
 
 #define PIN_NOT_USED PMAP_ROW(NULL,0,NULL,0,NULL,ADCx,0),
-extern timer_dev timer1;
-extern timer_dev timer2;
-extern timer_dev timer3;
-extern timer_dev timer4;
-extern timer_dev timer5;
-extern adc_dev adc1;
-extern adc_dev adc2;
-
+extern "C" {
+    extern timer_dev timer1;
+    extern timer_dev timer2;
+    extern timer_dev timer3;
+    extern timer_dev timer4;
+    extern timer_dev timer5;
+    extern adc_dev adc1;
+    extern adc_dev adc2;
+}
 // Pin map: this lets the basic I/O functions (digitalWrite(),
 // analogRead(), pwmWrite()) translate from pin numbers to STM32
 // peripherals.
@@ -229,34 +230,33 @@ const xbar_dev_info XBAR_MAP[XBAR_NULL] = {
 uint8_t board_get_short_num(uint8_t pin)
 {
     switch (pin) {
-
+#if defined(PIN_D30_SHORTED)
     case PIN_D30_SHORTED:
         return 30;
-
-
+#endif // defined(PIN_D30_SHORTED)
+#if defined(PIN_D31_SHORTED)
     case PIN_D31_SHORTED:
         return 31;
-
-
+#endif // defined(PIN_D31_SHORTED)
+#if defined(PIN_D32_SHORTED)
     case PIN_D32_SHORTED:
         return 32;
-
-
+#endif // defined(PIN_D32_SHORTED)
+#if defined(PIN_D33_SHORTED)
     case PIN_D33_SHORTED:
         return 33;
-
-
+#endif // defined(PIN_D33_SHORTED)
+#if defined(PIN_D34_SHORTED)
     case PIN_D34_SHORTED:
         return 34;
-
-
+#endif // defined(PIN_D34_SHORTED)
+#if defined(PIN_D35_SHORTED)
     case PIN_D35_SHORTED:
         return 35;
-
+#endif // defined(PIN_D35_SHORTED)
     default:
         return pin;
     }
-    return pin;
 }
 
 /* Description: Returns 1 if a secondary shorted pin (e.g. D33). */

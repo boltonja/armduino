@@ -85,7 +85,7 @@ void __irq_tim2_high(void) {
 static const nvic_irq_num timer1_irqs[1] = {NVIC_EPCA1};
 static const timer_chnl_reg_map *t1_chnl_regs[6] = {TIMER1_CH0, TIMER1_CH1, TIMER1_CH2,
                                                TIMER1_CH3, TIMER1_CH4, TIMER1_CH5};
-static timer_dev timer1 = {
+timer_dev timer1 = {
     .regs = TIMER1_BASE,
     .clk_id = CLK_EPCA1,
     .type = TIMER_ADVANCED,
@@ -99,7 +99,7 @@ timer_dev *TIMER1 = &timer1;
 
 static const nvic_irq_num timer2_irqs[1] = {NVIC_PCA1};
 static const timer_chnl_reg_map *t2_chnl_regs[2] = {TIMER2_CH0, TIMER2_CH1};
-static timer_dev timer2 = {
+timer_dev timer2 = {
     .regs = TIMER2_BASE,
     .clk_id = CLK_PCA1,
     .type = TIMER_GENERAL,
@@ -113,7 +113,7 @@ timer_dev *TIMER2 = &timer2;
 
 static const nvic_irq_num timer3_irqs[1] = {NVIC_PCA2};
 static const timer_chnl_reg_map *t3_chnl_regs[2] = {TIMER3_CH0, TIMER3_CH1};
-static timer_dev timer3 = {
+timer_dev timer3 = {
     .regs = TIMER3_BASE,
     .clk_id = CLK_PCA2,
     .type = TIMER_GENERAL,
@@ -126,7 +126,7 @@ static timer_dev timer3 = {
 timer_dev *TIMER3 = &timer3;
 
 static const nvic_irq_num timer4_irqs[2] = {NVIC_TIMER0L, NVIC_TIMER0H};
-static timer_dev timer4 = {
+timer_dev timer4 = {
     .regs = TIMER4_BASE,
     .clk_id = CLK_TIMER1,
     .type = TIMER_BASIC,
@@ -139,7 +139,7 @@ static timer_dev timer4 = {
 timer_dev *TIMER4 = &timer4;
 
 static const nvic_irq_num timer5_irqs[2] = {NVIC_TIMER1L, NVIC_TIMER1H};
-static timer_dev timer5 = {
+timer_dev timer5 = {
     .regs = TIMER5_BASE,
     .clk_id = CLK_TIMER2,
     .type = TIMER_BASIC,
