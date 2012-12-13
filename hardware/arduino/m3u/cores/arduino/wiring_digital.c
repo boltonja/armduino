@@ -75,10 +75,11 @@ void pinMode(uint32_t pin_num, uint32_t dwMode) {
         }
         else {
             // Disable PWM on secondary. Set primary pin function and return.
-            gpio_set_af(PIN_MAP[short_num].gpio_device, PIN_MAP[short_num].gpio_bit, GPIOHD_FNCT_GPIO);
-            timer_set_mode(PIN_MAP[short_num].timer_device,
-                    PIN_MAP[short_num].timer_channel, TIMER_DISABLED);
-            gpio_set_mode(PIN_MAP[short_num].gpio_device, PIN_MAP[short_num].gpio_bit, GPIO_DIGITAL_INPUT_PULLUP);
+            const stm32_pin_info *short_pin = &PIN_MAP[short_num];
+            gpio_set_af(short_pin->gpio_device, short_pin->gpio_bit, GPIOHD_FNCT_GPIO);
+            timer_set_mode(short_pin->timer_device,
+                    short_pin->timer_channel, TIMER_DISABLED);
+            gpio_set_mode(short_pin->gpio_device, short_pin->gpio_bit, GPIO_DIGITAL_INPUT_PULLUP);
             gpio_set_mode(gpio_pin->gpio_device, gpio_pin->gpio_bit, outputMode);
             return;
         }

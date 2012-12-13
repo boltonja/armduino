@@ -26,7 +26,13 @@
 #include <libmaple/gpio.h>
 
 #define PIN_NOT_USED PMAP_ROW(NULL,0,NULL,0,NULL,ADCx,0),
-
+extern timer_dev timer1;
+extern timer_dev timer2;
+extern timer_dev timer3;
+extern timer_dev timer4;
+extern timer_dev timer5;
+extern adc_dev adc1;
+extern adc_dev adc2;
 
 // Pin map: this lets the basic I/O functions (digitalWrite(),
 // analogRead(), pwmWrite()) translate from pin numbers to STM32
@@ -68,33 +74,33 @@ const stm32_pin_info  __attribute__ ((used)) PIN_MAP[BOARD_NR_GPIO_PINS] = {
     PMAP_ROW(&gpiod,   2,   NULL,  0,  NULL,  ADCx,   0), /* D11/PD2    SPI_MOSI(PWM) SPI2_MOSI  D35                */
     PMAP_ROW(&gpiod,   1,   NULL,  0,  NULL,  ADCx,   0), /* D12/PD1    SPI_MISO      SPI2_MISO                     */
     PMAP_ROW(&gpiod,   0,   NULL,  0,  NULL,  ADCx,   0), /* D13/PD0    SPI_SCK/LED   SPI2_SCK                      */
-    PMAP_ROW(&gpioa,   0,   NULL,  0,  ADC1,     0,   0), /* D14/PA0    UART_TX       USART0_TX          ADC0.0     */
-    PMAP_ROW(&gpioa,   1,   NULL,  0,  ADC1,     1,   0), /* D15/PA1    UART_RX       USART0_RX          ADC0.1     */
-    PMAP_ROW(&gpioa,   2,   NULL,  0,  ADC1,     2,   0), /* D16/PA2    UART_TX       SPI0_SCK           ADC0.2     */
-    PMAP_ROW(&gpioa,   3,   NULL,  0,  ADC1,     3,   0), /* D17/PA3    UART_RX       SPI0_MISO          ADC0.3     */
-    PMAP_ROW(&gpioa,   4,   NULL,  0,  ADC1,     4,   0), /* D18/PA4    UART_TX       SPI0_MOSI          ADC0.4     */
-    PMAP_ROW(&gpioa,   5,   NULL,  0,  ADC1,     5,   0), /* D19/PA5    UART_RX       SPI0_NSS           ADC0.5     */
+    PMAP_ROW(&gpioa,   0,   NULL,  0,  &adc1,     0,   0), /* D14/PA0    UART_TX       USART0_TX          ADC0.0     */
+    PMAP_ROW(&gpioa,   1,   NULL,  0,  &adc1,     1,   0), /* D15/PA1    UART_RX       USART0_RX          ADC0.1     */
+    PMAP_ROW(&gpioa,   2,   NULL,  0,  &adc1,     2,   0), /* D16/PA2    UART_TX       SPI0_SCK           ADC0.2     */
+    PMAP_ROW(&gpioa,   3,   NULL,  0,  &adc1,     3,   0), /* D17/PA3    UART_RX       SPI0_MISO          ADC0.3     */
+    PMAP_ROW(&gpioa,   4,   NULL,  0,  &adc1,     4,   0), /* D18/PA4    UART_TX       SPI0_MOSI          ADC0.4     */
+    PMAP_ROW(&gpioa,   5,   NULL,  0,  &adc1,     5,   0), /* D19/PA5    UART_RX       SPI0_NSS           ADC0.5     */
 
     PMAP_ROW(&gpioa,   6,   NULL,  0,  NULL,  ADCx,   0), /* D20/PA6    I2C_SDA       USART1_TX                     */
-    PMAP_ROW(&gpioa,   7,   NULL,  0,  ADC1,     6,   0), /* D21/PA7    I2C_SCL       USART1_RX          ADC0.6     */
-    PMAP_ROW(&gpioa,  13, TIMER2,  2,  NULL,  ADCx,   0), /* D22/PA13                 PCA0_CEX1                     */
-    PMAP_ROW(&gpioa,  14, TIMER3,  1,  NULL,  ADCx,   0), /* D23/PA14                 PCA1_CEX0                     */
-    PMAP_ROW(&gpioa,  15, TIMER3,  2,  NULL,  ADCx,  12), /* D24/PA15                 PCA1_CEX1                     */
+    PMAP_ROW(&gpioa,   7,   NULL,  0,  &adc1,     6,   0), /* D21/PA7    I2C_SCL       USART1_RX          ADC0.6     */
+    PMAP_ROW(&gpioa,  13, &timer2,  2,  NULL,  ADCx,   0), /* D22/PA13                 PCA0_CEX1                     */
+    PMAP_ROW(&gpioa,  14, &timer3,  1,  NULL,  ADCx,   0), /* D23/PA14                 PCA1_CEX0                     */
+    PMAP_ROW(&gpioa,  15, &timer3,  2,  NULL,  ADCx,  12), /* D24/PA15                 PCA1_CEX1                     */
     PMAP_ROW(&gpiob,   0,   NULL,  0,  NULL,  ADCx,   0), /* D25/PB0                                                */
     PMAP_ROW(&gpiob,   2,   NULL,  0,  NULL,  ADCx,   0), /* D26/PB2                                                */
     PIN_NOT_USED                                          /* D27    ~ Pin Not Used ~                                */
     PIN_NOT_USED                                          /* D28    ~ Pin Not Used ~                                */
     PIN_NOT_USED                                          /* D29    ~ Pin Not Used ~                                */
 
-    PMAP_ROW(&gpioe,   5, TIMER1,  6,  NULL,  ADCx,   0), /* D30/PE5    PWM           EPCA_CEX5  D3                 */
-    PMAP_ROW(&gpioe,   4, TIMER1,  5,  NULL,  ADCx,   0), /* D31/PE4    PWM           EPCA_CEX4  D5                 */
-    PMAP_ROW(&gpioe,   3, TIMER1,  4,  NULL,  ADCx,   0), /* D32/PE3    PWM           EPCA_CEX3  D6                 */
-    PMAP_ROW(&gpioe,   2, TIMER1,  3,  NULL,  ADCx,   0), /* D33/PE2    PWM           EPCA_CEX2  D9                 */
-    PMAP_ROW(&gpioe,   1, TIMER1,  2,  NULL,  ADCx,   0), /* D34/PE1    PWM           EPCA_CEX1  D10                */
-    PMAP_ROW(&gpioe,   0, TIMER1,  1,  NULL,  ADCx,   0), /* D35/PE0    PWM           EPCA_CEX0  D11                */
-    PMAP_ROW(&gpioc,   0,   NULL,  0,  ADC2,     2,   1), /* D36/PC0                                                */
-    PMAP_ROW(&gpioc,   1,   NULL,  0,  ADC2,     1,   2), /* D37/PC1                                                */
-    PMAP_ROW(&gpioc,   2,   NULL,  0,  ADC2,     0,   3), /* D38/PC2                                                */
+    PMAP_ROW(&gpioe,   5, &timer1,  6,  NULL,  ADCx,   0), /* D30/PE5    PWM           EPCA_CEX5  D3                 */
+    PMAP_ROW(&gpioe,   4, &timer1,  5,  NULL,  ADCx,   0), /* D31/PE4    PWM           EPCA_CEX4  D5                 */
+    PMAP_ROW(&gpioe,   3, &timer1,  4,  NULL,  ADCx,   0), /* D32/PE3    PWM           EPCA_CEX3  D6                 */
+    PMAP_ROW(&gpioe,   2, &timer1,  3,  NULL,  ADCx,   0), /* D33/PE2    PWM           EPCA_CEX2  D9                 */
+    PMAP_ROW(&gpioe,   1, &timer1,  2,  NULL,  ADCx,   0), /* D34/PE1    PWM           EPCA_CEX1  D10                */
+    PMAP_ROW(&gpioe,   0, &timer1,  1,  NULL,  ADCx,   0), /* D35/PE0    PWM           EPCA_CEX0  D11                */
+    PMAP_ROW(&gpioc,   0,   NULL,  0,  &adc2,     2,   1), /* D36/PC0                                                */
+    PMAP_ROW(&gpioc,   1,   NULL,  0,  &adc2,     1,   2), /* D37/PC1                                                */
+    PMAP_ROW(&gpioc,   2,   NULL,  0,  &adc2,     0,   3), /* D38/PC2                                                */
     PMAP_ROW(&gpioc,   3,   NULL,  0,  NULL,  ADCx,   4), /* D39/PC3                                                */
 
     PMAP_ROW(&gpioc,   4,   NULL,  0,  NULL,  ADCx,   5), /* D40/PC4                                                */
@@ -115,22 +121,22 @@ const stm32_pin_info  __attribute__ ((used)) PIN_MAP[BOARD_NR_GPIO_PINS] = {
 
     // 54 .. 70 - Analog pins
     // ----------------------
-    PMAP_ROW(&gpioa,   8,   NULL,  0,  ADC1,     7,   0), /* A0/PA8     ADC0          ADC0.7                        */
-    PMAP_ROW(&gpioa,  11, TIMER2,  1,  ADC1,     9,   0), /* A1/PA11    ADC1          ADC0.9             PCA0_CEX0  */
-    PMAP_ROW(&gpiob,   1,   NULL,  0,  ADC1,    11,   0), /* A2/PB1     ADC2          ADC0.11                       */
-    PMAP_ROW(&gpiob,   3,   NULL,  0,  ADC1,    12,   0), /* A3/PB3     ADC3          ADC0.12                       */
-    PMAP_ROW(&gpiob,   4,   NULL,  0,  ADC1,    13,   0), /* A4/PB4     ADC4/SDA      ADC0.13            I2C0_SDA   */
-    PMAP_ROW(&gpiob,   5,   NULL,  0,  ADC1,    14,   0), /* A5/PB5     ADC5/SCL      ADC0.14            I2C0_SCL   */
-    PMAP_ROW(&gpiob,   6,   NULL,  0,  ADC1,    15,   0), /* A6/PB6     ADC6          ADC0.15                       */
-    PMAP_ROW(&gpiob,   7,   NULL,  0,  ADC2,    11,   0), /* A7/PB7     ADC7          ADC1.11                       */
-    PMAP_ROW(&gpiob,   8, TIMER4,  1,  ADC2,    10,   0), /* A8/PB8     ADC8          ADC1.10            TIMER0_CT  */
-    PMAP_ROW(&gpiob,   9, TIMER4,  2,  ADC2,     9,   0), /* A9/PB9     ADC9          ADC1.9             TIMER0_EX  */
-    PMAP_ROW(&gpiob,  10, TIMER5,  1,  ADC2,     8,   0), /* A10/PB10   ADC10         ADC1.8             TIMER1_CT  */
-    PMAP_ROW(&gpiob,  11, TIMER5,  2,  ADC2,     7,   0), /* A11/PB11   ADC11         ADC1.7             TIMER1_EX  */
-    PMAP_ROW(&gpiob,  12,   NULL,  0,  ADC2,     6,   0), /* A12/PB12   ADC12         ADC1.6             UART0_TX   */
-    PMAP_ROW(&gpiob,  13,   NULL,  0,  ADC2,     5,   0), /* A13/PB13   ADC13         ADC1.5             UART0_RX   */
-    PMAP_ROW(&gpiob,  14,   NULL,  0,  ADC2,     4,   0), /* A14/PB14   ADC14         ADC1.4                        */
-    PMAP_ROW(&gpiob,  15,   NULL,  0,  ADC2,     3,   0), /* A15/PB15   ADC15         ADC1.3                        */
+    PMAP_ROW(&gpioa,   8,   NULL,  0,  &adc1,     7,   0), /* A0/PA8     ADC0          ADC0.7                        */
+    PMAP_ROW(&gpioa,  11, &timer2,  1,  &adc1,     9,   0), /* A1/PA11    ADC1          ADC0.9             PCA0_CEX0  */
+    PMAP_ROW(&gpiob,   1,   NULL,  0,  &adc1,    11,   0), /* A2/PB1     ADC2          ADC0.11                       */
+    PMAP_ROW(&gpiob,   3,   NULL,  0,  &adc1,    12,   0), /* A3/PB3     ADC3          ADC0.12                       */
+    PMAP_ROW(&gpiob,   4,   NULL,  0,  &adc1,    13,   0), /* A4/PB4     ADC4/SDA      ADC0.13            I2C0_SDA   */
+    PMAP_ROW(&gpiob,   5,   NULL,  0,  &adc1,    14,   0), /* A5/PB5     ADC5/SCL      ADC0.14            I2C0_SCL   */
+    PMAP_ROW(&gpiob,   6,   NULL,  0,  &adc1,    15,   0), /* A6/PB6     ADC6          ADC0.15                       */
+    PMAP_ROW(&gpiob,   7,   NULL,  0,  &adc2,    11,   0), /* A7/PB7     ADC7          ADC1.11                       */
+    PMAP_ROW(&gpiob,   8, &timer4,  1,  &adc2,    10,   0), /* A8/PB8     ADC8          ADC1.10            TIMER0_CT  */
+    PMAP_ROW(&gpiob,   9, &timer4,  2,  &adc2,     9,   0), /* A9/PB9     ADC9          ADC1.9             TIMER0_EX  */
+    PMAP_ROW(&gpiob,  10, &timer5,  1,  &adc2,     8,   0), /* A10/PB10   ADC10         ADC1.8             TIMER1_CT  */
+    PMAP_ROW(&gpiob,  11, &timer5,  2,  &adc2,     7,   0), /* A11/PB11   ADC11         ADC1.7             TIMER1_EX  */
+    PMAP_ROW(&gpiob,  12,   NULL,  0,  &adc2,     6,   0), /* A12/PB12   ADC12         ADC1.6             UART0_TX   */
+    PMAP_ROW(&gpiob,  13,   NULL,  0,  &adc2,     5,   0), /* A13/PB13   ADC13         ADC1.5             UART0_RX   */
+    PMAP_ROW(&gpiob,  14,   NULL,  0,  &adc2,     4,   0), /* A14/PB14   ADC14         ADC1.4                        */
+    PMAP_ROW(&gpiob,  15,   NULL,  0,  &adc2,     3,   0), /* A15/PB15   ADC15         ADC1.3                        */
     PMAP_ROW(&gpioa,  12,   NULL,  0,  NULL,  ADCx,   0), /* AREF/PA12  AREF          VREF                          */
 };
 
@@ -223,33 +229,34 @@ const xbar_dev_info XBAR_MAP[XBAR_NULL] = {
 uint8_t board_get_short_num(uint8_t pin)
 {
     switch (pin) {
-#if defined(PIN_D30_SHORTED)
+
     case PIN_D30_SHORTED:
         return 30;
-#endif // defined(PIN_D30_SHORTED)
-#if defined(PIN_D31_SHORTED)
+
+
     case PIN_D31_SHORTED:
         return 31;
-#endif // defined(PIN_D31_SHORTED)
-#if defined(PIN_D32_SHORTED)
+
+
     case PIN_D32_SHORTED:
         return 32;
-#endif // defined(PIN_D32_SHORTED)
-#if defined(PIN_D33_SHORTED)
+
+
     case PIN_D33_SHORTED:
         return 33;
-#endif // defined(PIN_D33_SHORTED)
-#if defined(PIN_D34_SHORTED)
+
+
     case PIN_D34_SHORTED:
         return 34;
-#endif // defined(PIN_D34_SHORTED)
-#if defined(PIN_D35_SHORTED)
+
+
     case PIN_D35_SHORTED:
         return 35;
-#endif // defined(PIN_D35_SHORTED)
+
     default:
         return pin;
     }
+    return pin;
 }
 
 /* Description: Returns 1 if a secondary shorted pin (e.g. D33). */
