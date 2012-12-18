@@ -280,7 +280,7 @@ static inline uint16 timer_get_compare(timer_dev *dev, uint8 channel) {
     default:
         reg = dev->chnl_regs[channel];
         // Divide by 2
-        return (uint16)reg->CCAPVUPD / 2;
+        return (uint16)(reg->CCAPVUPD / 2);
     }
 }
 
