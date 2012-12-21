@@ -43,12 +43,14 @@ extern "C"{
 #include <libmaple/rcc.h>
 #include <libmaple/nvic.h>
 #include <libmaple/xbar.h>
+#include <libmaple/dma.h>
 
 #include <series/adc.h>
 
 /** ADC device type. */
 typedef struct adc_dev {
     adc_reg_map *regs;      /**< Register map */
+    dma_dev_tubes *dma_adc;  /**< Configurable DMA channels */
     clk_dev_id clk_id;      /**< Clock information */
     nvic_irq_num irq_num;   /**< IRQ number */
 } adc_dev;
@@ -56,20 +58,30 @@ extern const struct adc_dev *ADC1;
 extern const struct adc_dev *ADC2;
 
 
-/** SARADC status register */
-#define SARADC_SQ_REG(regs, tslot)      ((tslot) < 4 ? &((regs)->SQ3210) : &((regs)->SQ7654))
-#define SARADC_SQ_TSMUX_BIT(tslot)       (SARADC_SQ3210_TS0MUX_BIT + 8 * ((tslot) % 4))
-#define SARADC_SQ_TSMUX_MASK(tslot)      ((SARADC_SQ3210_TS0MUX_MASK >> SARADC_SQ3210_TS0MUX_BIT) << SARADC_SQ_TSMUX_BIT(tslot))
-#define SARADC_SQ_TSCHR_BIT(tslot)       (SARADC_SQ3210_TS0CHR_BIT + 8 * ((tslot) % 4))
-#define SARADC_SQ_TSCHR_MASK(tslot)      ((SARADC_SQ3210_TS0CHR_MASK >> SARADC_SQ3210_TS0CHR_BIT) << SARADC_SQ_TSCHR_BIT(tslot))
+// Timeslot macros
+#define SARADC_SQ_TSMUX_BIT(tslot)      (SARADC_SQ3210_TS0MUX_BIT + 8 * ((tslot) % 4))
+#define SARADC_SQ_TSMUX_MASK(tslot)     ((SARADC_SQ3210_TS0MUX_MASK >> SARADC_SQ3210_TS0MUX_BIT) << SARADC_SQ_TSMUX_BIT(tslot))
+#define SARADC_SQ_TSCHR_BIT(tslot)      (SARADC_SQ3210_TS0CHR_BIT + 8 * ((tslot) % 4))
+#define SARADC_SQ_TSCHR_MASK(tslot)     ((SARADC_SQ3210_TS0CHR_MASK >> SARADC_SQ3210_TS0CHR_BIT) << SARADC_SQ_TSCHR_BIT(tslot))
+
+// Group macros
+// Resolution select
 #define SARADC_CHAR_RSEL_BIT(grp)       (SARADC_CHAR10_CHR0RSEL_BIT + ((grp) & 1) * 16)
 #define SARADC_CHAR_RSEL_MASK(grp)      ((SARADC_CHAR10_CHR0RSEL_MASK >> SARADC_CHAR10_CHR0RSEL_BIT) << SARADC_CHAR_RSEL_BIT(grp))
-#define SARADC_CHAR_RPT_BIT(grp)       (SARADC_CHAR10_CHR0RPT_BIT + ((grp) & 1) * 16)
-#define SARADC_CHAR_RPT_MASK(grp)      ((SARADC_CHAR10_CHR0RPT_MASK >> SARADC_CHAR10_CHR0RPT_BIT) << SARADC_CHAR_RPT_BIT(grp))
-#define SARADC_CHAR_GN_BIT(grp)       (SARADC_CHAR10_CHR0GN_BIT + ((grp) & 1) * 16)
-#define SARADC_CHAR_GN_MASK(grp)      ((SARADC_CHAR10_CHR0GN_MASK >> SARADC_CHAR10_CHR0GN_BIT) << SARADC_CHAR_GN_BIT(grp))
-#define SARADC_CHAR_REG(regs, grp)      ((grp) < 2 ? &((regs)->CHAR10) : &((regs)->CHAR32))
+// Repeat counter
+#define SARADC_CHAR_RPT_BIT(grp)        (SARADC_CHAR10_CHR0RPT_BIT + ((grp) & 1) * 16)
+#define SARADC_CHAR_RPT_MASK(grp)       ((SARADC_CHAR10_CHR0RPT_MASK >> SARADC_CHAR10_CHR0RPT_BIT) << SARADC_CHAR_RPT_BIT(grp))
+// Gain select
+#define SARADC_CHAR_GN_BIT(grp)         (SARADC_CHAR10_CHR0GN_BIT + ((grp) & 1) * 16)
+#define SARADC_CHAR_GN_MASK(grp)        ((SARADC_CHAR10_CHR0GN_MASK >> SARADC_CHAR10_CHR0GN_BIT) << SARADC_CHAR_GN_BIT(grp))
+// Left shift
+#define SARADC_CHAR_LS_BIT(grp)         (SARADC_CHAR10_CHR1LS_BIT + ((grp) & 1) * 16)
+#define SARADC_CHAR_LS_MASK(grp)        ((SARADC_CHAR10_CHR1LS_MASK >> SARADC_CHAR10_CHR1LS_BIT) << SARADC_CHAR_LS_BIT(grp))
 
+
+// Register select
+#define SARADC_CHAR_REG(regs, grp)      ((grp) < 2 ? &((regs)->CHAR10) : &((regs)->CHAR32))
+#define SARADC_SQ_REG(regs, tslot)      ((tslot) < 4 ? &((regs)->SQ3210) : &((regs)->SQ7654))
 
 /*
  * Routines

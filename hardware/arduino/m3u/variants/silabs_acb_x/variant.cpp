@@ -311,6 +311,12 @@ DEFINE_HWSERIAL(Serial3, usart_rbuffers[2].buff, USART_RING_BUFF_SIZE, 3);
 DEFINE_HWSERIAL(Serial4, usart_rbuffers[3].buff, USART_RING_BUFF_SIZE, 4);
 UARTClass &Serial = Serial2;
 
+#if defined(USE_DMA)
+// 16 Primary structures and 16 alternate structures. Align on 256 boundary, per ref manual.
+static dma_tube_reg_map dma_tube_registers[32] __attribute__ ((aligned (256)));
+#else
+static dma_tube_reg_map *dma_tube_registers = NULL;
+#endif
 
 // ----------------------------------------------------------------------------
 void __libc_init_array(void);
@@ -319,6 +325,7 @@ static void setup_clocks(void);
 static void setup_nvic(void);
 static void setup_adcs(void);
 static void setup_timers(void);
+static void setup_dma(void);
 void board_setup_clock_prescalers(uint32_t sys_freq);
 void board_setup_rtc(void);
 void disable_watchdog(void);
@@ -327,6 +334,7 @@ void init( void )
 {
     disable_watchdog();
     gpio_init_all();
+    setup_dma();
     setup_flash();
     setup_clocks();
     setup_nvic();
@@ -517,4 +525,8 @@ void board_setup_rtc(void) {
 
     // Wait at least 2 ms
     delay(2);
+}
+
+void setup_dma(void) {
+    dma_init(DMA1, dma_tube_registers);
 }

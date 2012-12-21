@@ -37,172 +37,97 @@
 #include <wirish/../arch/arch.h> //todo fix header here
 
 /*
- * Convenience routines
- */
-
-/**
- * @brief Initialize a DMA device.
- * @param dev Device to initialize.
- */
-void dma_init(dma_dev *dev) {
-
-}
-
-/*
- * Private API
- */
-#if 0
-enum dma_atype _dma_addr_type(__io void *addr) {
-    return DMA_ATYPE_OTHER;
-}
-#endif
-
-/* Hack to ensure inlining in dma_irq_handler() */
-#define DMA_GET_HANDLER(dev, tube) (dev->handlers[tube].handler)
-#include "dma_private.h"
-
-/*
  * Devices
  */
-#if 0
+
 static dma_dev dma1 = {
     .regs = DMA1_BASE,
-    .clk_id = RCC_DMA1,
-    .handlers = {{ .handler = NULL, .irq_line = NVIC_DMA1_STREAM0 },
-                 { .handler = NULL, .irq_line = NVIC_DMA1_STREAM1 },
-                 { .handler = NULL, .irq_line = NVIC_DMA1_STREAM2 },
-                 { .handler = NULL, .irq_line = NVIC_DMA1_STREAM3 },
-                 { .handler = NULL, .irq_line = NVIC_DMA1_STREAM4 },
-                 { .handler = NULL, .irq_line = NVIC_DMA1_STREAM5 },
-                 { .handler = NULL, .irq_line = NVIC_DMA1_STREAM6 },
-                 { .handler = NULL, .irq_line = NVIC_DMA1_STREAM7 }},
+    .xbar_regs = DMA1_XBAR_BASE,
+    .handlers = {
+        {.handler = NULL, .irq_line = NVIC_DMACH0  },
+        {.handler = NULL, .irq_line = NVIC_DMACH1  },
+        {.handler = NULL, .irq_line = NVIC_DMACH2  },
+        {.handler = NULL, .irq_line = NVIC_DMACH3  },
+        {.handler = NULL, .irq_line = NVIC_DMACH4  },
+        {.handler = NULL, .irq_line = NVIC_DMACH5  },
+        {.handler = NULL, .irq_line = NVIC_DMACH6  },
+        {.handler = NULL, .irq_line = NVIC_DMACH7  },
+        {.handler = NULL, .irq_line = NVIC_DMACH8  },
+        {.handler = NULL, .irq_line = NVIC_DMACH9  },
+        {.handler = NULL, .irq_line = NVIC_DMACH10 },
+        {.handler = NULL, .irq_line = NVIC_DMACH11 },
+        {.handler = NULL, .irq_line = NVIC_DMACH12 },
+        {.handler = NULL, .irq_line = NVIC_DMACH13 },
+        {.handler = NULL, .irq_line = NVIC_DMACH14 },
+        {.handler = NULL, .irq_line = NVIC_DMACH15 }
+    },
 };
 dma_dev *DMA1 = &dma1;
 
-static dma_dev dma2 = {
-    .regs = DMA2_BASE,
-    .clk_id = RCC_DMA2,
-    .handlers = {{ .handler = NULL, .irq_line = NVIC_DMA2_STREAM0 },
-                 { .handler = NULL, .irq_line = NVIC_DMA2_STREAM1 },
-                 { .handler = NULL, .irq_line = NVIC_DMA2_STREAM2 },
-                 { .handler = NULL, .irq_line = NVIC_DMA2_STREAM3 },
-                 { .handler = NULL, .irq_line = NVIC_DMA2_STREAM4 },
-                 { .handler = NULL, .irq_line = NVIC_DMA2_STREAM5 },
-                 { .handler = NULL, .irq_line = NVIC_DMA2_STREAM6 },
-                 { .handler = NULL, .irq_line = NVIC_DMA2_STREAM7 }},
-};
-dma_dev *DMA2 = &dma2;
-
 /*
- * Helpers for dealing with dma_request_src's bit encoding (see the
- * comments in the dma_request_src definition).
+ * Convenience routines
  */
 
-/* clk_dev_id of dma_dev which supports src. */
-static __always_inline rcc_clk_id src_clk_id(dma_request_src src) {
-    return 0;
+
+void dma_init(dma_dev *dev, dma_tube_reg_map tube_regs) {
+    // Enable DMA
+    if (tube_regs == NULL) {
+        return;
+    }
+    dev->regs->CONFIG = 1;
+    dev->regs->BASEPTR = tube_regs;
 }
 
-/* Bit vector of streams supporting src (e.g., bit 0 set => DMA_S0 support). */
-static __always_inline uint32 src_stream_mask(dma_request_src src) {
-    return 0;
+const tube_info dma_saradc0_tubes = {
+        {DMA_S2, DMAXBAR_DMAXBAR0_CH2SEL_SARADC0},
+        {DMA_S4, DMAXBAR_DMAXBAR0_CH4SEL_SARADC0},
+        {DMA_S5, DMAXBAR_DMAXBAR0_CH5SEL_SARADC0}};
+dma_dev_tubes dma_saradc0 = {.num_tubes = sizeof(dma_saradc0_tubes) / sizeof(tube_info), &dma_saradc0_tubes};
+
+const tube_info dma_saradc1_tubes = {
+        {DMA_S3,  DMAXBAR_DMAXBAR0_CH3SEL_SARADC1},
+        {DMA_S10, DMAXBAR_DMAXBAR1_CH10SEL_SARADC1},
+        {DMA_S15, DMAXBAR_DMAXBAR1_CH15SEL_SARADC1}};
+dma_dev_tubes dma_saradc1 = {.num_tubes = sizeof(dma_saradc1_tubes) / sizeof(tube_info), &dma_saradc1_tubes};
+
+
+
+
+/* Hack to ensure inlining in dma_irq_handler() */
+#define DMA_GET_HANDLER(dev, tube) (dev->handlers[tube].handler)
+
+uint8_t dma_tube_enabled(dma_dev *dev, uint8_t tube_num) {
+    return (dev->regs->CHENSET & (1 << tube_num) ? 1 : 0);
 }
 
-/* Channel corresponding to src. */
-static __always_inline dma_channel src_channel(dma_request_src src) {
-    return (dma_channel)(src & 0x7);
+uint8_t dma_lock_tube(dma_dev *dev, uint8_t tube_num)
+{
+    if (dev->tube_mutex_bits & (1 << tube_num)) {
+        // Tube is used
+        return 0;
+    }
+    // Lock tube mutex
+    dev->tube_mutex_bits |= 1 << tube_num;
+    return 1;
 }
 
-/*
- * Routines
- */
-
-/* For convenience */
-#define ASSERT_NOT_ENABLED(dev, tube) ASSERT(!dma_is_enabled(dev, tube))
-
-/* Helpers for dma_tube_cfg() */
-static int preconfig_check(dma_dev *dev, dma_tube tube, dma_tube_config *cfg);
-static int postconfig_check(dma_tube_reg_map *dummy, dma_tube_config *cfg);
-static int config_fifo(dma_tube_reg_map *dummy, dma_tube_config *cfg);
-static int config_src_dst(dma_tube_reg_map *dummy, dma_tube_config *cfg);
-static void copy_regs(dma_tube_reg_map *src, dma_tube_reg_map *dst);
-
-int dma_tube_cfg(dma_dev *dev, dma_tube tube, dma_tube_config *cfg) {
-    return 0;
+void dma_unlock_tube(dma_dev *dev, uint8_t tube_num)
+{
+    dev->tube_mutex_bits &= ~(uint16_t)(1 << tube_num);
 }
 
-void dma_set_priority(dma_dev *dev, dma_stream stream, dma_priority priority) {
-
+static inline void dma_set_tube_trig(dma_dev *dev, uint8_t tube_num, uint8_t tube_bits) {
+    volatile uint32_t *reg = dma_get_xbar_reg(dev, tube_num);
+    uint32_t set, clr;
+    uint32_t shift = 4 * (tube_num % 8);
+    clr = 0xf << shift;
+    set = tube_bits << shift;
+    // Clear bits in the peripheral select register (DMAXBAR0)
+    REG_SET_CLR(*reg, 0, clr);
+    // Set the peripheral
+    REG_SET_CLR(*reg, 1, set);
 }
 
-void dma_set_num_transfers(dma_dev *dev, dma_tube tube, uint16 num_transfers) {
-
-}
-
-/**
- * @brief Set memory 0 or memory 1 address.
- *
- * This is a general function for setting one of the two memory
- * addresses available on the double-buffered STM32F2 DMA controllers.
- *
- * @param dev     DMA device
- * @param tube    Tube on dev.
- * @param n       If 0, set memory 0 address. If 1, set memory 1 address.
- * @param address Address to set
- */
-void dma_set_mem_n_addr(dma_dev *dev, dma_tube tube, int n,
-                        __io void *address) {
-
-}
-
-void dma_set_per_addr(dma_dev *dev, dma_tube tube, __io void *address) {
-
-}
-
-/**
- * @brief Enable a stream's FIFO.
- *
- * You may only call this function when the stream is disabled.
- *
- * @param dev  DMA device
- * @param tube Stream whose FIFO to enable.
- */
-void dma_enable_fifo(dma_dev *dev, dma_tube tube) {
-
-}
-
-/**
- * @brief Disable a stream's FIFO.
- *
- * You may only call this function when the stream is disabled.
- *
- * @param dev  DMA device
- * @param tube Stream whose FIFO to disable.
- */
-void dma_disable_fifo(dma_dev *dev, dma_tube tube) {
-
-}
-
-void dma_attach_interrupt(dma_dev *dev, dma_tube tube,
-                          void (*handler)(void)) {
-
-}
-
-void dma_detach_interrupt(dma_dev *dev, dma_tube tube) {
-
-}
-
-void dma_enable(dma_dev *dev, dma_tube tube) {
-
-}
-
-void dma_disable(dma_dev *dev, dma_tube tube) {
-
-}
-
-dma_irq_cause dma_get_irq_cause(dma_dev *dev, dma_tube tube) {
-    return DMA_TRANSFER_ERROR;
-}
 
 /*
  * IRQ handlers
@@ -239,98 +164,35 @@ void __irq_dma1_stream7(void) {
 
 }
 
-void __irq_dma2_stream0(void) {
+void __irq_dma1_stream8(void) {
 
 }
 
-void __irq_dma2_stream1(void) {
+void __irq_dma1_stream9(void) {
 
 }
 
-void __irq_dma2_stream2(void) {
+void __irq_dma1_stream10(void) {
 
 }
 
-void __irq_dma2_stream3(void) {
+void __irq_dma1_stream11(void) {
 
 }
 
-void __irq_dma2_stream4(void) {
+void __irq_dma1_stream12(void) {
 
 }
 
-void __irq_dma2_stream5(void) {
+void __irq_dma1_stream13(void) {
 
 }
 
-void __irq_dma2_stream6(void) {
+void __irq_dma1_stream14(void) {
 
 }
 
-void __irq_dma2_stream7(void) {
+void __irq_dma1_stream15(void) {
 
 }
 
-/*
- * Auxiliary routines for dma_tube_cfg()
- */
-
-/* Is addr acceptable for use as DMA src/dst? */
-static int cfg_mem_ok(__io void *addr) {
-    return 0;
-}
-
-/* Is src -> dst a reasonable combination of [MEM,PER] -> [MEM,PER]? */
-static int cfg_dir_ok(dma_dev *dev, __io void *src, __io void *dst) {
-    return 0;
-}
-
-/* Initial sanity check for dma_tube_cfg() */
-static int preconfig_check(dma_dev *dev, dma_tube tube,
-                           dma_tube_config *cfg) {
-    return DMA_TUBE_CFG_SUCCESS;
-}
-
-static int config_fifo(dma_tube_reg_map *dummy, dma_tube_config *cfg) {
-    return DMA_TUBE_CFG_SUCCESS;
-}
-
-/* Helper for configuring (DMA_SxCR) */
-#define BITS_WE_CARE_ABOUT                                              \
-    (DMA_SCR_CHSEL | DMA_SCR_MBURST | DMA_SCR_PBURST | DMA_SCR_PINCOS | \
-     DMA_SCR_MINC | DMA_SCR_PINC | DMA_SCR_CIRC | DMA_SCR_DIR |         \
-     DMA_SCR_PFCTRL | DMA_SCR_TCIE | DMA_SCR_HTIE | DMA_SCR_TEIE |      \
-     DMA_SCR_DMEIE)
-static inline void config_scr(dma_tube_reg_map *dummy, dma_tube_config *cfg,
-                              unsigned src_shift, uint32 src_inc,
-                              unsigned dst_shift, uint32 dst_inc,
-                              uint32 dir) {
-}
-#undef BITS_WE_CARE_ABOUT
-
-/* Helper for when cfg->tube_dst is memory */
-static int config_to_mem(dma_tube_reg_map *dummy, dma_tube_config *cfg) {
-    return 0;
-}
-
-/* Helper for when cfg->tube_src is peripheral */
-static int config_to_per(dma_tube_reg_map *dummy, dma_tube_config *cfg) {
-
-    return 0;
-}
-
-/* Configures SCR, SPAR, SM0AR, and checks that the result is OK. */
-static int config_src_dst(dma_tube_reg_map *dummy, dma_tube_config *cfg) {
-    return 0;
-}
-
-/* Final checks we can only perform when fully configured */
-static int postconfig_check(dma_tube_reg_map *dummy, dma_tube_config *cfg) {
-    return DMA_TUBE_CFG_SUCCESS;
-}
-
-/* Convenience for dealing with dummy registers */
-static void copy_regs(dma_tube_reg_map *src, dma_tube_reg_map *dst) {
-
-}
-#endif

@@ -42,6 +42,7 @@
 
 adc_dev adc1 = {
     .regs   = ADC1_BASE,
+    .dma_adc = DMA_SARADC1,
     .clk_id = CLK_SARADC1,
     .irq_num = NVIC_SARADC1
 };
@@ -50,6 +51,7 @@ const adc_dev *ADC1 = &adc1;
 
 adc_dev adc2 = {
     .regs   = ADC2_BASE,
+    .dma_adc = DMA_SARADC2,
     .clk_id = CLK_SARADC2,
     .irq_num = NVIC_SARADC2
 };
@@ -133,6 +135,15 @@ static inline void adc_set_grp_gain(const adc_dev *dev, uint32 grp, adc_grp_gain
 {
     volatile uint32 *reg = SARADC_CHAR_REG(dev->regs, grp);
     REG_SET_CLR(*reg, gn, 1 << SARADC_CHAR_GN_BIT(grp));
+}
+
+static inline void adc_set_grp_leftshift(const adc_dev *dev, uint32 grp, uint8_t shift_cnt)
+{
+    volatile uint32 *reg = SARADC_CHAR_REG(dev->regs, grp);
+    // Clear field
+    REG_SET_CLR(*reg, 0, SARADC_CHAR_LS_MASK(grp));
+    // Set bits
+    REG_SET_CLR(*reg, 1, shift_cnt << SARADC_CHAR_LS_BIT(grp));
 }
 
 /**
@@ -260,6 +271,7 @@ uint16 adc_read(const adc_dev *dev, uint8 channel) {
     // Single read only uses timeslot 0
     adc_set_tslot_chnl(dev, 0, channel);
 
+
     REG_SET_CLR(regs->CONTROL, 1, SARADC_CR_BURSTEN_EN);
 
     // a 1-to-0 transition on ACCMD bit will enable the accumulator for the next conversion
@@ -271,9 +283,9 @@ uint16 adc_read(const adc_dev *dev, uint8 channel) {
 
     while (!(regs->FIFOSTATUS & SARADC_FIFOSTATUS_FIFOLVL_MASK));
     val = regs->DATA;
-
-    // Set previous channel
+    // Set previous channel
     adc_set_tslot_chnl(dev, 0, prev_chnl);
+
 
     return val;
 }
