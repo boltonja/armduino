@@ -214,11 +214,11 @@ typedef enum clk_dev_id {
 /**
  * @brief STM32F2 Peripheral clock domains.
  */
-typedef enum clk_domain{
+typedef enum clk_domain {
     CLK_AHB,
     CLK_APB0,
     CLK_APB1
-}clk_domain;
+} clk_domain;
 
 #define CLK_CR_AHBDIV_MASK           0x00000700
 #define CLK_CR_APBDIV_MASK           0x00010000

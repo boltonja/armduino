@@ -103,10 +103,9 @@ void gpio_init_all(void) {
 
     // Enable Crossbars
     REG_SET_CLR(PBCFG_BASE->XBAR0H, 1, PBCFG_XBAR0H_XBAR0EN_MASK);
-    REG_SET_CLR(PBCFG_BASE->XBAR1, 1, PBCFG_XBAR0H_XBAR0EN_MASK);
-
-    // Enable Crossbar 1 signals & set properties
     REG_SET_CLR(PBCFG_BASE->XBAR1, 1, PBCFG_XBAR1_XBAR1EN_MASK);
+
+    // Skip all gpio pins (xbar is not connected to gpio)
     GPIOA->regs->std.PBSKIPEN = 0x0000FFFF;
     GPIOB->regs->std.PBSKIPEN = 0x0000FFFF; // 0xf00-timers
     GPIOC->regs->std.PBSKIPEN = 0x0000FFFF;
