@@ -268,7 +268,8 @@ static void enable_device(spi_dev *dev,
     configure_gpios(dev, as_master);
     if (as_master) {
         spi_master_enable(dev, freq, mode, cfg_flags);
-    } else {
+    }
+    else {
         spi_slave_enable(dev, mode, cfg_flags);
     }
 }

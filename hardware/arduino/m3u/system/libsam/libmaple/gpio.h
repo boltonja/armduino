@@ -128,7 +128,7 @@ static inline void gpio_write_bit(gpio_dev *dev, uint8 pin, uint8 val) {
  * @return True if the pin is set, false otherwise.
  */
 static inline uint32 gpio_read_bit(gpio_dev *dev, uint8 pin) {
-    return (dev->regs->PBPIN & 1 << pin) == 0;
+    return (dev->regs->PBPIN & 1 << pin) != 0;
 }
 
 /**
