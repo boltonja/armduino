@@ -196,6 +196,9 @@ typedef enum SI32_UART_STOP_BITS_Enum
 void usart_enable(usart_dev *dev) {;
     usart_reg_map *regs = dev->regs;
 
+	// usart_disable disables the clock, so reenable.
+    clk_enable_dev(dev->clk_id);
+	
     // Enable tx/rx
     REG_SET_CLR(regs->CONTROL, 1 , UART_CR_REN_EN | UART_CR_TEN_EN);
 
@@ -213,14 +216,14 @@ void usart_enable(usart_dev *dev) {;
 void usart_disable(usart_dev *dev) {
     usart_reg_map *regs = dev->regs;
 
-    // DISABLE INTERRUPTS
+    // disable interrupts
     REG_SET_CLR(regs->CONTROL, 0, UART_CR_RDREQIEN_EN);
     nvic_clr_pending_irq(dev->irq_num);
 
-    // DISABLE UART0 CLOCK
+    // disable clock
     clk_disable_dev(dev->clk_id);
 
-    /* Clean up buffer */
+    // Clean up buffer
     usart_reset_rx(dev);
 
     // Disable usart GPIO pins

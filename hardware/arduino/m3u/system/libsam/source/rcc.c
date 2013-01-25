@@ -236,7 +236,20 @@ void clk_disable_dev(clk_dev_id clock) {
  * @return 1 if the clock is on, 0 if the clock is off.
  */
 int clk_is_dev_on(clk_dev_id clock) {
-    return 0;
+    uint32 bit;
+    clk_domain bus = clk_dev_get_bus(clock);
+    CLK_GET_DEV_BIT(clock, bus, bit);
+
+    switch (bus) {
+    case CLK_AHB:
+        return 0 != (CLK_BASE->AHBCLKG & bit);
+    case CLK_APB0:
+        return 0 != (CLK_BASE->APBCLKG0 & bit);
+    case CLK_APB1:
+        return 0 != (CLK_BASE->APBCLKG1 & bit);
+    default:
+        return 0;
+    }
 }
 
 /**
