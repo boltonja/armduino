@@ -17,7 +17,7 @@
 #
 
 # Tool suffix when cross-compiling
-ARM_GCC_TOOLCHAIN = C:/Users/nkgeoca/Desktop/Development/Software/armduino1/armduino/build/windows/arm/bin
+ARM_GCC_TOOLCHAIN = ../../../../../../build/windows/arm/bin
 CROSS_COMPILE = $(ARM_GCC_TOOLCHAIN)/arm-none-eabi-
 
 # Compilation tools
