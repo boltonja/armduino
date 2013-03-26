@@ -141,6 +141,12 @@ const stm32_pin_info  __attribute__ ((used)) PIN_MAP[BOARD_NR_GPIO_PINS] = {
     PMAP_ROW(&gpioa,  12,   NULL,  0,  NULL,  ADCx,   0), /* AREF/PA12  AREF          VREF                          */
 };
 
+uint32_t analogPinMaping(uint32_t pin){
+    uint32_t analogPins[] = {54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 16, 17, 18, 19, 20, 21, 22, 23, 24};
+	return analogPins[pin];
+}
+
+
 // Array of pins you can use for pwmWrite(). Keep it in Flash because
 // it doesn't change, and so we don't waste RAM.
 const uint8_t boardPWMPins[] = {

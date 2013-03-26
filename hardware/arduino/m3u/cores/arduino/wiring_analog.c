@@ -22,7 +22,7 @@
 extern "C" {
 #endif
 
-static int _readResolution = 12;
+static int _readResolution = 10;
 static int _writeResolution = 8;
 
 void analogReadResolution(int res) {
@@ -61,6 +61,7 @@ uint32_t analogRead(uint32_t pin)
     if (board_pin_invalid(pin)) {
         return;
     }
+	pin = analogPinMaping(pin);
     const adc_dev *dev = PIN_MAP[pin].adc_device;
     pinMode(pin, INPUT_ANALOG);
     uint32_t value = adc_read(dev, PIN_MAP[pin].adc_channel);
