@@ -85,6 +85,9 @@ extern const stm32_pin_info PIN_MAP[];
  *
  * Its length is BOARD_NR_PWM_PINS.
  */
+ 
+ uint32_t analogPinMaping(uint32_t pin);
+ 
 extern const uint8_t boardPWMPins[];
 
 /**

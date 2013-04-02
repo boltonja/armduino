@@ -153,4 +153,26 @@ typedef uint8_t byte ;
 } // extern "C"
 #endif // __cplusplus
 
+
+/** \brief  Enable IRQ Interrupts
+
+  This function enables IRQ interrupts by clearing the I-bit in the CPSR.
+  Can only be executed in Privileged modes.
+ */
+static inline void __enable_irq(void)
+{
+	asm volatile("cpsie i");
+}
+
+
+/** \brief  Disable IRQ Interrupts
+
+  This function disables IRQ interrupts by setting the I-bit in the CPSR.
+  Can only be executed in Privileged modes.
+ */
+static inline void __disable_irq(void)
+{
+	asm volatile("cpsid i");
+}
+
 #endif /* _WIRING_CONSTANTS_ */
