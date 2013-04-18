@@ -75,34 +75,34 @@ const stm32_pin_info  __attribute__ ((used)) PIN_MAP[BOARD_NR_GPIO_PINS] = {
     PMAP_ROW(&gpiod,   2,   NULL,  0,  NULL,  ADCx,   0), /* D11/PD2    SPI_MOSI(PWM) SPI2_MOSI  D35                */
     PMAP_ROW(&gpiod,   1,   NULL,  0,  NULL,  ADCx,   0), /* D12/PD1    SPI_MISO      SPI2_MISO                     */
     PMAP_ROW(&gpiod,   0,   NULL,  0,  NULL,  ADCx,   0), /* D13/PD0    SPI_SCK/LED   SPI2_SCK                      */
-    PMAP_ROW(&gpioa,   0,   NULL,  0, &adc1,     0,   0), /* D14/PA0    UART_TX       USART0_TX          ADC0.0     */
-    PMAP_ROW(&gpioa,   1,   NULL,  0, &adc1,     1,   0), /* D15/PA1    UART_RX       USART0_RX          ADC0.1     */
-    PMAP_ROW(&gpioa,   2,   NULL,  0, &adc1,     2,   0), /* D16/PA2    UART_TX       SPI0_SCK           ADC0.2     */
-    PMAP_ROW(&gpioa,   3,   NULL,  0, &adc1,     3,   0), /* D17/PA3    UART_RX       SPI0_MISO          ADC0.3     */
-    PMAP_ROW(&gpioa,   4,   NULL,  0, &adc1,     4,   0), /* D18/PA4    UART_TX       SPI0_MOSI          ADC0.4     */
-    PMAP_ROW(&gpioa,   5,   NULL,  0, &adc1,     5,   0), /* D19/PA5    UART_RX       SPI0_NSS           ADC0.5     */
+    PMAP_ROW(&gpioa,   0,   NULL,  0,  &adc1,     0,   0), /* D14/PA0    UART_TX       USART0_TX          ADC0.0     */
+    PMAP_ROW(&gpioa,   1,   NULL,  0,  &adc1,     1,   0), /* D15/PA1    UART_RX       USART0_RX          ADC0.1     */
+    PMAP_ROW(&gpioa,   2,   NULL,  0,  &adc1,     2,   0), /* D16/PA2    UART_TX       SPI0_SCK           ADC0.2     */
+    PMAP_ROW(&gpioa,   3,   NULL,  0,  &adc1,     3,   0), /* D17/PA3    UART_RX       SPI0_MISO          ADC0.3     */
+    PMAP_ROW(&gpioa,   4,   NULL,  0,  &adc1,     4,   0), /* D18/PA4    UART_TX       SPI0_MOSI          ADC0.4     */
+    PMAP_ROW(&gpioa,   5,   NULL,  0,  &adc1,     5,   0), /* D19/PA5    UART_RX       SPI0_NSS           ADC0.5     */
 
     PMAP_ROW(&gpioa,   6,   NULL,  0,  NULL,  ADCx,   0), /* D20/PA6    I2C_SDA       USART1_TX                     */
-    PMAP_ROW(&gpioa,   7,   NULL,  0, &adc1,     6,   0), /* D21/PA7    I2C_SCL       USART1_RX          ADC0.6     */
-    PMAP_ROW(&gpioa,  13, &timer2,  2, NULL,  ADCx,   0), /* D22/PA13                 PCA0_CEX1                     */
-    PMAP_ROW(&gpioa,  14, &timer3,  1, NULL,  ADCx,   0), /* D23/PA14                 PCA1_CEX0                     */
-    PMAP_ROW(&gpioa,  15, &timer3,  2, NULL,  ADCx,  12), /* D24/PA15                 PCA1_CEX1                     */
+    PMAP_ROW(&gpioa,   7,   NULL,  0,  &adc1,     6,   0), /* D21/PA7    I2C_SCL       USART1_RX          ADC0.6     */
+    PMAP_ROW(&gpioa,  13, &timer2,  2,  NULL,  ADCx,   0), /* D22/PA13                 PCA0_CEX1                     */
+    PMAP_ROW(&gpioa,  14, &timer3,  1,  NULL,  ADCx,   0), /* D23/PA14                 PCA1_CEX0                     */
+    PMAP_ROW(&gpioa,  15, &timer3,  2,  NULL,  ADCx,  12), /* D24/PA15                 PCA1_CEX1                     */
     PMAP_ROW(&gpiob,   0,   NULL,  0,  NULL,  ADCx,   0), /* D25/PB0                                                */
     PMAP_ROW(&gpiob,   2,   NULL,  0,  NULL,  ADCx,   0), /* D26/PB2                                                */
     PIN_NOT_USED                                          /* D27    ~ Pin Not Used ~                                */
     PIN_NOT_USED                                          /* D28    ~ Pin Not Used ~                                */
     PIN_NOT_USED                                          /* D29    ~ Pin Not Used ~                                */
 
-    PMAP_ROW(&gpioe,   5, &timer1,  6, NULL,  ADCx,   0), /* D30/PE5    PWM           EPCA_CEX5  D3                 */
-    PMAP_ROW(&gpioe,   4, &timer1,  5, NULL,  ADCx,   0), /* D31/PE4    PWM           EPCA_CEX4  D5                 */
-    PMAP_ROW(&gpioe,   3, &timer1,  4, NULL,  ADCx,   0), /* D32/PE3    PWM           EPCA_CEX3  D6                 */
-    PMAP_ROW(&gpioe,   2, &timer1,  3, NULL,  ADCx,   0), /* D33/PE2    PWM           EPCA_CEX2  D9                 */
-    PMAP_ROW(&gpioe,   1, &timer1,  2, NULL,  ADCx,   0), /* D34/PE1    PWM           EPCA_CEX1  D10                */
-    PMAP_ROW(&gpioe,   0, &timer1,  1, NULL,  ADCx,   0), /* D35/PE0    PWM           EPCA_CEX0  D11                */
-    PMAP_ROW(&gpioc,   0,    NULL,  0, &adc2,    2,   1), /* D36/PC0                                                */
-    PMAP_ROW(&gpioc,   1,    NULL,  0, &adc2,    1,   2), /* D37/PC1                                                */
-    PMAP_ROW(&gpioc,   2,    NULL,  0, &adc2,    0,   3), /* D38/PC2                                                */
-    PMAP_ROW(&gpioc,   3,    NULL,  0, NULL,  ADCx,   4), /* D39/PC3                                                */
+    PMAP_ROW(&gpioe,   5, &timer1,  6,  NULL,  ADCx,   0), /* D30/PE5    PWM           EPCA_CEX5  D3                 */
+    PMAP_ROW(&gpioe,   4, &timer1,  5,  NULL,  ADCx,   0), /* D31/PE4    PWM           EPCA_CEX4  D5                 */
+    PMAP_ROW(&gpioe,   3, &timer1,  4,  NULL,  ADCx,   0), /* D32/PE3    PWM           EPCA_CEX3  D6                 */
+    PMAP_ROW(&gpioe,   2, &timer1,  3,  NULL,  ADCx,   0), /* D33/PE2    PWM           EPCA_CEX2  D9                 */
+    PMAP_ROW(&gpioe,   1, &timer1,  2,  NULL,  ADCx,   0), /* D34/PE1    PWM           EPCA_CEX1  D10                */
+    PMAP_ROW(&gpioe,   0, &timer1,  1,  NULL,  ADCx,   0), /* D35/PE0    PWM           EPCA_CEX0  D11                */
+    PMAP_ROW(&gpioc,   0,   NULL,  0,  &adc2,     2,   1), /* D36/PC0                                                */
+    PMAP_ROW(&gpioc,   1,   NULL,  0,  &adc2,     1,   2), /* D37/PC1                                                */
+    PMAP_ROW(&gpioc,   2,   NULL,  0,  &adc2,     0,   3), /* D38/PC2                                                */
+    PMAP_ROW(&gpioc,   3,   NULL,  0,  NULL,  ADCx,   4), /* D39/PC3                                                */
 
     PMAP_ROW(&gpioc,   4,   NULL,  0,  NULL,  ADCx,   5), /* D40/PC4                                                */
     PMAP_ROW(&gpioc,   5,   NULL,  0,  NULL,  ADCx,   6), /* D41/PC5                                                */
@@ -123,27 +123,27 @@ const stm32_pin_info  __attribute__ ((used)) PIN_MAP[BOARD_NR_GPIO_PINS] = {
     // 54 .. 70 - Analog pins
     // ----------------------
     PMAP_ROW(&gpioa,   8,   NULL,  0,  &adc1,     7,   0), /* A0/PA8     ADC0          ADC0.7                        */
-    PMAP_ROW(&gpioa,  11,&timer2,  1,  &adc1,     9,   0), /* A1/PA11    ADC1          ADC0.9             PCA0_CEX0  */
+    PMAP_ROW(&gpioa,  11, &timer2,  1,  &adc1,     9,   0), /* A1/PA11    ADC1          ADC0.9             PCA0_CEX0  */
     PMAP_ROW(&gpiob,   1,   NULL,  0,  &adc1,    11,   0), /* A2/PB1     ADC2          ADC0.11                       */
     PMAP_ROW(&gpiob,   3,   NULL,  0,  &adc1,    12,   0), /* A3/PB3     ADC3          ADC0.12                       */
     PMAP_ROW(&gpiob,   4,   NULL,  0,  &adc1,    13,   0), /* A4/PB4     ADC4/SDA      ADC0.13            I2C0_SDA   */
     PMAP_ROW(&gpiob,   5,   NULL,  0,  &adc1,    14,   0), /* A5/PB5     ADC5/SCL      ADC0.14            I2C0_SCL   */
     PMAP_ROW(&gpiob,   6,   NULL,  0,  &adc1,    15,   0), /* A6/PB6     ADC6          ADC0.15                       */
     PMAP_ROW(&gpiob,   7,   NULL,  0,  &adc2,    11,   0), /* A7/PB7     ADC7          ADC1.11                       */
-    PMAP_ROW(&gpiob,   8,&timer4,  1,  &adc2,    10,   0), /* A8/PB8     ADC8          ADC1.10            TIMER0_CT  */
-    PMAP_ROW(&gpiob,   9,&timer4,  2,  &adc2,     9,   0), /* A9/PB9     ADC9          ADC1.9             TIMER0_EX  */
-    PMAP_ROW(&gpiob,  10,&timer5,  1,  &adc2,     8,   0), /* A10/PB10   ADC10         ADC1.8             TIMER1_CT  */
-    PMAP_ROW(&gpiob,  11,&timer5,  2,  &adc2,     7,   0), /* A11/PB11   ADC11         ADC1.7             TIMER1_EX  */
+    PMAP_ROW(&gpiob,   8, &timer4,  1,  &adc2,    10,   0), /* A8/PB8     ADC8          ADC1.10            TIMER0_CT  */
+    PMAP_ROW(&gpiob,   9, &timer4,  2,  &adc2,     9,   0), /* A9/PB9     ADC9          ADC1.9             TIMER0_EX  */
+    PMAP_ROW(&gpiob,  10, &timer5,  1,  &adc2,     8,   0), /* A10/PB10   ADC10         ADC1.8             TIMER1_CT  */
+    PMAP_ROW(&gpiob,  11, &timer5,  2,  &adc2,     7,   0), /* A11/PB11   ADC11         ADC1.7             TIMER1_EX  */
     PMAP_ROW(&gpiob,  12,   NULL,  0,  &adc2,     6,   0), /* A12/PB12   ADC12         ADC1.6             UART0_TX   */
     PMAP_ROW(&gpiob,  13,   NULL,  0,  &adc2,     5,   0), /* A13/PB13   ADC13         ADC1.5             UART0_RX   */
     PMAP_ROW(&gpiob,  14,   NULL,  0,  &adc2,     4,   0), /* A14/PB14   ADC14         ADC1.4                        */
     PMAP_ROW(&gpiob,  15,   NULL,  0,  &adc2,     3,   0), /* A15/PB15   ADC15         ADC1.3                        */
-    PMAP_ROW(&gpioa,  12,   NULL,  0,  NULL,   ADCx,   0), /* AREF/PA12  AREF          VREF                          */
+    PMAP_ROW(&gpioa,  12,   NULL,  0,  NULL,  ADCx,   0), /* AREF/PA12  AREF          VREF                          */
 };
 
 uint32_t analogPinMaping(uint32_t pin){
     uint32_t analogPins[] = {54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 16, 17, 18, 19, 20, 21, 22, 23, 24};
-	return analogPins[pin];
+    return analogPins[pin];
 }
 
 
@@ -177,28 +177,44 @@ D27,D28,D29,D43,D44,D47,D48,D53
                         PIN_MAP[pin].gpio_device == GPIOC || PIN_MAP[pin].gpio_device == GPIOD ? XBAR_NUM_1 : \
                                 xlow_offset + XBAR_NUM_0L)
 #define XBAR_ROW(array, xbar_num) {(sizeof(array) / sizeof(si_xbar_info)), xbar_num, (si_xbar_info *) &array}
-static const si_xbar_info xbar_usart1[] = {XBAR_UART0_ROW(PIN_TO_PB_MASK2(BOARD_USART1_TX_PIN, BOARD_USART1_RX_PIN), XBAR_NUM(BOARD_USART1_TX_PIN, 1))};
-static const si_xbar_info xbar_usart2[] = {XBAR_UART1_ROW(PIN_TO_PB_MASK2(BOARD_USART2_TX_PIN, BOARD_USART2_RX_PIN), XBAR_NUM(BOARD_USART2_TX_PIN, 1))};
-static const si_xbar_info xbar_usart3[] = {XBAR_USART0_ROW(PIN_TO_PB_MASK2(BOARD_USART3_TX_PIN, BOARD_USART3_RX_PIN), XBAR_NUM(BOARD_USART3_TX_PIN, 0))};
-static const si_xbar_info xbar_usart4[] = {XBAR_USART1_ROW(PIN_TO_PB_MASK2(BOARD_USART4_TX_PIN, BOARD_USART4_RX_PIN), XBAR_NUM(BOARD_USART4_TX_PIN, 0))};
-static const si_xbar_info xbar_spi1[] = {XBAR_SPI0_ROW(PIN_TO_PB_MASK3(BOARD_SPI1_SCK_PIN, BOARD_SPI1_MISO_PIN, BOARD_SPI1_MOSI_PIN), XBAR_NUM(BOARD_SPI1_MISO_PIN, 0)),
-                                        XBAR_SPI0NSS_ROW(PIN_TO_PB_MASK(BOARD_SPI1_NSS_PIN), XBAR_NUM(BOARD_SPI1_NSS_PIN, 0))};
-static const si_xbar_info xbar_spi2[] = {XBAR_SPI1_ROW(PIN_TO_PB_MASK3(BOARD_SPI2_SCK_PIN, BOARD_SPI2_MISO_PIN, BOARD_SPI2_MOSI_PIN), XBAR_NUM(BOARD_SPI2_MISO_PIN, 1)),
-                                        XBAR_SPI1NSS_ROW(PIN_TO_PB_MASK(BOARD_SPI2_NSS_PIN), XBAR_NUM(BOARD_SPI2_NSS_PIN, 1))};
-static const si_xbar_info xbar_spi3[] = {XBAR_SPI2_ROW(PIN_TO_PB_MASK3(BOARD_SPI3_SCK_PIN, BOARD_SPI3_MISO_PIN, BOARD_SPI3_MOSI_PIN), XBAR_NUM(BOARD_SPI3_MISO_PIN, 1)),
-                                        XBAR_SPI2NSS_ROW(PIN_TO_PB_MASK(BOARD_SPI3_NSS_PIN), XBAR_NUM(BOARD_SPI3_NSS_PIN, 1))};
-static const si_xbar_info xbar_timer1[] = {XBAR_EPCA0_ROW(PIN_TO_PB_MASK6(BOARD_TIMER1C1_PIN, BOARD_TIMER1C2_PIN, BOARD_TIMER1C3_PIN, BOARD_TIMER1C4_PIN, BOARD_TIMER1C5_PIN, BOARD_TIMER1C6_PIN), XBAR_NUM(BOARD_USART1_TX_PIN, 0))};
-static const si_xbar_info xbar_timer2[] = {XBAR_PCA0_ROW(PIN_TO_PB_MASK2(BOARD_TIMER2C1_PIN, BOARD_TIMER2C2_PIN), XBAR_NUM(BOARD_TIMER2C1_PIN, 0))};
-static const si_xbar_info xbar_timer3[] = {XBAR_PCA1_ROW(PIN_TO_PB_MASK2(BOARD_TIMER3C1_PIN, BOARD_TIMER3C2_PIN), XBAR_NUM(BOARD_TIMER3C1_PIN, 0))};
-static const si_xbar_info xbar_timer4[] = {XBAR_TIMER0CT_ROW(PIN_TO_PB_MASK(BOARD_TIMER4CX_PIN), XBAR_NUM(BOARD_TIMER4CX_PIN, 0)),
-                                            XBAR_TIMER0EX_ROW(PIN_TO_PB_MASK(BOARD_TIMER4EX_PIN), XBAR_NUM(BOARD_TIMER4EX_PIN, 0))};
-static const si_xbar_info xbar_timer5[] = {XBAR_TIMER1CT_ROW(PIN_TO_PB_MASK(BOARD_TIMER5CX_PIN), XBAR_NUM(BOARD_TIMER5CX_PIN, 0)),
-                                            XBAR_TIMER1EX_ROW(PIN_TO_PB_MASK(BOARD_TIMER5EX_PIN), XBAR_NUM(BOARD_TIMER5EX_PIN, 0))};
-static const si_xbar_info xbar_i2s1[] = {XBAR_I2S0TX_ROW(PIN_TO_PB_MASK3(BOARD_I2S1TX_WS_PIN, BOARD_I2S1TX_SCK_PIN, BOARD_I2S1TX_SD_PIN), XBAR_NUM(BOARD_I2S1TX_WS_PIN, 0)),
-                                         XBAR_I2S0RX_ROW(PIN_TO_PB_MASK3(BOARD_I2S1RX_WS_PIN, BOARD_I2S1RX_SCK_PIN, BOARD_I2S1RX_SD_PIN), XBAR_NUM(BOARD_I2S1RX_WS_PIN, 0))};
-static const si_xbar_info xbar_i2c1[] = {XBAR_I2C0_ROW(PIN_TO_PB_MASK2(BOARD_I2C1_SDA_PIN, BOARD_I2C1_SCL_PIN), XBAR_NUM(BOARD_I2C1_SDA_PIN, 0))};
-static const si_xbar_info xbar_i2c2[] = {XBAR_I2C1_ROW(PIN_TO_PB_MASK2(BOARD_I2C2_SDA_PIN, BOARD_I2C2_SCL_PIN), XBAR_NUM(BOARD_I2C2_SDA_PIN, 0))};
-static const si_xbar_info xbar_ahb_out[] = {XBAR_AHB_OUT_ROW(PIN_TO_PB_MASK(BOARD_AHB_OUT_PIN), XBAR_NUM(BOARD_AHB_OUT_PIN, 1))};
+static const si_xbar_info xbar_usart1[] = {
+    /* Index 0 */  XBAR_UART0_ROW(PIN_TO_PB_MASK2(BOARD_USART1_TX_PIN, BOARD_USART1_RX_PIN), XBAR_NUM(BOARD_USART1_TX_PIN, 1))};
+static const si_xbar_info xbar_usart2[] = {
+    /* Index 0 */  XBAR_UART1_ROW(PIN_TO_PB_MASK2(BOARD_USART2_TX_PIN, BOARD_USART2_RX_PIN), XBAR_NUM(BOARD_USART2_TX_PIN, 1))};
+static const si_xbar_info xbar_usart3[] = {
+    /* Index 0 */  XBAR_USART0_ROW(PIN_TO_PB_MASK2(BOARD_USART3_TX_PIN, BOARD_USART3_RX_PIN), XBAR_NUM(BOARD_USART3_TX_PIN, 0))};
+static const si_xbar_info xbar_usart4[] = {
+    /* Index 0 */  XBAR_USART1_ROW(PIN_TO_PB_MASK2(BOARD_USART4_TX_PIN, BOARD_USART4_RX_PIN), XBAR_NUM(BOARD_USART4_TX_PIN, 0))};
+static const si_xbar_info xbar_spi1[] = {
+    /* Index 0 */  XBAR_SPI0_ROW(PIN_TO_PB_MASK3(BOARD_SPI1_SCK_PIN, BOARD_SPI1_MISO_PIN, BOARD_SPI1_MOSI_PIN), XBAR_NUM(BOARD_SPI1_MISO_PIN, 0)),
+    /* Index 1 */  XBAR_SPI0NSS_ROW(PIN_TO_PB_MASK(BOARD_SPI1_NSS_PIN), XBAR_NUM(BOARD_SPI1_NSS_PIN, 0))};
+static const si_xbar_info xbar_spi2[] = {
+    /* Index 0 */  XBAR_SPI1_ROW(PIN_TO_PB_MASK3(BOARD_SPI2_SCK_PIN, BOARD_SPI2_MISO_PIN, BOARD_SPI2_MOSI_PIN), XBAR_NUM(BOARD_SPI2_MISO_PIN, 1)),
+    /* Index 1 */  XBAR_SPI1NSS_ROW(PIN_TO_PB_MASK(BOARD_SPI2_NSS_PIN), XBAR_NUM(BOARD_SPI2_NSS_PIN, 1))};
+static const si_xbar_info xbar_spi3[] = {
+    /* Index 0 */  XBAR_SPI2_ROW(PIN_TO_PB_MASK3(BOARD_SPI3_SCK_PIN, BOARD_SPI3_MISO_PIN, BOARD_SPI3_MOSI_PIN), XBAR_NUM(BOARD_SPI3_MISO_PIN, 1)),
+    /* Index 1 */  XBAR_SPI2NSS_ROW(PIN_TO_PB_MASK(BOARD_SPI3_NSS_PIN), XBAR_NUM(BOARD_SPI3_NSS_PIN, 1))};
+static const si_xbar_info xbar_timer1[] = {
+    /* Index 0 */  XBAR_EPCA0_ROW(PIN_TO_PB_MASK6(BOARD_TIMER1C1_PIN, BOARD_TIMER1C2_PIN, BOARD_TIMER1C3_PIN, BOARD_TIMER1C4_PIN, BOARD_TIMER1C5_PIN, BOARD_TIMER1C6_PIN), XBAR_NUM(BOARD_USART1_TX_PIN, 0))};
+static const si_xbar_info xbar_timer2[] = {
+    /* Index 0 */  XBAR_PCA0_ROW(PIN_TO_PB_MASK2(BOARD_TIMER2C1_PIN, BOARD_TIMER2C2_PIN), XBAR_NUM(BOARD_TIMER2C1_PIN, 0))};
+static const si_xbar_info xbar_timer3[] = {
+    /* Index 0 */  XBAR_PCA1_ROW(PIN_TO_PB_MASK2(BOARD_TIMER3C1_PIN, BOARD_TIMER3C2_PIN), XBAR_NUM(BOARD_TIMER3C1_PIN, 0))};
+static const si_xbar_info xbar_timer4[] = {
+    /* Index 0 */  XBAR_TIMER0CT_ROW(PIN_TO_PB_MASK(BOARD_TIMER4CX_PIN), XBAR_NUM(BOARD_TIMER4CX_PIN, 0)),
+    /* Index 1 */  XBAR_TIMER0EX_ROW(PIN_TO_PB_MASK(BOARD_TIMER4EX_PIN), XBAR_NUM(BOARD_TIMER4EX_PIN, 0))};
+static const si_xbar_info xbar_timer5[] = {
+    /* Index 0 */  XBAR_TIMER1CT_ROW(PIN_TO_PB_MASK(BOARD_TIMER5CX_PIN), XBAR_NUM(BOARD_TIMER5CX_PIN, 0)),
+    /* Index 1 */  XBAR_TIMER1EX_ROW(PIN_TO_PB_MASK(BOARD_TIMER5EX_PIN), XBAR_NUM(BOARD_TIMER5EX_PIN, 0))};
+static const si_xbar_info xbar_i2s1[] = {
+    /* Index 0 */  XBAR_I2S0TX_ROW(PIN_TO_PB_MASK3(BOARD_I2S1TX_WS_PIN, BOARD_I2S1TX_SCK_PIN, BOARD_I2S1TX_SD_PIN), XBAR_NUM(BOARD_I2S1TX_WS_PIN, 0)),
+    /* Index 1 */  XBAR_I2S0RX_ROW(PIN_TO_PB_MASK3(BOARD_I2S1RX_WS_PIN, BOARD_I2S1RX_SCK_PIN, BOARD_I2S1RX_SD_PIN), XBAR_NUM(BOARD_I2S1RX_WS_PIN, 0))};
+static const si_xbar_info xbar_i2c1[] = {
+    /* Index 0 */  XBAR_I2C0_ROW(PIN_TO_PB_MASK2(BOARD_I2C1_SDA_PIN, BOARD_I2C1_SCL_PIN), XBAR_NUM(BOARD_I2C1_SDA_PIN, 0))};
+static const si_xbar_info xbar_i2c2[] = {
+    /* Index 0 */  XBAR_I2C1_ROW(PIN_TO_PB_MASK2(BOARD_I2C2_SDA_PIN, BOARD_I2C2_SCL_PIN), XBAR_NUM(BOARD_I2C2_SDA_PIN, 0))};
+static const si_xbar_info xbar_ahb_out[] = {
+    /* Index 0 */  XBAR_AHB_OUT_ROW(PIN_TO_PB_MASK(BOARD_AHB_OUT_PIN), XBAR_NUM(BOARD_AHB_OUT_PIN, 1))};
 
 const xbar_dev_info XBAR_MAP[XBAR_NULL] = {
     // USART
