@@ -1,0 +1,22 @@
+Rev: 20130125-01
+
+Working/ported peripherals, libaries, and shields are listed below.
+
+Peripherals:
+ * SPI: 3 controllers
+ * Timers/PWM: 12 independent timers and/or 12 PWM channels
+ * UART:4 controllers
+ * External Interrupts:16 configurable pins and up to 2 at once
+ * ADC: 26 channels at 12-bit resolution
+ * Clock: 23-80MHz, 2.5MHz
+ 
+Ported Arduino Libraries:
+ * SD
+ * Liquid Crystal
+ * SPI
+ * Ethernet
+ 
+Ported Shields:
+ * Arduino Ethernet Shield
+ * Arduino Wireless Shield
+ * Arduino Wifi Shield
