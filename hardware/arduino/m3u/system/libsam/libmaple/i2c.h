@@ -44,6 +44,8 @@
 extern "C" {
 #endif
 
+#include <string.h>
+
 /*
  * Series header must provide:
  *
@@ -72,6 +74,7 @@ extern "C" {
 #include <libmaple/nvic.h>
 #include <libmaple/gpio.h>
 struct gpio_dev;
+#define i2c_reg_map SI32_I2C_A_Struct
 struct i2c_reg_map;
 struct i2c_msg;
 
@@ -117,6 +120,7 @@ typedef struct i2c_dev {
     nvic_irq_num ev_nvic_line;  /**< Event IRQ number */
     nvic_irq_num er_nvic_line;  /**< Error IRQ number */
     volatile i2c_state state;   /**< Device state */
+	xbar_dev_id xbar_id; 
 } i2c_dev;
 
 #define I2C_MSG_READ            0x1
@@ -198,7 +202,15 @@ static inline void i2c_disable(i2c_dev *dev) {
  * @param dev I2C device
  */
 static inline void i2c_start_condition(i2c_dev *dev) {
-
+  //  while ((cr1 = dev->regs->CR1) & (I2C_CR1_START |
+  //                                   I2C_CR1_STOP  |
+  //                                   I2C_CR1_PEC)) {
+  
+  
+  //couldn't find the package error checking register.
+	uint32_t control;
+	while ((control = dev -> regs -> CONTROL) &(I2C_CR_STA_MASK|I2C_CR_STO_MASK)){;}	
+	dev -> regs->CONTROL |= I2C_CR_STA_MASK;
 }
 
 /**
@@ -206,7 +218,10 @@ static inline void i2c_start_condition(i2c_dev *dev) {
  * @param dev I2C device
  */
 static inline void i2c_stop_condition(i2c_dev *dev) {
-
+	uint32_t control;
+	while ((control = dev -> regs->CONTROL) &(I2C_CR_STA_MASK|I2C_CR_STO_MASK)){;}	
+	dev -> regs->CONTROL |= I2C_CR_STO_MASK;
+	while ((control = dev -> regs->CONTROL) &(I2C_CR_STA_MASK|I2C_CR_STO_MASK)){;}	
 }
 
 /* IRQ enable/disable */
@@ -229,7 +244,8 @@ static inline void i2c_stop_condition(i2c_dev *dev) {
  *             I2C_IRQ_BUFFER (buffer interrupt).
  */
 static inline void i2c_enable_irq(i2c_dev *dev, uint32 irqs) {
-
+	_i2c_irq_priority_fixup(dev);
+	dev -> regs->CONFIG |= irqs;
 }
 
 /**
@@ -241,7 +257,7 @@ static inline void i2c_enable_irq(i2c_dev *dev, uint32 irqs) {
  *             I2C_IRQ_BUFFER (buffer interrupt).
  */
 static inline void i2c_disable_irq(i2c_dev *dev, uint32 irqs) {
-
+	dev -> regs->CONFIG &= ~irqs;
 }
 
 /* ACK/NACK */
@@ -251,7 +267,7 @@ static inline void i2c_disable_irq(i2c_dev *dev, uint32 irqs) {
  * @param dev I2C device
  */
 static inline void i2c_enable_ack(i2c_dev *dev) {
-
+	dev -> regs->CONTROL |= I2C_CR_ACK_MASK;
 }
 
 /**
@@ -259,7 +275,7 @@ static inline void i2c_enable_ack(i2c_dev *dev) {
  * @param dev I2C device
  */
 static inline void i2c_disable_ack(i2c_dev *dev) {
-
+	dev -> regs->CONTROL &= (~I2C_CR_ACK_MASK);
 }
 
 /* GPIO control */
@@ -296,7 +312,8 @@ void i2c_init(i2c_dev *dev);
  * @param dev Device to enable
  */
 static inline void i2c_peripheral_enable(i2c_dev *dev) {
-
+	dev -> regs->CONTROL |= I2C_CR_I2CEN_MASK;
+	xbar_set_dev(dev->xbar_id, 1, 0, 0); 
 }
 
 /**
@@ -304,16 +321,21 @@ static inline void i2c_peripheral_enable(i2c_dev *dev) {
  * @param dev Device to turn off
  */
 static inline void i2c_peripheral_disable(i2c_dev *dev) {
+	dev -> regs->CONTROL |= ~I2C_CR_I2CEN_MASK;
+	xbar_set_dev(dev->xbar_id, 0, 0, 0); 
 
 }
 
 /**
  * @brief Fill transmit register
  * @param dev I2C device
- * @param byte Byte to write
+ * @param byte Bytes to write
  */
-static inline void i2c_write(i2c_dev *dev, uint8 byte) {
-    dev->regs->DR = byte;
+static inline void i2c_write(i2c_dev *dev, uint32_t bytes) {
+	uint32_t start = dev -> msg -> xferred;
+	//dev -> regs->DATA = dev -> msg-> data[start:start+bytes];
+	memcpy((void *)&(dev->regs->DATA),(void *)&(dev->msg->data[start]),bytes);
+	start = dev -> msg -> xferred + bytes;
 }
 
 /**
@@ -350,6 +372,7 @@ static inline void i2c_set_clk_control(i2c_dev *dev, uint32 val) {
 static inline void i2c_set_trise(i2c_dev *dev, uint32 trise) {
 
 }
+
 /* For old-style definitions (SDA/SCL on same GPIO device) */
 #define I2C_DEV_OLD(num, port, sda, scl)          \
     {                                             \
@@ -359,10 +382,11 @@ static inline void i2c_set_trise(i2c_dev *dev, uint32 trise) {
         .sda_port     = NULL,                     \
         .sda_pin      = sda,                      \
         .scl_pin      = scl,                      \
-        .clk_id       = RCC_I2C##num,             \
-        .ev_nvic_line = NVIC_I2C##num##_EV,       \
-        .er_nvic_line = NVIC_I2C##num##_ER,       \
+        .clk_id       = CLK_I2C##num,             \
+        .ev_nvic_line = NVIC_I2C##num,            \
+        .er_nvic_line = NVIC_I2C##num,            \
         .state        = I2C_STATE_DISABLED,       \
+		.xbar_id      = XBAR_I2C##num,            \
     }
 
 /* For new-style definitions (SDA/SCL may be on different GPIO devices) */
@@ -374,28 +398,31 @@ static inline void i2c_set_trise(i2c_dev *dev, uint32 trise) {
         .scl_pin      = sclbit,                                     \
         .sda_port     = sdaport,                                    \
         .sda_pin      = sdabit,                                     \
-        .clk_id       = RCC_I2C##num,                               \
-        .ev_nvic_line = NVIC_I2C##num##_EV,                         \
-        .er_nvic_line = NVIC_I2C##num##_ER,                         \
+        .clk_id       = CLK_I2C##num,                               \
+        .ev_nvic_line = NVIC_I2C##num,                              \
+        .er_nvic_line = NVIC_I2C##num,                              \
         .state        = I2C_STATE_DISABLED,                         \
+		.xbar_id      = XBAR_I2C##num,                              \
     }
 
 void _i2c_irq_handler(i2c_dev *dev);
 void _i2c_irq_error_handler(i2c_dev *dev);
 
+
 struct gpio_dev;
 
 static inline struct gpio_dev* scl_port(const i2c_dev *dev) {
-    return NULL;
+    return (dev->gpio_port == NULL) ? dev->scl_port : dev->gpio_port;
 }
 
 static inline struct gpio_dev* sda_port(const i2c_dev *dev) {
-    return NULL;
+    return (dev->gpio_port == NULL) ? dev->sda_port : dev->gpio_port;
 }
+struct gpio_dev;
 
 /* Auxiliary procedure for enabling an I2C peripheral; `flags' as for
  * i2c_master_enable(). */
-void _i2c_set_ccr_trise(i2c_dev *dev, uint32 flags);
+void _i2c_set_freq_scl(i2c_dev *dev, uint32 flags);
 
 #ifdef __cplusplus
 }

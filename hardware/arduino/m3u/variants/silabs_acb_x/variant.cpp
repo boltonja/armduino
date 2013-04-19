@@ -69,7 +69,7 @@ const stm32_pin_info  __attribute__ ((used)) PIN_MAP[BOARD_NR_GPIO_PINS] = {
     PMAP_ROW(&gpiod,   9,   NULL,  0,  NULL,  ADCx,  15), /* D6/PD9     (PWM)                    D32                */
     PMAP_ROW(&gpioc,  10,   NULL,  0,  NULL,  ADCx,  16), /* D7/PC10                                                */
     PMAP_ROW(&gpiod,  10,   NULL,  0,  NULL,  ADCx,   0), /* D8/PD10                  I2C1_SDA                      */
-    PMAP_ROW(&gpiod,  11,   NULL,  0,  NULL,  ADCx,   0), /* D9/PD11    (PWM)                    D33                */
+    PMAP_ROW(&gpiod,  11,   NULL,  0,  NULL,  ADCx,   0), /* D9/PD11    (PWM)         I2C1_SCL           D33                */
 
     PMAP_ROW(&gpiod,   3,   NULL,  0,  NULL,  ADCx,   0), /* D10/PD3    SPI_SS(PWM)   SPI2_NSS   D34                */
     PMAP_ROW(&gpiod,   2,   NULL,  0,  NULL,  ADCx,   0), /* D11/PD2    SPI_MOSI(PWM) SPI2_MOSI  D35                */
