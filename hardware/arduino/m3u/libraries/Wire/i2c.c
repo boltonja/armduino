@@ -124,15 +124,16 @@ enum {
  */
 void i2c_bus_reset(const i2c_dev *dev) {
     /* Release both lines */
-	fooprint("before");
+    fooprint("i2c_bus_reset: entry");
     i2c_master_release_bus(dev);
-	dumpxbar();
+    fooprint("i2c_bus_reset: dumping xbar cfg");
+    dumpxbar();
     
     /*
      * Make sure the bus is free by clocking it until any slaves release the
      * bus.
      */
-    while (!gpio_read_bit(sda_port(dev), dev->sda_pin)) {
+   while (!gpio_read_bit(sda_port(dev), dev->sda_pin)) {
         /* Wait for any clock stretching to finish */
         while (!gpio_read_bit(scl_port(dev), dev->scl_pin))
             ;
@@ -186,41 +187,50 @@ void i2c_init(i2c_dev *dev){
  *                         SDA/PB9.
  */
 void i2c_master_enable(i2c_dev *dev, uint32 flags) {
+    fooprint("i2c_master_enable: entry");
     /* PE must be disabled to configure the device */
    // ASSERT(!(dev->regs->CR1 & I2C_CR1_PE));
 
     /* Ugh */
    //_i2c_handle_remap(dev, flags);
 
-    /* Reset the bus. Clock out any hung slaves. */
-	fooprint("setup\n");
-	fooprint("hey");
-    if (flags & I2C_BUS_RESET) {
-        i2c_bus_reset(dev);
-    }
-    fooprint("you");
+    fooprint("i2c_master_enable: calling i2c_init");
     /* Turn on clock and set GPIO modes */
     i2c_init(dev);
 	
+    fooprint("i2c_master_enable: calling i2c_config_gpios");
     i2c_config_gpios(dev);
 
+    fooprint("i2c_master_enable: calling set_freq_scl");
     /* Configure clock and rise time */
     set_freq_scl(dev, flags);
 
+    fooprint("i2c_master_enable: calling nvic_irq_enable(ev)");
     /* Enable event and buffer interrupts */
     nvic_irq_enable(dev->ev_nvic_line);
+    fooprint("i2c_master_enable: calling nvic_irq_enable(er)");
     nvic_irq_enable(dev->er_nvic_line);
 	
 	//gutted
 	//I2C_IRQ_EVENT | I2C_IRQ_BUFFER | I2C_IRQ_ERROR
+    fooprint("i2c_master_enable: calling i2c_enable_irq");
     i2c_enable_irq(dev, I2C_CFGR_STOIEN_MASK | I2C_CFGR_ACKIEN_MASK | I2C_CFGR_RXIEN_MASK | I2C_CFGR_TXIEN_MASK | I2C_CFGR_STAIEN_MASK | I2C_CFGR_ARBLIEN_MASK);
 
     /* Make it go! */
 	
+    fooprint("i2c_master_enable: calling i2c_peripheral_enable");
 	//gutted
     i2c_peripheral_enable(dev);
 
+    /* Reset the bus. Clock out any hung slaves. */
+    if (flags & I2C_BUS_RESET) {
+        fooprint("i2c_master_enable: calling i2c_bus_reset");
+        i2c_bus_reset(dev);
+    }
+
+
     dev->state = I2C_STATE_IDLE;
+    fooprint("i2c_master_enable: exit, dev-state = I2C_STATE_IDLE");
 }
 
 /**

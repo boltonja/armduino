@@ -40,21 +40,21 @@
  * Devices
  */
 
-static i2c_dev i2c1 = I2C_DEV_OLD(1, &gpiob, 58, 59);
-static i2c_dev i2c2 = I2C_DEV_OLD(2, &gpiod, 8, 9);
+static i2c_dev i2c0 = I2C_DEV_OLD(0, &gpiob, 58, 59);
+static i2c_dev i2c1 = I2C_DEV_OLD(1, &gpiod, 8, 9);
 
 /** sim3u167 I2C device 1 */
-i2c_dev* const I2C1 = &i2c1;
+i2c_dev* const I2C0 = &i2c0;
 /** sim3u167 I2C device 2 */
-i2c_dev* const I2C2 = &i2c2;
+i2c_dev* const I2C1 = &i2c1;
 
 /*
  * Routines
  */
 
-/* static int i2c1_wants_remap(const i2c_dev *dev) {
-    //Check if we've got I2C1 configured for SDA/SCL remap on PB9/PB8
-    return (dev->clk_id == RCC_I2C1) &&
+/* static int i2c0_wants_remap(const i2c_dev *dev) {
+    //Check if we've got I2C0 configured for SDA/SCL remap on PB9/PB8
+    return (dev->clk_id == RCC_I2C0) &&
         (scl_port(dev)->clk_id == RCC_GPIOB) &&
         (sda_port(dev)->clk_id == RCC_GPIOB) &&
         (dev->sda_pin == 9) &&
@@ -63,8 +63,8 @@ i2c_dev* const I2C2 = &i2c2;
  */
  
 void i2c_config_gpios(const i2c_dev *dev) {
-/*     if (i2c1_wants_remap(dev)) {
-        afio_remap(AFIO_REMAP_I2C1);
+/*     if (i2c0_wants_remap(dev)) {
+        afio_remap(AFIO_REMAP_I2C0);
     } */
     gpio_set_mode(sda_port(dev), dev->sda_pin, OUTPUT_OPEN_DRAIN);
     gpio_set_mode(scl_port(dev), dev->scl_pin, OUTPUT_OPEN_DRAIN);
@@ -81,20 +81,20 @@ void i2c_master_release_bus(const i2c_dev *dev) {
  * IRQ handlers
  */
 
+void __irq_i2c0(void) {
+   _i2c_irq_handler(I2C0);
+}
+
 void __irq_i2c1(void) {
    _i2c_irq_handler(I2C1);
 }
 
-void __irq_i2c2(void) {
-   _i2c_irq_handler(I2C2);
+/* void __irq_i2c0_er(void) {
+    _i2c_irq_error_handler(I2C0);
 }
 
-/* void __irq_i2c1_er(void) {
+void __irq_i2c1_er(void) {
     _i2c_irq_error_handler(I2C1);
-}
-
-void __irq_i2c2_er(void) {
-    _i2c_irq_error_handler(I2C2);
 } */
 
 /*

@@ -88,8 +88,8 @@ typedef struct SI32_I2C_A_Struct
 
 //I2C register bases
 
-#define I2C1_BASE ((struct i2c_reg_map*) 0x40009000)
-#define I2C2_BASE ((struct i2c_reg_map*) 0x4000A000)
+#define I2C0_BASE ((struct i2c_reg_map*) 0x40009000)
+#define I2C1_BASE ((struct i2c_reg_map*) 0x4000A000)
 
 
 // Control Register

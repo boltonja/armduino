@@ -201,7 +201,7 @@ typedef enum xbar_dev_id {
     // I2S
     XBAR_I2S1,
     // I2C
-    XBAR_I2C1, XBAR_I2C2,
+    XBAR_I2C0, XBAR_I2C1,
     // Misc
     XBAR_AHB_OUT,
     // Must always be last. Is not a peripheral
