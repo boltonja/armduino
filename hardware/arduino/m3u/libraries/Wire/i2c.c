@@ -126,16 +126,23 @@ void i2c_bus_reset(const i2c_dev *dev) {
     /* Release both lines */
     fooprint("i2c_bus_reset: entry");
     i2c_master_release_bus(dev);
+
     fooprint("i2c_bus_reset: dumping xbar cfg");
+	
     dumpxbar();
-    
+    fooprint("before reset");
     /*
      * Make sure the bus is free by clocking it until any slaves release the
      * bus.
      */
+	 //gpio_write_bit(sda_port(dev), dev->sda_pin, 1);
+	 //gpio_write_bit(scl_port(dev), dev->scl_pin, 1);
    while (!gpio_read_bit(sda_port(dev), dev->sda_pin)) {
+   //fooprint("me3");
+   fooprint("in reset loop 1");
         /* Wait for any clock stretching to finish */
         while (!gpio_read_bit(scl_port(dev), dev->scl_pin))
+		fooprint("in reset loop 2");
             ;
         delay_us(10);
 
@@ -147,7 +154,7 @@ void i2c_bus_reset(const i2c_dev *dev) {
         gpio_write_bit(scl_port(dev), dev->scl_pin, 1);
         delay_us(10);
     }
-    fooprint("after");
+    fooprint("after resest");
     /* Generate start then stop condition */
     gpio_write_bit(sda_port(dev), dev->sda_pin, 0);
     delay_us(10);
@@ -157,7 +164,7 @@ void i2c_bus_reset(const i2c_dev *dev) {
     delay_us(10);
     gpio_write_bit(sda_port(dev), dev->sda_pin, 1);
 }
-
+//fooprint("me2");
 /**
  * @brief Initialize an I2C device and reset its registers to their
  *        default values.
@@ -187,6 +194,11 @@ void i2c_init(i2c_dev *dev){
  *                         SDA/PB9.
  */
 void i2c_master_enable(i2c_dev *dev, uint32 flags) {
+	//i2c_peripheral_enable(dev);
+	//fooprint("this is ours : ");
+	//fooprint_int((int)dev->xbar_id);
+	//char *tmp = ""; tmp[0] = (char)((int)dev->xbar_id + 0x30); fooprint(tmp);}
+	//return;
     fooprint("i2c_master_enable: entry");
     /* PE must be disabled to configure the device */
    // ASSERT(!(dev->regs->CR1 & I2C_CR1_PE));
@@ -254,7 +266,7 @@ int32 i2c_master_xfer(i2c_dev *dev,
                       uint16 num,
                       uint32 timeout) {
     int32 rc;
-
+	//fooprint("me1");
     ASSERT(dev->state == I2C_STATE_IDLE);
 
     dev->msg = msgs;
@@ -267,7 +279,7 @@ int32 i2c_master_xfer(i2c_dev *dev,
 	// already enabled in master enable
     //i2c_enable_irq(dev, I2C_IRQ_EVENT);
     i2c_start_condition(dev);
-
+fooprint("me3");
     rc = wait_for_state_change(dev, I2C_STATE_XFER_DONE, timeout);
     if (rc < 0) {
         goto out;
@@ -289,22 +301,25 @@ static inline int32 wait_for_state_change(i2c_dev *dev,
                                           i2c_state state,
                                           uint32 timeout) {
     i2c_state tmp;
-
+fooprint("me2");
     while (1) {
         tmp = dev->state;
 
         if (tmp == I2C_STATE_ERROR) {
             return I2C_STATE_ERROR;
+			fooprint("me2errer");
         }
 
         if (tmp == state) {
             return 0;
+			fooprint("me2state");
         }
 
         if (timeout) {
             if (systick_uptime() > (dev->timestamp + timeout)) {
                 /* TODO: overflow? */
                 /* TODO: racy? */
+				fooprint("metime");
                 return I2C_ERROR_TIMEOUT;
             }
         }
@@ -322,6 +337,7 @@ void _i2c_irq_handler(i2c_dev *dev) {
     /* WTFs:
      * - Where is I2C_MSG_10BIT_ADDR handled?
      */
+	 fooprint("me1");
     i2c_msg *msg = dev->msg;
 
 	// true if this is a receive intruction
@@ -359,6 +375,7 @@ void _i2c_irq_handler(i2c_dev *dev) {
      * EV5: Start condition sent
      */
     if (controlReg & I2C_CR_STA_MASK) {
+		
         msg->xferred = 0;
         //i2c_enable_irq(dev, I2C_IRQ_BUFFER);
 		

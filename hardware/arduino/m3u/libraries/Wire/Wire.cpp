@@ -29,9 +29,9 @@ extern "C" {
 #include "Wire.h"
 
 /** sim3u167 I2C device 1 */
-extern i2c_dev* const I2C1;
+extern i2c_dev* const I2C0;
 /** sim3u167 I2C device 2 */
-extern i2c_dev* const I2C2;
+extern i2c_dev* const I2C1;
 
 // Initialize Class Variables //////////////////////////////////////////////////
 
@@ -52,7 +52,7 @@ void (*TwoWire::user_onReceive)(int);
 
 TwoWire::TwoWire()
 {
- dev = I2C1;
+ dev = I2C0;
 }
 
 // Public Methods //////////////////////////////////////////////////////////////

@@ -248,10 +248,10 @@ static const uint8_t SCK  =     BOARD_SPI2_SCK_PIN;
 #define BOARD_TIMER5EX_PIN      A11
 
 /* I2C pin numbers */
-#define BOARD_I2C1_SDA_PIN      0x3A
-#define BOARD_I2C1_SCL_PIN      0x3B
-#define BOARD_I2C2_SDA_PIN      0x08
-#define BOARD_I2C2_SCL_PIN      0x09
+#define BOARD_I2C1_SDA_PIN      A4
+#define BOARD_I2C1_SCL_PIN      A5
+#define BOARD_I2C2_SDA_PIN      D8
+#define BOARD_I2C2_SCL_PIN      D9
 
 /* I2S pin numbers */
 #define BOARD_I2S1TX_WS_PIN      0xFF
