@@ -52,7 +52,7 @@ void (*TwoWire::user_onReceive)(int);
 
 TwoWire::TwoWire()
 {
- dev = I2C0;
+ dev = I2C1;
 }
 
 // Public Methods //////////////////////////////////////////////////////////////

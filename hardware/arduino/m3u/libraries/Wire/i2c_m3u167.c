@@ -66,13 +66,12 @@ void i2c_config_gpios(const i2c_dev *dev) {
 /*     if (i2c0_wants_remap(dev)) {
         afio_remap(AFIO_REMAP_I2C0);
     } */
+	//OUTPUT_OPEN_DRAIN
     gpio_set_mode(sda_port(dev), dev->sda_pin, OUTPUT_OPEN_DRAIN);
     gpio_set_mode(scl_port(dev), dev->scl_pin, OUTPUT_OPEN_DRAIN);
 }
 
 void i2c_master_release_bus(const i2c_dev *dev) {
-    gpio_write_bit(scl_port(dev), dev->scl_pin, 1);
-    gpio_write_bit(sda_port(dev), dev->sda_pin, 1);
     gpio_set_mode(scl_port(dev), dev->scl_pin, OUTPUT_OPEN_DRAIN);
     gpio_set_mode(sda_port(dev), dev->sda_pin, OUTPUT_OPEN_DRAIN);
 }

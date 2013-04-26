@@ -208,8 +208,8 @@ static inline void i2c_start_condition(i2c_dev *dev) {
   
   
   //couldn't find the package error checking register.
-	uint32_t control;
-	while ((control = dev -> regs -> CONTROL) &(I2C_CR_STA_MASK|I2C_CR_STO_MASK)){;}	
+	//uint32_t control;
+	//while ((control = dev -> regs -> CONTROL) &(I2C_CR_STA_MASK|I2C_CR_STO_MASK)){;}	
 	dev -> regs->CONTROL |= I2C_CR_STA_MASK;
 }
 
@@ -219,10 +219,10 @@ static inline void i2c_start_condition(i2c_dev *dev) {
  */
 static inline void i2c_stop_condition(i2c_dev *dev) {
 	uint32_t control;
-	while ((control = dev -> regs->CONTROL) &(I2C_CR_STA_MASK|I2C_CR_STO_MASK)){;}	
+	//while ((control = dev -> regs->CONTROL) &(I2C_CR_STA_MASK|I2C_CR_STO_MASK)){;}	
 	dev -> regs->CONTROL |= I2C_CR_STO_MASK;
-	while ((control = dev -> regs->CONTROL) &(I2C_CR_STA_MASK|I2C_CR_STO_MASK)){;}	
-}
+	//while ((control = dev -> regs->CONTROL) &(I2C_CR_STA_MASK|I2C_CR_STO_MASK)){;}	
+}//
 
 /* IRQ enable/disable */
 
@@ -245,6 +245,7 @@ static inline void i2c_stop_condition(i2c_dev *dev) {
  */
 static inline void i2c_enable_irq(i2c_dev *dev, uint32 irqs) {
 	_i2c_irq_priority_fixup(dev);
+	//dev -> regs->CONFIG &= (~0x3FF00);
 	dev -> regs->CONFIG |= irqs;
 }
 
@@ -333,9 +334,15 @@ static inline void i2c_peripheral_disable(i2c_dev *dev) {
  */
 static inline void i2c_write(i2c_dev *dev, uint32_t bytes) {
 	uint32_t start = dev -> msg -> xferred;
+	uint32_t data, i;
 	//dev -> regs->DATA = dev -> msg-> data[start:start+bytes];
-	memcpy((void *)&(dev->regs->DATA),(void *)&(dev->msg->data[start]),bytes);
-	start = dev -> msg -> xferred + bytes;
+	//memcpy((void *)&(dev->regs->DATA),(void *)&(dev->msg->data[start]),bytes);
+	data = 0;
+	for (i=0; i<= bytes; i++) {
+		data |= dev->msg->data[start+i];
+	}
+	dev->regs->DATA = data;
+	dev -> msg -> xferred += bytes + 1;
 }
 
 /**
