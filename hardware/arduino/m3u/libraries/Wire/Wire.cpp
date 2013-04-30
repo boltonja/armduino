@@ -106,7 +106,7 @@ uint8_t TwoWire::requestFrom(uint8_t address, uint8_t quantity, uint8_t sendStop
   if(quantity > BUFFER_LENGTH){
     quantity = BUFFER_LENGTH;
   }
-   msg.addr = address;
+   msg.addr = address<<1;
    msg.data = rxBuffer;
    msg.length = quantity;
    msg.xferred = 0;
@@ -143,7 +143,7 @@ void TwoWire::beginTransmission(uint8_t address)
   // indicate that we are transmitting
   transmitting = 1;
   // set address of targeted slave
-  txAddress = address;
+  txAddress = address<<1;
   // reset tx buffer iterator vars
   txBufferIndex = 0;
   txBufferLength = 0;
