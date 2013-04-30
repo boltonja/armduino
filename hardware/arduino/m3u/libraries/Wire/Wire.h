@@ -28,6 +28,11 @@
 
 #define BUFFER_LENGTH 32
 
+typedef enum i2c_interfaces {
+	I2C_INTERFACE_ZERO = 0,
+	I2C_INTERFACE_ONE = 1
+} I2C_INTERFACE_TYPE;
+
 class TwoWire : public Stream
 {
   private:
@@ -51,6 +56,7 @@ class TwoWire : public Stream
     static void onReceiveService(uint8_t*, int);
   public:
     TwoWire();
+    void begin(I2C_INTERFACE_TYPE iface);
     void begin();
     void begin(uint8_t);
     void begin(int);

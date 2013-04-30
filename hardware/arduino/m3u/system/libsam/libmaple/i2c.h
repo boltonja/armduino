@@ -46,6 +46,9 @@ extern "C" {
 
 #include <string.h>
 
+extern void fooprint(char *s);
+extern void fooprint_int(int a);
+
 /*
  * Series header must provide:
  *
@@ -202,15 +205,7 @@ static inline void i2c_disable(i2c_dev *dev) {
  * @param dev I2C device
  */
 static inline void i2c_start_condition(i2c_dev *dev) {
-  //  while ((cr1 = dev->regs->CR1) & (I2C_CR1_START |
-  //                                   I2C_CR1_STOP  |
-  //                                   I2C_CR1_PEC)) {
-  
-  
-  //couldn't find the package error checking register.
-	//uint32_t control;
-	//while ((control = dev -> regs -> CONTROL) &(I2C_CR_STA_MASK|I2C_CR_STO_MASK)){;}	
-	dev -> regs->CONTROL |= I2C_CR_STA_MASK;
+	dev->regs->CONTROL |= I2C_CR_STA_MASK;
 }
 
 /**
@@ -218,11 +213,8 @@ static inline void i2c_start_condition(i2c_dev *dev) {
  * @param dev I2C device
  */
 static inline void i2c_stop_condition(i2c_dev *dev) {
-	uint32_t control;
-	//while ((control = dev -> regs->CONTROL) &(I2C_CR_STA_MASK|I2C_CR_STO_MASK)){;}	
-	dev -> regs->CONTROL |= I2C_CR_STO_MASK;
-	//while ((control = dev -> regs->CONTROL) &(I2C_CR_STA_MASK|I2C_CR_STO_MASK)){;}	
-}//
+	dev->regs->CONTROL |= I2C_CR_STO_MASK;
+}
 
 /* IRQ enable/disable */
 
@@ -245,8 +237,8 @@ static inline void i2c_stop_condition(i2c_dev *dev) {
  */
 static inline void i2c_enable_irq(i2c_dev *dev, uint32 irqs) {
 	_i2c_irq_priority_fixup(dev);
-	//dev -> regs->CONFIG &= (~0x3FF00);
-	dev -> regs->CONFIG |= irqs;
+	//dev->regs->CONFIG &= (~0x3FF00);
+	dev->regs->CONFIG |= irqs;
 }
 
 /**
@@ -258,7 +250,7 @@ static inline void i2c_enable_irq(i2c_dev *dev, uint32 irqs) {
  *             I2C_IRQ_BUFFER (buffer interrupt).
  */
 static inline void i2c_disable_irq(i2c_dev *dev, uint32 irqs) {
-	dev -> regs->CONFIG &= ~irqs;
+	dev->regs->CONFIG &= ~irqs;
 }
 
 /* ACK/NACK */
@@ -268,7 +260,7 @@ static inline void i2c_disable_irq(i2c_dev *dev, uint32 irqs) {
  * @param dev I2C device
  */
 static inline void i2c_enable_ack(i2c_dev *dev) {
-	dev -> regs->CONTROL |= I2C_CR_ACK_MASK;
+	dev->regs->CONTROL |= I2C_CR_ACK_MASK;
 }
 
 /**
@@ -276,7 +268,7 @@ static inline void i2c_enable_ack(i2c_dev *dev) {
  * @param dev I2C device
  */
 static inline void i2c_disable_ack(i2c_dev *dev) {
-	dev -> regs->CONTROL &= (~I2C_CR_ACK_MASK);
+	dev->regs->CONTROL &= (~I2C_CR_ACK_MASK);
 }
 
 /* GPIO control */
@@ -313,7 +305,7 @@ void i2c_init(i2c_dev *dev);
  * @param dev Device to enable
  */
 static inline void i2c_peripheral_enable(i2c_dev *dev) {
-	dev -> regs->CONTROL |= I2C_CR_I2CEN_MASK;
+	dev->regs->CONTROL |= I2C_CR_I2CEN_MASK;
 	xbar_set_dev(dev->xbar_id, 1, 0, 0); 
 }
 
@@ -322,7 +314,7 @@ static inline void i2c_peripheral_enable(i2c_dev *dev) {
  * @param dev Device to turn off
  */
 static inline void i2c_peripheral_disable(i2c_dev *dev) {
-	dev -> regs->CONTROL |= ~I2C_CR_I2CEN_MASK;
+	dev->regs->CONTROL |= ~I2C_CR_I2CEN_MASK;
 	xbar_set_dev(dev->xbar_id, 0, 0, 0); 
 
 }
@@ -333,16 +325,9 @@ static inline void i2c_peripheral_disable(i2c_dev *dev) {
  * @param byte Bytes to write
  */
 static inline void i2c_write(i2c_dev *dev, uint32_t bytes) {
-	uint32_t start = dev -> msg -> xferred;
-	uint32_t data, i;
-	//dev -> regs->DATA = dev -> msg-> data[start:start+bytes];
-	//memcpy((void *)&(dev->regs->DATA),(void *)&(dev->msg->data[start]),bytes);
-	data = 0;
-	for (i=0; i<= bytes; i++) {
-		data |= dev->msg->data[start+i];
-	}
-	dev->regs->DATA = data;
-	dev -> msg -> xferred += bytes + 1;
+	uint32_t start = dev->msg->xferred;
+	memcpy((void *)&(dev->regs->DATA),(void *)&(dev->msg->data[start]),bytes);
+	dev->msg->xferred += bytes;
 }
 
 /**

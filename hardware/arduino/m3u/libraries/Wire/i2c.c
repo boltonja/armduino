@@ -61,9 +61,9 @@ static void set_freq_scl(i2c_dev *dev, uint32 flags);
  * @param rw Read/write bit
  */
 static inline void i2c_send_slave_addr(i2c_dev *dev, uint32 addr, uint32 rw) {
-    //dev->regs->DATA = (addr << 1) | rw;
+	//dev->regs->DATA = (addr << 1) | rw;
 	
-	dev -> regs->DATA = addr | rw;
+	dev->regs->DATA = addr | rw;
 }
 
 /*
@@ -76,12 +76,12 @@ static struct crumb crumbs[NR_CRUMBS];
 static uint32 cur_crumb = 0;
 
 static inline void i2c_drop_crumb(uint32 event, uint32 arg0, uint32 arg1) {
-    if (cur_crumb < NR_CRUMBS) {
-        struct crumb *crumb = &crumbs[cur_crumb++];
-        crumb->event = event;
-        crumb->arg0 = arg0;
-        crumb->arg1 = arg1;
-    }
+	if (cur_crumb < NR_CRUMBS) {
+		struct crumb *crumb = &crumbs[cur_crumb++];
+		crumb->event = event;
+		crumb->arg0 = arg0;
+		crumb->arg1 = arg1;
+	}
 }
 #define I2C_CRUMB(event, arg0, arg1) i2c_drop_crumb(event, arg0, arg1)
 
@@ -89,30 +89,28 @@ static inline void i2c_drop_crumb(uint32 event, uint32 arg0, uint32 arg1) {
 #define I2C_CRUMB(event, arg0, arg1)
 #endif
 
-extern fooprint(char *s);
-extern void dumpxbar();
-extern sqwave();
+extern void fooprint(char *s);
 
 struct crumb {
-    uint32 event;
-    uint32 arg0;
-    uint32 arg1;
+	uint32 event;
+	uint32 arg0;
+	uint32 arg1;
 };
 
 enum {
-    IRQ_ENTRY           = 1,
-    TXE_ONLY            = 2,
-    TXE_BTF             = 3,
-    STOP_SENT           = 4,
-    TEST                = 5,
-    RX_ADDR_START       = 6,
-    RX_ADDR_STOP        = 7,
-    RXNE_ONLY           = 8,
-    RXNE_SENDING        = 9,
-    RXNE_START_SENT     = 10,
-    RXNE_STOP_SENT      = 11,
-    RXNE_DONE           = 12,
-    ERROR_ENTRY         = 13,
+	IRQ_ENTRY           = 1,
+	TXE_ONLY            = 2,
+	TXE_BTF             = 3,
+	STOP_SENT           = 4,
+	TEST                = 5,
+	RX_ADDR_START       = 6,
+	RX_ADDR_STOP        = 7,
+	RXNE_ONLY           = 8,
+	RXNE_SENDING        = 9,
+	RXNE_START_SENT     = 10,
+	RXNE_STOP_SENT      = 11,
+	RXNE_DONE           = 12,
+	ERROR_ENTRY         = 13,
 };
 
 /**
@@ -125,18 +123,17 @@ enum {
  * @param dev I2C device
  */
 void i2c_bus_reset(const i2c_dev *dev) {
-    /* Release both lines */
-    fooprint("i2c_bus_reset: entry");
-    i2c_master_release_bus(dev);
+	/* Release both lines */
+	fooprint("i2c_bus_reset: entry");
+	i2c_master_release_bus(dev);
 
-    fooprint("i2c_bus_reset: dumping xbar cfg");
+	fooprint("i2c_bus_reset: dumping xbar cfg");
 	
-    //dumpxbar();
 	fooprint("before reset");
-	dev -> regs->CONTROL |=I2C_CR_RESET_MASK;
+	dev->regs->CONTROL |=I2C_CR_RESET_MASK;
 	
-	while(dev -> regs->CONTROL&I2C_CR_RESET_MASK){
-	;
+	while(dev->regs->CONTROL&I2C_CR_RESET_MASK){
+		;
 	}
 	fooprint("after reset");
 
@@ -148,7 +145,7 @@ void i2c_bus_reset(const i2c_dev *dev) {
  * @param dev Device to initialize.
  */
 void i2c_init(i2c_dev *dev){
-    clk_enable_dev(dev->clk_id);
+	clk_enable_dev(dev->clk_id);
 
 }
 
@@ -171,52 +168,52 @@ void i2c_init(i2c_dev *dev){
  *                         SDA/PB9.
  */
 void i2c_master_enable(i2c_dev *dev, uint32 flags) {
-    /* Reset the bus. Clock out any hung slaves. */
-    if (flags & I2C_BUS_RESET) {
-        fooprint("i2c_master_enable: calling i2c_bus_reset");
-        i2c_bus_reset(dev);
-    }
-    fooprint("i2c_master_enable: entry");
-    /* PE must be disabled to configure the device */
-   // ASSERT(!(dev->regs->CR1 & I2C_CR1_PE));
+	/* Reset the bus. Clock out any hung slaves. */
+	if (flags & I2C_BUS_RESET) {
+		fooprint("i2c_master_enable: calling i2c_bus_reset");
+		i2c_bus_reset(dev);
+	}
+	fooprint("i2c_master_enable: entry");
+	/* PE must be disabled to configure the device */
+	// ASSERT(!(dev->regs->CR1 & I2C_CR1_PE));
 
-    /* Ugh */
-   //_i2c_handle_remap(dev, flags);
+	/* Ugh */
+	//_i2c_handle_remap(dev, flags);
 
-    fooprint("i2c_master_enable: calling i2c_init");
-    /* Turn on clock and set GPIO modes */
-    i2c_init(dev);
+	fooprint("i2c_master_enable: calling i2c_init");
+	/* Turn on clock and set GPIO modes */
+	i2c_init(dev);
 	
-    fooprint("i2c_master_enable: calling i2c_config_gpios");
-    i2c_config_gpios(dev);
+	fooprint("i2c_master_enable: calling i2c_config_gpios");
+	i2c_config_gpios(dev);
 
-    fooprint("i2c_master_enable: calling set_freq_scl");
-    /* Configure clock and rise time */
-    set_freq_scl(dev, flags);
+	fooprint("i2c_master_enable: calling set_freq_scl");
+	/* Configure clock and rise time */
+	set_freq_scl(dev, flags);
 
-    fooprint("i2c_master_enable: calling nvic_irq_enable(ev)");
-    /* Enable event and buffer interrupts */
-    nvic_irq_enable(dev->ev_nvic_line);
-    fooprint("i2c_master_enable: calling nvic_irq_enable(er)");
-    nvic_irq_enable(dev->er_nvic_line);
+	fooprint("i2c_master_enable: calling nvic_irq_enable(ev)");
+	/* Enable event and buffer interrupts */
+	nvic_irq_enable(dev->ev_nvic_line);
+	fooprint("i2c_master_enable: calling nvic_irq_enable(er)");
+	nvic_irq_enable(dev->er_nvic_line);
 	
 	//gutted
 	
-    fooprint("i2c_master_enable: calling i2c_enable_irq");
-    i2c_enable_irq(dev, I2C_CFGR_STOIEN_MASK | I2C_CFGR_ACKIEN_MASK | I2C_CFGR_RXIEN_MASK | I2C_CFGR_TXIEN_MASK | I2C_CFGR_STAIEN_MASK | I2C_CFGR_ARBLIEN_MASK);
+	fooprint("i2c_master_enable: calling i2c_enable_irq");
+	i2c_enable_irq(dev, I2C_CFGR_STOIEN_MASK | I2C_CFGR_ACKIEN_MASK | I2C_CFGR_RXIEN_MASK | I2C_CFGR_TXIEN_MASK | I2C_CFGR_STAIEN_MASK | I2C_CFGR_ARBLIEN_MASK);
 
-    /* Make it go! */
+	/* Make it go! */
 	
-    fooprint("i2c_master_enable: calling i2c_peripheral_enable");
+	fooprint("i2c_master_enable: calling i2c_peripheral_enable");
 	//gutted
 
-    i2c_peripheral_enable(dev);
+	i2c_peripheral_enable(dev);
 
 
 
 
-    dev->state = I2C_STATE_IDLE;
-    fooprint("i2c_master_enable: exit, dev-state = I2C_STATE_IDLE");
+	dev->state = I2C_STATE_IDLE;
+	fooprint("i2c_master_enable: exit, dev-state = I2C_STATE_IDLE");
 }
 
 /**
@@ -239,32 +236,35 @@ int32 i2c_master_xfer(i2c_dev *dev,
                       i2c_msg *msgs,
                       uint16 num,
                       uint32 timeout) {
-    int32 rc;
+	int32 rc;
 	fooprint("master xfer1");
 	//fooprint("me1");
-    ASSERT(dev->state == I2C_STATE_IDLE);
+	ASSERT(dev->state == I2C_STATE_IDLE);
 
-    dev->msg = msgs;
-    dev->msgs_left = num;
+	dev->msg = msgs;
+	dev->msgs_left = num;
 
 	// what is this?????????????????????????????????????????
-    dev->timestamp = systick_uptime();
-    dev->state = I2C_STATE_BUSY;
+	dev->timestamp = systick_uptime();
+	dev->state = I2C_STATE_BUSY;
+
+	// workaround repeated start issue identified in SiM3U1XX Errata
+	dev->regs->SCONFIG |= 1 << I2C_SCONFIG_SETUP_BIT;
 
 	// already enabled in master enable
-    //i2c_enable_irq(dev, I2C_IRQ_EVENT);
+	//i2c_enable_irq(dev, I2C_IRQ_EVENT);
 	fooprint("master exfer2");
-    i2c_start_condition(dev);
-fooprint("master exfer3");
-    rc = wait_for_state_change(dev, I2C_STATE_XFER_DONE, timeout);
+	i2c_start_condition(dev);
+	fooprint("master exfer3");
+	rc = wait_for_state_change(dev, I2C_STATE_XFER_DONE, timeout);
 	fooprint("master exfer after wait for state");
-    if (rc < 0) {
-        goto out;
-    }
+	if (rc < 0) {
+		goto out;
+	}
 
-    dev->state = I2C_STATE_IDLE;
-out:
-    return rc;
+	dev->state = I2C_STATE_IDLE;
+  out:
+	return rc;
 }
 
 /**
@@ -277,29 +277,29 @@ out:
 static inline int32 wait_for_state_change(i2c_dev *dev,
                                           i2c_state state,
                                           uint32 timeout) {
-    i2c_state tmp;
-fooprint("wait for state");
-    while (1) {
-        tmp = dev->state;
+	i2c_state tmp;
+	fooprint("wait for state");
+	while (1) {
+		tmp = dev->state;
 
-        if (tmp == I2C_STATE_ERROR) {
-            return I2C_STATE_ERROR;
+		if (tmp == I2C_STATE_ERROR) {
+			return I2C_STATE_ERROR;
 			fooprint("me2errer");
-        }
+		}
 
-        if (tmp == state) {
-            return 0;
-        }
+		if (tmp == state) {
+			return 0;
+		}
 
-        // if (timeout) {
-          //  if (systick_uptime() > (dev->timestamp + timeout)) {
-         //       /* TODO: overflow? */
-        //       /* TODO: racy? */
+		// if (timeout) {
+		//  if (systick_uptime() > (dev->timestamp + timeout)) {
+		//       /* TODO: overflow? */
+		//       /* TODO: racy? */
 		//		fooprint("timeout");
-          //      return I2C_ERROR_TIMEOUT;
-         //   }
-        //}
-    }
+		//      return I2C_ERROR_TIMEOUT;
+		//   }
+		//}
+	}
 }
 
 /*
@@ -310,104 +310,100 @@ fooprint("wait for state");
  * IRQ handler for I2C master. Handles transmission/reception.
  */
 void _i2c_irq_handler(i2c_dev *dev) {
-    /* WTFs:
-     * - Where is I2C_MSG_10BIT_ADDR handled?
-     */
+	i2c_msg *msg = dev->msg;
 	fooprint("inside interrupt");
-    i2c_msg *msg = dev->msg;
 
 	// true if this is a receive intruction
-    uint8 read = msg->flags & I2C_MSG_READ;
+	uint8 read = msg->flags & I2C_MSG_READ;
 
-    //uint32 sr1 = dev->regs->SR1;
-    //uint32 sr2 = dev->regs->SR2;
-    //I2C_CRUMB(IRQ_ENTRY, sr1, sr2);
 	uint32_t controlReg = dev ->regs->CONTROL;
-
-    /*
-     * Reset timeout counter
-     */
-    dev->timestamp = systick_uptime();
+	fooprint_int(controlReg);
 
 	/*
-     * Master needs to acknowledge after recieving every byte and clear the acknowledge interrupt bit
-     */
-	if (controlReg &I2C_CR_ACKI_MASK){
-	fooprint("ack condition");
-		dev -> regs->CONTROL |=I2C_CR_ACK_MASK;
-		dev -> regs->CONTROL &= ~I2C_CR_ACKI_MASK;
+	 * Reset timeout counter
+	 */
+	dev->timestamp = systick_uptime();
+
+	/*
+	 * Master needs to acknowledge after recieving every byte and clear the acknowledge interrupt bit
+	 */
+	if (controlReg & I2C_CR_ACKI_MASK){
+		fooprint("ack condition");
+		uint8_t bytes = (dev->regs->CONFIG & I2C_CFGR_BC_MASK) >> I2C_CFGR_BC_BIT;
+		if (!bytes)
+			bytes = 4;
+		if ((dev->msg->xferred + bytes == dev->msg->length) &&
+		    (dev->msgs_left==1)) {
+			fooprint("last byte, sending NACK");
+		} else {
+			fooprint("more bytes expected, sending ACK");
+			dev->regs->CONTROL |=I2C_CR_ACK_MASK;
+		}
+		fooprint("BP");
+		fooprint_int(dev->regs->CONFIG & I2C_CFGR_BP_MASK);
+		fooprint("BC");
+		fooprint_int(dev->regs->CONFIG & I2C_CFGR_BC_MASK);
+		dev->regs->CONTROL &= ~I2C_CR_ACKI_MASK;
 		return;
 	}
 	
 	
 	/*
-     * Stop Condition Sent
-     */
-	if (controlReg & I2C_CR_STO_MASK){
-	fooprint("stop condition");
-		dev -> regs->CONTROL &= ~I2C_CR_STO_MASK;
-		dev -> regs->CONTROL &= ~I2C_CR_STOI_MASK;
+	 * Stop Condition Sent
+	 */
+	if (controlReg & I2C_CR_STOI_MASK){
+		fooprint("stop condition");
+		dev->state = I2C_STATE_XFER_DONE;
+		dev->regs->CONTROL &= ~I2C_CR_STO_MASK;
+		dev->regs->CONTROL &= ~I2C_CR_STOI_MASK;
 		return;
 	}
 	
-    /*
-     * EV5: Start condition sent
-     */
-    if (controlReg & I2C_CR_STAI_MASK) {
+	/*
+	 * EV5: Start condition sent
+	 */
+	if (controlReg & I2C_CR_STAI_MASK) {
 		fooprint("start condition");
-        msg->xferred = 0;
-        //i2c_enable_irq(dev, I2C_IRQ_BUFFER);
+		msg->xferred = 0;
+		//i2c_enable_irq(dev, I2C_IRQ_BUFFER);
 		
 		// clear Start bit (sta) and
-		dev -> regs->CONTROL &= (~I2C_CR_STA_MASK);
+		dev->regs->CONTROL &= (~I2C_CR_STA_MASK);
 		
 
 
-        /*
-         * Master receiver
-         */
-		 //???????????????????????????????????????????????????????????????
-		 // enable an acknowledge interrupt
-        if (read) {
-            i2c_enable_ack(dev);
-        }
-		
-		
-		int32_t bytesLeft = msg -> length - msg -> xferred;
-		bytesLeft = bytesLeft - 1;
-		if (bytesLeft >=3){
-			bytesLeft = 3;
-		//clear BC bits
-			dev -> regs->CONFIG &= ~I2C_CFGR_BC_MASK;
-			dev -> regs->CONFIG |= bytesLeft << I2C_CFGR_BC_BIT;
+		/*
+		 * Master receiver
+		 */
+		//???????????????????????????????????????????????????????????????
+		// enable an acknowledge interrupt
+		if (read) {
+			i2c_enable_ack(dev);
 		}
-		else{
-			dev -> regs->CONFIG &= ~I2C_CFGR_BC_MASK;
-			// N left is set a N-1 in BC
-			dev -> regs->CONFIG |= bytesLeft << I2C_CFGR_BC_BIT;
-		}	
+		
+		
+		dev->regs->CONFIG &= ~I2C_CFGR_BC_MASK;
+		dev->regs->CONFIG |= 1 << I2C_CFGR_BC_BIT;
 
 		
 		// sets the slave address and read/write direction
-        i2c_send_slave_addr(dev, msg->addr, read);
+		i2c_send_slave_addr(dev, msg->addr, read);
 
 		controlReg = 0;
 		// set the arm transmit bit to enable transmission of message
-		dev -> regs->CONTROL |= I2C_CR_TXARM_MASK;
+		dev->regs->CONTROL |= I2C_CR_TXARM_MASK;
 		
 		// clear start interrupt flag(STAI) bit
-		dev -> regs->CONTROL &= (~I2C_CR_STAI_MASK);		
-    }
+		dev->regs->CONTROL &= (~I2C_CR_STAI_MASK);		
+	}
 
-    /*
-     * EV6: Slave address sent
-     */
-	 //sr1 & I2C_SR1_ADDR
-	 // is true when a transmit is done
-    if (controlReg & I2C_CR_TXI_MASK) {
-       fooprint("transfer");
+	/*
+	 * EV6: Slave address sent
+	 */
+	if (controlReg & I2C_CR_TXI_MASK) {
+		fooprint("transfer");
 		 
-		 //if slave doesn't acknowledge generate a stop
+		//if slave doesn't acknowledge generate a stop
 		if (!(controlReg & I2C_CR_ACK_MASK)){
 			fooprint("nack");
 			i2c_stop_condition(dev);
@@ -416,125 +412,151 @@ void _i2c_irq_handler(i2c_dev *dev) {
         
 		fooprint(" no nack");
 		if (read) {        
-			int32_t bytesLeft = msg -> length - msg -> xferred;	
-			bytesLeft = bytesLeft -1;
-			if (bytesLeft >= 3){
-			//clear BC bits
-				bytesLeft = 3;
+			fooprint("transfer reading");
+			int32_t bytesLeft = msg->length - msg->xferred;	
+			if (bytesLeft >= 4){
+				bytesLeft = 4;
 			}
-			dev -> regs->CONFIG &= ~I2C_CFGR_BC_MASK;
-			dev -> regs->CONFIG |= bytesLeft << I2C_CFGR_BC_BIT;
-			// load the data Buffer
-			i2c_write(dev, bytesLeft);
+			dev->regs->CONFIG &= ~I2C_CFGR_BC_MASK;
+			if (bytesLeft < 4) {
+				dev->regs->CONFIG |= bytesLeft << I2C_CFGR_BC_BIT;
+			}
 
-			// clear the transmit interrupt flag
-			dev -> regs->CONFIG &= ~I2C_CFGR_TXIEN_MASK;
 			// set the receive arm interrupt bit
-			dev -> regs->CONTROL |= I2C_CR_RXARM_MASK; 
+			dev->regs->CONTROL |= I2C_CR_RXARM_MASK; 
+			// clear the transmit interrupt flag
+			dev->regs->CONTROL &= (~I2C_CR_TXI_MASK);		
 
-        } 
-		else {
-		fooprint("transfer writing");
-			int32_t bytesLeft = msg -> length - msg -> xferred;	
+		} else {
+			fooprint("transfer writing");
+			int32_t bytesLeft = msg->length - msg->xferred;	
 			// if the last byte is transferred and there are no more messages generate a stop condition
+			if (!bytesLeft) {
+				if (--dev->msgs_left)
+					dev->msg++;
+			}
 			if (bytesLeft == 0 && dev->msgs_left == 0){
+				fooprint("tx done, generating stop");
 				i2c_stop_condition(dev);
 				// clear the transmit interrupt flag
-				dev -> regs->CONFIG &= ~I2C_CFGR_TXIEN_MASK;
+				dev->regs->CONTROL &= (~I2C_CR_TXI_MASK);		
 				return;
 			}
-			// are no more bytes to transfere and there are messages do a repeated start
+			// are no more bytes to transfer and there are messages do a repeated start
 			else if(bytesLeft == 0){
+				fooprint("transfer repeated start");
 				i2c_start_condition(dev);
 				// clear the transmit interrupt flag
-				dev -> regs->CONFIG &= ~I2C_CFGR_TXIEN_MASK;
+				dev->regs->CONTROL &= (~I2C_CR_TXI_MASK);		
+				// clear the transmit interrupt flag
+				dev->regs->CONTROL &= (~I2C_CR_TXI_MASK);		
 				return;
 			}
-            // determine BC
-			
-			// N left is set a N-1 in BC
-			bytesLeft = bytesLeft -1;
-			if (bytesLeft >= 3){
-			//clear BC bits
-				bytesLeft = 3;
+		
+			if (bytesLeft >= 4){
+				bytesLeft = 4;
 			}
-			dev -> regs->CONFIG &= ~I2C_CFGR_BC_MASK;
-			dev -> regs->CONFIG |= bytesLeft << I2C_CFGR_BC_BIT;
+			fooprint("bytes left:");
+			fooprint_int(bytesLeft);
+			fooprint("");
+			//clear BC bits
+			dev->regs->CONFIG &= ~I2C_CFGR_BC_MASK;
+			if (bytesLeft < 4) {
+				dev->regs->CONFIG |= bytesLeft << I2C_CFGR_BC_BIT;
+			}
+			fooprint("CONFIG");
+			fooprint_int(dev->regs->CONFIG);
+			fooprint("");
 			// load the data Buffer
-			//fooprint_int(dev->msg->data[0]);
-			//fooprint_int(dev->msg->data[1]);
-			//fooprint_int(dev->msg->data[2]);
-			//fooprint_int(bytesLeft);
 			i2c_write(dev, bytesLeft);
-			
+			fooprint("DATA");
+			fooprint_int(dev->regs->DATA);
+			fooprint("");
 
-		// set the arm transmit bit to enable transmission of message
-		dev -> regs->CONTROL |= I2C_CR_TXARM_MASK;	
-		// clear the transmit interrupt flag
-		dev -> regs->CONFIG &= ~I2C_CFGR_TXIEN_MASK;
-        }
-
-		fooprint("transfer done");
-    }
-
-
-    /*
-     * EV7: Master Receiver
-     */
-	 //sr1 & I2C_SR1_RXNE
-    if (controlReg & I2C_CR_RXI_MASK) {
-        //I2C_CRUMB(RXNE_ONLY, 0, 0);
-		uint32_t start = dev -> msg -> xferred;
-		uint8_t bytes = (dev->regs->CONFIG & I2C_CFGR_BC_MASK) >> I2C_CFGR_BC_BIT;
-		memcpy(&dev->msg->data[start], &dev->regs->DATA, bytes);
-		start = dev -> msg -> xferred + bytes;
-		int32_t bytesLeft = msg -> length - msg -> xferred;	
-        if (bytesLeft == 0 && dev->msgs_left == 0){
+			// set the arm transmit bit to enable transmission of message
+			dev->regs->CONTROL |= I2C_CR_TXARM_MASK;	
 			// clear the transmit interrupt flag
-			dev -> regs->CONFIG &= ~I2C_CFGR_RXIEN_MASK;
+			dev->regs->CONTROL &= (~I2C_CR_TXI_MASK);		
+		}
+		fooprint("transfer done");
+	}
+
+
+	/*
+	 * EV7: Master Receiver
+	 */
+	if (controlReg & I2C_CR_RXI_MASK) {
+		fooprint("receive");
+		uint32_t start = dev->msg->xferred;
+		uint8_t bytes = (dev->regs->CONFIG & I2C_CFGR_BC_MASK) >> I2C_CFGR_BC_BIT;
+		if (!bytes)
+			bytes = 4;
+		fooprint("bytes");
+		fooprint_int(bytes);
+		fooprint("");
+		memcpy(&dev->msg->data[start], &dev->regs->DATA, bytes);
+		dev->msg->xferred += bytes;
+		start = dev->msg->xferred;
+		fooprint("xferred");
+		fooprint_int(dev->msg->xferred);
+		fooprint("");
+		int32_t bytesLeft = msg->length - msg->xferred;	
+		if (!bytesLeft) {
+			fooprint("rx: no bytes left");
+			dev->msgs_left--;
+		}
+		if (bytesLeft == 0 && dev->msgs_left == 0){
+			fooprint("rx: no msgs left, generating stop");
 			i2c_stop_condition(dev);
+			fooprint("rx: clearing rxi");
+			// clear the receive interrupt flag
+			dev->regs->CONTROL &= (~I2C_CR_RXI_MASK);		
 			return;
 		}
-		// are no more bytes to transfere and there are messages do a repeated start
+		// are no more bytes to transfer and there are messages do a repeated start
 		else if(bytesLeft == 0){
-			// clear the transmit interrupt flag
-			dev -> regs->CONFIG &= ~I2C_CFGR_RXIEN_MASK;
+			fooprint("rx: msgs left, repeated start");
+			// clear the receive interrupt flag
 			i2c_start_condition(dev);
+			dev->regs->CONTROL &= (~I2C_CR_RXI_MASK);		
 			return;
 		}
 		
-		bytesLeft = bytesLeft -1;
-		if (bytesLeft >= 3){
-		//clear BC bits
-			bytesLeft = 3;
+		if (bytesLeft >= 4){
+			//clear BC bits
+			bytesLeft = 4;
 		}
-		dev -> regs->CONFIG &= ~I2C_CFGR_BC_MASK;
-		dev -> regs->CONFIG |= bytesLeft << I2C_CFGR_BC_BIT;
+		dev->regs->CONFIG &= ~I2C_CFGR_BC_MASK;
+		if (bytesLeft < 4) {
+			dev->regs->CONFIG |= bytesLeft << I2C_CFGR_BC_BIT;
+		}
 
 		// set the receive arm interrupt bit
-		dev -> regs->CONTROL |= I2C_CR_RXARM_MASK; 
+		dev->regs->CONTROL |= I2C_CR_RXARM_MASK; 
+		dev->regs->CONTROL &= (~I2C_CR_RXI_MASK);		
+		fooprint("rx: exit");
 	
-    }
+	}
 }
 
 /*
  * Interrupt handler for I2C error conditions. Aborts any pending I2C
  * transactions.
  */
- // void _i2c_irq_error_handler(i2c_dev *dev) {
-    // I2C_CRUMB(ERROR_ENTRY, dev->regs->SR1, dev->regs->SR2);
+// void _i2c_irq_error_handler(i2c_dev *dev) {
+// I2C_CRUMB(ERROR_ENTRY, dev->regs->SR1, dev->regs->SR2);
 
-    // dev->error_flags = dev->regs->SR2 & (I2C_SR1_BERR |
-                                         // I2C_SR1_ARLO |
-                                         // I2C_SR1_AF |
-                                         // I2C_SR1_OVR);
-    // /* Clear flags */
-    // dev->regs->SR1 = 0;
-    // dev->regs->SR2 = 0;
+// dev->error_flags = dev->regs->SR2 & (I2C_SR1_BERR |
+// I2C_SR1_ARLO |
+// I2C_SR1_AF |
+// I2C_SR1_OVR);
+// /* Clear flags */
+// dev->regs->SR1 = 0;
+// dev->regs->SR2 = 0;
 
-    // i2c_stop_condition(dev);
-    // i2c_disable_irq(dev, I2C_IRQ_BUFFER | I2C_IRQ_EVENT | I2C_IRQ_ERROR);
-    // dev->state = I2C_STATE_ERROR;
+// i2c_stop_condition(dev);
+// i2c_disable_irq(dev, I2C_IRQ_BUFFER | I2C_IRQ_EVENT | I2C_IRQ_ERROR);
+// dev->state = I2C_STATE_ERROR;
 // } 
 
 
@@ -542,25 +564,25 @@ void _i2c_irq_handler(i2c_dev *dev) {
  * configure i2c frequency and the scl low and high times for both fast mode and standard
  */
 static void set_freq_scl(i2c_dev *dev, uint32 flags) {
-		int32_t freq_ic;
-		int32_t scl_high;
-		int32_t scl_low;
-    if (flags & I2C_FAST_MODE) {
+	int32_t freq_ic;
+	int32_t scl_high;
+	int32_t scl_low;
+	if (flags & I2C_FAST_MODE) {
 		// tlow/thigh = 2
 		int32_t freq_ic = 400000;
 		int32_t scl_high = freq_ic/3;
 		int32_t scl_low = (freq_ic*2)/3;
-    } 
+	} 
 	else {
 		// tlow/thigh = 1
 		int32_t freq_ic = 100000;
 		int32_t scl_high = freq_ic/2;
 		int32_t scl_low = freq_ic/2;
-    }	
+	}	
 	int32_t scalar = 64 - (clk_get_bus_freq(dev->clk_id)/freq_ic);
 	int32_t trl = 256 -(scl_high*freq_ic);
 	int32_t scll = 256 - (scl_low*freq_ic);
-	dev -> regs->CONFIG = (~I2C_CFGR_SCALER_MASK & dev -> regs->CONFIG) | scalar;
-	dev -> regs->TIMERRL = (~I2C_TIMERRL_T1RL_MASK & dev -> regs->TIMERRL) | (trl << 8);
-	dev -> regs->SCONFIG = (~I2C_SCONFIG_SCLL_MASK & dev -> regs->SCONFIG) | (scll << 8);
+	dev->regs->CONFIG = (~I2C_CFGR_SCALER_MASK & dev->regs->CONFIG) | scalar;
+	dev->regs->TIMERRL = (~I2C_TIMERRL_T1RL_MASK & dev->regs->TIMERRL) | (trl << 8);
+	dev->regs->SCONFIG = (~I2C_SCONFIG_SCLL_MASK & dev->regs->SCONFIG) | (scll << 8);
 }

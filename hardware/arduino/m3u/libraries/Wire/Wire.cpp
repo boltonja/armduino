@@ -52,7 +52,7 @@ void (*TwoWire::user_onReceive)(int);
 
 TwoWire::TwoWire()
 {
- dev = I2C1;
+ dev = I2C0;
 }
 
 // Public Methods //////////////////////////////////////////////////////////////
@@ -69,6 +69,12 @@ void TwoWire::begin(void)
   
   
   //twi_init();
+}
+
+void TwoWire::begin(I2C_INTERFACE_TYPE iface)
+{
+  dev = (iface == I2C_INTERFACE_ONE) ? I2C1: I2C0;
+  begin();
 }
 
 void TwoWire::begin(uint8_t address)
