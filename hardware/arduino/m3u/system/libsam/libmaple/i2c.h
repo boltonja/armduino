@@ -260,7 +260,7 @@ static inline void i2c_disable_irq(i2c_dev *dev, uint32 irqs) {
  * @param dev I2C device
  */
 static inline void i2c_enable_ack(i2c_dev *dev) {
-	dev->regs->CONTROL |= I2C_CR_ACK_MASK;
+	dev->regs->CONFIG |= I2C_CFGR_ACKIEN_MASK;
 }
 
 /**
@@ -268,7 +268,7 @@ static inline void i2c_enable_ack(i2c_dev *dev) {
  * @param dev I2C device
  */
 static inline void i2c_disable_ack(i2c_dev *dev) {
-	dev->regs->CONTROL &= (~I2C_CR_ACK_MASK);
+	dev->regs->CONFIG &= ~I2C_CFGR_ACKIEN_MASK;
 }
 
 /* GPIO control */

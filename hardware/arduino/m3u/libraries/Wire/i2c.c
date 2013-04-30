@@ -310,6 +310,7 @@ static inline int32 wait_for_state_change(i2c_dev *dev,
  * IRQ handler for I2C master. Handles transmission/reception.
  */
 void _i2c_irq_handler(i2c_dev *dev) {
+	static uint8_t received_bytes;
 	i2c_msg *msg = dev->msg;
 	fooprint("inside interrupt");
 
@@ -328,21 +329,29 @@ void _i2c_irq_handler(i2c_dev *dev) {
 	 * Master needs to acknowledge after recieving every byte and clear the acknowledge interrupt bit
 	 */
 	if (controlReg & I2C_CR_ACKI_MASK){
+		uint8_t bp,bc;
 		fooprint("ack condition");
-		uint8_t bytes = (dev->regs->CONFIG & I2C_CFGR_BC_MASK) >> I2C_CFGR_BC_BIT;
-		if (!bytes)
-			bytes = 4;
-		if ((dev->msg->xferred + bytes == dev->msg->length) &&
+		received_bytes++; // there's a bug here if we have multiple msgs
+		fooprint("xferred");
+		fooprint_int(dev->msg->xferred);
+		fooprint("");
+		fooprint("received_bytes");
+		fooprint_int(received_bytes);
+		fooprint("");
+		fooprint("msg_length");
+		fooprint_int(dev->msg->length);
+		fooprint("");
+		fooprint("msgs_left");
+		fooprint_int(dev->msgs_left);
+		fooprint("");
+		if ((dev->msg->xferred + received_bytes == dev->msg->length) &&
 		    (dev->msgs_left==1)) {
+			dev->regs->CONTROL &=~I2C_CR_ACK_MASK;
 			fooprint("last byte, sending NACK");
 		} else {
 			fooprint("more bytes expected, sending ACK");
 			dev->regs->CONTROL |=I2C_CR_ACK_MASK;
 		}
-		fooprint("BP");
-		fooprint_int(dev->regs->CONFIG & I2C_CFGR_BP_MASK);
-		fooprint("BC");
-		fooprint_int(dev->regs->CONFIG & I2C_CFGR_BC_MASK);
 		dev->regs->CONTROL &= ~I2C_CR_ACKI_MASK;
 		return;
 	}
@@ -412,6 +421,7 @@ void _i2c_irq_handler(i2c_dev *dev) {
         
 		fooprint(" no nack");
 		if (read) {        
+			received_bytes=0;
 			fooprint("transfer reading");
 			int32_t bytesLeft = msg->length - msg->xferred;	
 			if (bytesLeft >= 4){
@@ -497,6 +507,7 @@ void _i2c_irq_handler(i2c_dev *dev) {
 		memcpy(&dev->msg->data[start], &dev->regs->DATA, bytes);
 		dev->msg->xferred += bytes;
 		start = dev->msg->xferred;
+		received_bytes=0;
 		fooprint("xferred");
 		fooprint_int(dev->msg->xferred);
 		fooprint("");
