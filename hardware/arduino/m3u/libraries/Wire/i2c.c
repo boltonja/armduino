@@ -90,6 +90,10 @@ static inline void i2c_drop_crumb(uint32 event, uint32 arg0, uint32 arg1) {
 #endif
 
 extern void fooprint(char *s);
+#if 1
+#define fooprint(a)
+#define fooprint_int(a)
+#endif
 
 struct crumb {
 	uint32 event;
