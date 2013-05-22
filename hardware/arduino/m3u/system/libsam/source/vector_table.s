@@ -82,8 +82,8 @@ __sim3_vector_table:
         .long __irq_spi1
         .long __irq_spi2
       	.long __irq_spi3
-        .long __irq_i2c1
-      	.long __irq_i2c2
+        .long __irq_i2c0
+      	.long __irq_i2c1
   	    .long __irq_usb
       	.long __irq_adc1
       	.long __irq_adc2       

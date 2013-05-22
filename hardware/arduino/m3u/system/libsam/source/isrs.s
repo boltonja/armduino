@@ -173,12 +173,12 @@ __default_handler:
         .globl __irq_spi3
         .set   __irq_spi3, __default_handler
         .weak  __irq_spi3
+        .globl __irq_i2c0
+        .set   __irq_i2c0, __default_handler
+        .weak  __irq_i2c0
         .globl __irq_i2c1
         .set   __irq_i2c1, __default_handler
         .weak  __irq_i2c1
-        .globl __irq_i2c2
-        .set   __irq_i2c2, __default_handler
-        .weak  __irq_i2c2
         .globl __irq_usb
         .set   __irq_usb, __default_handler
         .weak  __irq_usb
